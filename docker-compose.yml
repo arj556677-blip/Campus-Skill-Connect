@@ -1,0 +1,87 @@
+services:
+  # ── Next.js Application ──
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://zuszzptghicmymbsddov.supabase.co}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1c3p6cHRnaGljbXltYnNkZG92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1Njk4MDIsImV4cCI6MjEwODE0NTgwMn0.aVMSeHyYjZ-iO61f45ceUKilB4Bwtr44DaqGQmI4GUg}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Campus Skill Connect}
+    container_name: csc-nextjs
+    restart: unless-stopped
+    env_file: .env.docker
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - csc-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── Redis 7 (Cache, Sessions, Rate Limiting, Pub/Sub) ──
+  redis:
+    image: redis:7-alpine
+    container_name: csc-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save 60 1000
+      --save 300 100
+      --tcp-keepalive 60
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - csc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── NGINX Reverse Proxy ──
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: csc-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      nextjs:
+        condition: service_healthy
+    networks:
+      - csc-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  csc-network:
+    driver: bridge

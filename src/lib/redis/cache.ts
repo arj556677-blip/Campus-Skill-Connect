@@ -1,0 +1,105 @@
+/* ─────────────────────────────────────────────────────
+ * Redis — Cache-Aside Layer for Supabase Optimization
+ * Transparent caching with TTL-based invalidation
+ * ───────────────────────────────────────────────────── */
+
+import { getRedisClient } from './client';
+
+const PREFIX = 'cache:';
+
+/** Default TTLs in seconds */
+export const CacheTTL = {
+  PROFILE: 300,        // 5 minutes
+  WORK: 300,           // 5 minutes
+  DISCOVER_FEED: 120,  // 2 minutes
+  SKILLS_ALL: 1800,    // 30 minutes
+  SKILLS_TRENDING: 600, // 10 minutes
+  COMMUNITIES: 3600,   // 1 hour
+  ZONES: 3600,         // 1 hour
+} as const;
+
+/**
+ * Get a cached value or execute the fetcher and cache the result.
+ * Cache-aside pattern: check Redis first, fallback to DB query, then store in Redis.
+ */
+export async function cacheGet<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  ttlSeconds: number = 300
+): Promise<T> {
+  const redis = getRedisClient();
+  const cacheKey = PREFIX + key;
+
+  try {
+    // 1. Try cache
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached) as T;
+    }
+  } catch (err) {
+    console.warn('[Cache] Read error, falling through to DB:', err);
+  }
+
+  // 2. Fetch from source (Supabase)
+  const data = await fetcher();
+
+  // 3. Store in cache
+  try {
+    await redis.setex(cacheKey, ttlSeconds, JSON.stringify(data));
+  } catch (err) {
+    console.warn('[Cache] Write error:', err);
+  }
+
+  return data;
+}
+
+/** Invalidate a specific cache key */
+export async function cacheInvalidate(key: string): Promise<void> {
+  const redis = getRedisClient();
+  try {
+    await redis.del(PREFIX + key);
+  } catch (err) {
+    console.warn('[Cache] Invalidate error:', err);
+  }
+}
+
+/** Invalidate all keys matching a pattern */
+export async function cacheInvalidatePattern(pattern: string): Promise<void> {
+  const redis = getRedisClient();
+  try {
+    const keys = await redis.keys(PREFIX + pattern);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch (err) {
+    console.warn('[Cache] Pattern invalidate error:', err);
+  }
+}
+
+/** Manually set a cache value */
+export async function cacheSet(key: string, value: unknown, ttlSeconds: number = 300): Promise<void> {
+  const redis = getRedisClient();
+  try {
+    await redis.setex(PREFIX + key, ttlSeconds, JSON.stringify(value));
+  } catch (err) {
+    console.warn('[Cache] Set error:', err);
+  }
+}
+
+// ── Specific cache key generators ──
+
+export const CacheKeys = {
+  profile: (userId: string) => `profile:${userId}`,
+  work: (workId: string) => `work:${workId}`,
+  userWorks: (userId: string) => `user_works:${userId}`,
+  discoverFeed: (hash: string) => `feed:discover:${hash}`,
+  showcaseFeed: (hash: string) => `feed:showcase:${hash}`,
+  skillsAll: () => 'skills:all',
+  skillsTrending: () => 'skills:trending',
+  userSkills: (userId: string) => `user_skills:${userId}`,
+  communities: () => 'communities:all',
+  zones: () => 'zones:all',
+  connections: (userId: string) => `connections:${userId}`,
+  conversations: (userId: string) => `conversations:${userId}`,
+  notifications: (userId: string) => `notifications:${userId}`,
+};

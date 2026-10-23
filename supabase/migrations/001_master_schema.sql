@@ -88,6 +88,7 @@ CREATE OR REPLACE FUNCTION update_updated_at() RETURNS TRIGGER AS $$ BEGIN NEW.u
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS profiles_updated_at ON profiles;
 CREATE TRIGGER profiles_updated_at BEFORE
 UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 -- ═══════════════════════════════════════════
@@ -161,6 +162,7 @@ CREATE TABLE IF NOT EXISTS works (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+DROP TRIGGER IF EXISTS works_updated_at ON works;
 CREATE TRIGGER works_updated_at BEFORE
 UPDATE ON works FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 -- ═══════════════════════════════════════════
@@ -194,6 +196,7 @@ CREATE TABLE IF NOT EXISTS connection_requests (
   updated_at TIMESTAMPTZ DEFAULT now(),
   CONSTRAINT no_self_connection CHECK (sender_id != receiver_id)
 );
+DROP TRIGGER IF EXISTS connection_requests_updated_at ON connection_requests;
 CREATE TRIGGER connection_requests_updated_at BEFORE
 UPDATE ON connection_requests FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 -- ═══════════════════════════════════════════
@@ -227,6 +230,7 @@ WHERE id = NEW.conversation_id;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS messages_update_conversation ON messages;
 CREATE TRIGGER messages_update_conversation
 AFTER
 INSERT ON messages FOR EACH ROW EXECUTE FUNCTION update_conversation_last_message();
@@ -259,6 +263,7 @@ CREATE TABLE IF NOT EXISTS cv_resumes (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+DROP TRIGGER IF EXISTS cv_resumes_updated_at ON cv_resumes;
 CREATE TRIGGER cv_resumes_updated_at BEFORE
 UPDATE ON cv_resumes FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 -- ═══════════════════════════════════════════
@@ -271,6 +276,7 @@ CREATE TABLE IF NOT EXISTS ai_copilot_conversations (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+DROP TRIGGER IF EXISTS ai_copilot_updated_at ON ai_copilot_conversations;
 CREATE TRIGGER ai_copilot_updated_at BEFORE
 UPDATE ON ai_copilot_conversations FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 -- ═══════════════════════════════════════════
@@ -336,6 +342,7 @@ CREATE TABLE IF NOT EXISTS support_tickets (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+DROP TRIGGER IF EXISTS support_tickets_updated_at ON support_tickets;
 CREATE TRIGGER support_tickets_updated_at BEFORE
 UPDATE ON support_tickets FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 -- ═══════════════════════════════════════════
@@ -399,6 +406,7 @@ VALUES (NEW.id) ON CONFLICT DO NOTHING;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+DROP TRIGGER IF EXISTS on_profile_created_settings ON profiles;
 CREATE TRIGGER on_profile_created_settings
 AFTER
 INSERT ON profiles FOR EACH ROW EXECUTE FUNCTION create_user_settings();

@@ -13,25 +13,11 @@ import { MOCK_PROFILES } from '@/lib/data/mock-data';
 export default function ConnectionsPage() {
   const [activeTab, setActiveTab] = useState<'pending' | 'connected'>('pending');
 
-  const [pendingRequests, setPendingRequests] = useState([
-    {
-      id: 'req-1',
-      sender: MOCK_PROFILES[3], // Dr. Anita Sengupta (Faculty)
-      note: 'Hello Alex, I was impressed by your HyperCache benchmarks. Would love to connect regarding our campus systems research group.',
-      time: '2 hours ago',
-    },
-    {
-      id: 'req-2',
-      sender: MOCK_PROFILES[4], // Marcus Chen (Recruiter)
-      note: 'Hi Alex! We are actively recruiting for distributed systems interns at Scale AI. Let us connect.',
-      time: '1 day ago',
-    },
-  ]);
+  const [pendingRequests, setPendingRequests] = useState<
+    { id: string; sender: (typeof MOCK_PROFILES)[0]; note?: string; time: string }[]
+  >([]);
 
-  const [activeConnections, setActiveConnections] = useState([
-    MOCK_PROFILES[1], // Priya Sharma
-    MOCK_PROFILES[2], // Karan Verma
-  ]);
+  const [activeConnections, setActiveConnections] = useState<(typeof MOCK_PROFILES)[0][]>([]);
 
   const handleAccept = (reqId: string, sender: (typeof MOCK_PROFILES)[0]) => {
     setPendingRequests(pendingRequests.filter((r) => r.id !== reqId));
@@ -165,40 +151,60 @@ export default function ConnectionsPage() {
 
         {/* Active Connections Tab */}
         {activeTab === 'connected' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {activeConnections.map((person) => (
-              <div
-                key={person.id}
-                className="rounded-3xl bg-white border border-[var(--color-border)] p-5 shadow-soft flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <img
-                    src={person.avatar_url!}
-                    alt={person.display_name}
-                    className="w-12 h-12 rounded-2xl object-cover ring-1 ring-zinc-200 shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <Link
-                      href={`/profile/${person.id}`}
-                      className="font-bold text-sm text-[var(--color-ink)] hover:text-[var(--color-brand-primary)] truncate block"
-                    >
-                      {person.display_name}
-                    </Link>
-                    <p className="text-xs text-[var(--color-ink-muted)] truncate">
-                      {person.headline}
-                    </p>
-                  </div>
+          <div>
+            {activeConnections.length === 0 ? (
+              <div className="rounded-3xl bg-white border border-dashed border-[var(--color-border)] p-12 text-center space-y-3">
+                <Users className="w-10 h-10 text-slate-400 mx-auto" />
+                <h3 className="text-sm font-bold text-[var(--color-ink)]">No connections yet</h3>
+                <p className="text-xs text-[var(--color-ink-muted)] max-w-sm mx-auto">
+                  Connect with students, researchers, and recruiters across universities to build your network.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href="/people"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-xs"
+                  >
+                    <span>Discover Campus Builders</span>
+                  </Link>
                 </div>
-
-                <Link
-                  href="/messages"
-                  className="p-2.5 rounded-xl bg-zinc-100 hover:bg-[var(--color-brand-primary-light)] hover:text-[var(--color-brand-primary)] text-zinc-600 transition-colors shrink-0"
-                  title="Message"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                </Link>
               </div>
-            ))}
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {activeConnections.map((person) => (
+                  <div
+                    key={person.id}
+                    className="rounded-3xl bg-white border border-[var(--color-border)] p-5 shadow-soft flex items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img
+                        src={person.avatar_url!}
+                        alt={person.display_name}
+                        className="w-12 h-12 rounded-2xl object-cover ring-1 ring-zinc-200 shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <Link
+                          href={`/profile/${person.id}`}
+                          className="font-bold text-sm text-[var(--color-ink)] hover:text-[var(--color-brand-primary)] truncate block"
+                        >
+                          {person.display_name}
+                        </Link>
+                        <p className="text-xs text-[var(--color-ink-muted)] truncate">
+                          {person.headline}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Link
+                      href="/messages"
+                      className="p-2.5 rounded-xl bg-zinc-100 hover:bg-[var(--color-brand-primary-light)] hover:text-[var(--color-brand-primary)] text-zinc-600 transition-colors shrink-0"
+                      title="Message"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

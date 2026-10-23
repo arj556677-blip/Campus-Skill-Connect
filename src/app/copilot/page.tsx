@@ -8,12 +8,12 @@ import {
   ArrowLeft,
   User,
   Lightbulb,
-  RefreshCw,
   ShieldCheck,
   Trash2,
   Check,
   Copy,
 } from 'lucide-react';
+import LatticeLoader, { LatticePattern } from '@/components/ui/LatticeLoader';
 
 interface ChatMessage {
   id: string;
@@ -145,6 +145,8 @@ export default function CopilotPage() {
   const [inputVal, setInputVal] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [thinkingVerb, setThinkingVerb] = useState('Thinking');
+  const [pattern, setPattern] = useState<LatticePattern>('orbit');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -156,6 +158,17 @@ export default function CopilotPage() {
     const text = contentToSend || inputVal;
     if (!text.trim() || isLoading) return;
 
+    const lower = text.toLowerCase();
+    if (lower.includes('interview') || lower.includes('mock') || lower.includes('question')) {
+      setThinkingVerb('Simulating interview scenario');
+    } else if (lower.includes('resume') || lower.includes('ats') || lower.includes('keyword') || lower.includes('cv')) {
+      setThinkingVerb('Scanning ATS checklist');
+    } else if (lower.includes('architecture') || lower.includes('system') || lower.includes('design') || lower.includes('critique')) {
+      setThinkingVerb('Evaluating architecture');
+    } else {
+      setThinkingVerb('Thinking');
+    }
+
     const userMsgId = createMessageId('user');
     const newMessages: ChatMessage[] = [
       ...messages,
@@ -166,7 +179,7 @@ export default function CopilotPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/copilot/chat', {
+      const res = await fetch('/api/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -174,7 +187,16 @@ export default function CopilotPage() {
         }),
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type') || '';
+      let data: { reply?: string; error?: string } = {};
+
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(text.slice(0, 100) || `Server error (${res.status})`);
+      }
+
       if (!res.ok) {
         throw new Error(data.error || 'Failed to generate copilot critique');
       }
@@ -249,6 +271,23 @@ export default function CopilotPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-full text-xs text-slate-600 shadow-xs">
+              <span className="text-[11px] font-semibold text-slate-400">Thinking Wave:</span>
+              <select
+                value={pattern as string}
+                onChange={(e) => setPattern(e.target.value as LatticePattern)}
+                className="bg-transparent border-none text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+                title="Select LatticeLoader thinking wave pattern"
+              >
+                <option value="orbit">Orbit</option>
+                <option value="ripple">Ripple</option>
+                <option value="snake">Snake</option>
+                <option value="spiral">Spiral</option>
+                <option value="arrow">Arrow</option>
+                <option value="dots">Dots</option>
+              </select>
+            </div>
+
             <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 font-semibold">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Rate Limiter: Active</span>
@@ -323,13 +362,32 @@ export default function CopilotPage() {
             })}
 
             {isLoading && (
-              <div className="flex items-center gap-3 text-xs text-slate-500">
-                <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 text-[#1b59f8] flex items-center justify-center">
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+              <div className="flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#1b59f8] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <span className="animate-pulse">
-                  Analyzing portfolio evidence &amp; synthesizing engineering critique...
-                </span>
+                <div className="rounded-2xl px-5 py-3.5 bg-white border border-slate-200/90 text-slate-800 shadow-xs inline-flex items-center">
+                  <LatticeLoader
+                    status="working"
+                    label={thinkingVerb}
+                    doneLabel="Done in"
+                    errorLabel="Failed after"
+                    pattern={pattern}
+                    grid={3}
+                    shape="round"
+                    color="#1b59f8"
+                    doneColor="#10b981"
+                    errorColor="#ef4444"
+                    cellSize={6}
+                    gap={2.5}
+                    fontSize={13}
+                    step={90}
+                    idleOpacity={0.18}
+                    glow={true}
+                    glowColor="rgba(27, 89, 248, 0.4)"
+                    showTimer={true}
+                  />
+                </div>
               </div>
             )}
 

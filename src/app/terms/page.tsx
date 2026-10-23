@@ -53,20 +53,20 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <Database className="w-5 h-5 text-indigo-600" />
-              <span>2. PostgreSQL Row-Level Security (RLS) Enforcement</span>
+              <span>2. Cryptographic Row-Level Tenant Security Enforcement</span>
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Security is enforced at the database kernel level, not just in application middleware. Every query executed against our 23 database tables automatically evaluates row-level tenant security expressions tied to your authenticated JWT signature.
+              Security is enforced at the core database level, not just in application middleware. Every query executed against our database records automatically evaluates strict tenant-isolation security expressions tied to your cryptographically verified session signature.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <Server className="w-5 h-5 text-emerald-600" />
-              <span>3. Redis In-Memory Cache Isolation &amp; Invalidation</span>
+              <span>3. Edge Cache Isolation &amp; Instant Invalidation</span>
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Cached query responses stored in Redis are automatically scoped to permission boundaries. When a member updates their project visibility, atomic cache purge commands wipe corresponding keys across the Redis cluster in sub-millisecond intervals.
+              Cached query responses are strictly scoped to permission boundaries. When a member updates their project visibility, atomic cache purge commands wipe corresponding cached keys across edge clusters in sub-millisecond intervals.
             </p>
           </section>
 
@@ -76,7 +76,7 @@ export default function TermsPage() {
               <span>4. Recruiter Anti-Scraping Protection</span>
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              We prohibit third-party automated web scraping of student portfolios. Recruiter accounts must be authenticated and validated with corporate or institution domains, and adhere to sliding-window rate limits (NGINX + Redis).
+              We prohibit third-party automated web scraping of student portfolios. Recruiter accounts must be authenticated and validated with corporate or institution domains, and adhere to sliding-window rate limits and automated anti-abuse safeguards.
             </p>
           </section>
         </div>

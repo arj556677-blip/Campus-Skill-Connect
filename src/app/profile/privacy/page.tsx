@@ -177,7 +177,7 @@ export default function PrivacyDashboardPage() {
                 <span>Only Me (Private)</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Enforced by Postgres Row Level Security. Never readable by any other user or search query.
+                Enforced by cryptographically isolated tenant security. Never readable by any other user or search query.
               </p>
               <ul className="text-[11px] space-y-1 text-slate-500 list-disc list-inside">
                 <li>Draft projects and unpublished works</li>

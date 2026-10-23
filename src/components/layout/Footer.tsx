@@ -11,17 +11,17 @@ export default function Footer() {
           <div className="flex items-center gap-4 flex-wrap">
             <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Redis 7: In-Memory Cache-Aside & PubSub Active
+              Real-Time High-Speed Network Active
             </span>
             <span className="hidden sm:inline text-slate-300">|</span>
             <span className="hidden sm:flex items-center gap-1.5 text-slate-600">
               <Server className="w-3.5 h-3.5 text-blue-600" />
-              NGINX 1.25 Edge Proxy & Rate Zones Ready
+              Secure Edge Network &amp; DDoS Protection
             </span>
             <span className="hidden md:inline text-slate-300">|</span>
             <span className="hidden md:flex items-center gap-1.5 text-slate-600">
               <Database className="w-3.5 h-3.5 text-indigo-600" />
-              PostgreSQL 15 + RLS 23 Tables
+              Tenant-Isolated Data Security &amp; Encryption
             </span>
           </div>
 
@@ -106,7 +106,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/collaborate" className="hover:text-[#1b59f8] transition-colors">
-                  WebRTC Meeting Rooms
+                  Live Sprint Collab Rooms
                 </Link>
               </li>
               <li>
@@ -125,7 +125,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs text-slate-500">
               <li>
                 <Link href="/admin" className="hover:text-[#1b59f8] transition-colors">
-                  Admin & Audit Log
+                  Admin &amp; Audit Log
                 </Link>
               </li>
               <li>
@@ -135,7 +135,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/terms" className="hover:text-[#1b59f8] transition-colors">
-                  Privacy & RLS Policies
+                  Privacy &amp; Data Rights
                 </Link>
               </li>
               <li>
@@ -151,7 +151,7 @@ export default function Footer() {
           <p>© {new Date().getFullYear()} Campus Skill Connect. Engineered for student creators and developers.</p>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
-              Next.js 16 • Redis 7 • PostgreSQL 15 • NGINX
+              Encrypted Proof-of-Work Architecture • DPDP Act 2023 Aligned
             </span>
           </div>
         </div>

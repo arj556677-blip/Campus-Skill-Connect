@@ -128,7 +128,7 @@ export default function AdminClient({
               className="px-4 py-2 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 shrink-0 active:scale-95"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${cacheFlushed ? 'animate-spin text-emerald-400' : ''}`} />
-              <span>{cacheFlushed ? 'Cache Re-indexed' : 'Purge Redis Cache'}</span>
+              <span>{cacheFlushed ? 'Cache Re-indexed' : 'Re-index Network Cache'}</span>
             </button>
           </div>
         </div>
@@ -138,21 +138,21 @@ export default function AdminClient({
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">PostgreSQL RLS</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Tenant Data Security</p>
               <p className="text-xs font-bold text-slate-800">100% Strict Enforced</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Redis 7 Cluster</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">High-Speed Cache Cluster</p>
               <p className="text-xs font-bold text-slate-800">1.2ms Avg Latency</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1b59f8] animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">WebRTC SFU</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Real-Time Collab Cluster</p>
               <p className="text-xs font-bold text-slate-800">14 Active Sprint Rooms</p>
             </div>
           </div>
@@ -509,7 +509,7 @@ export default function AdminClient({
               </span>
               <Server className="w-5 h-5 text-emerald-600" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">Redis 7 Alpine</h3>
+            <h3 className="text-2xl font-black text-slate-900">High-Speed Cache Engine</h3>
             <div className="space-y-2 text-xs font-mono text-slate-600">
               <div className="flex justify-between">
                 <span>Limiter Status:</span>
@@ -537,7 +537,7 @@ export default function AdminClient({
               </span>
               <Database className="w-5 h-5 text-indigo-600" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">PostgreSQL 15</h3>
+            <h3 className="text-2xl font-black text-slate-900">Enterprise Database Cluster</h3>
             <div className="space-y-2 text-xs font-mono text-slate-600">
               <div className="flex justify-between">
                 <span>Relational Tables:</span>
@@ -565,7 +565,7 @@ export default function AdminClient({
               </span>
               <Activity className="w-5 h-5 text-[#1b59f8]" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">NGINX 1.25 Edge</h3>
+            <h3 className="text-2xl font-black text-slate-900">Secure Edge Gateway</h3>
             <div className="space-y-2 text-xs font-mono text-slate-600">
               <div className="flex justify-between">
                 <span>Brotli / Gzip:</span>
@@ -576,7 +576,7 @@ export default function AdminClient({
                 <span className="font-bold text-emerald-700">Enabled</span>
               </div>
               <div className="flex justify-between">
-                <span>Turbopack HMR Stream:</span>
+                <span>Live Socket Stream:</span>
                 <span className="font-bold text-[#1b59f8]">Active</span>
               </div>
               <div className="flex justify-between">

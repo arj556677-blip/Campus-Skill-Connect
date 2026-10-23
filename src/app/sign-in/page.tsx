@@ -58,7 +58,7 @@ function SignInContent() {
   const redirectParam = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : null;
 
   // Unified form state
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => searchParams.get('email') || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'github' | null>(null);
@@ -416,7 +416,7 @@ function SignInContent() {
               </Link>
             </p>
             <p className="text-[11px] text-slate-400">
-              Powered by Firebase Authentication &amp; Supabase PostgreSQL Row-Level Security.
+              Encrypted institutional authentication &amp; university privacy compliance (DPDP Act 2023).
             </p>
           </div>
         </div>

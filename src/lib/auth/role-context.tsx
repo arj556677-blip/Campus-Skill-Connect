@@ -100,6 +100,7 @@ interface RoleContextValue {
   currentUser: RoleUser | null;
   login: (role: UserRoleType, redirectUrl?: string, customProfile?: Partial<RoleUser>) => void;
   switchRole: (role: UserRoleType, redirect?: boolean) => void;
+  updateUserProfile: (updates: Partial<RoleUser>) => void;
   signOut: () => Promise<void>;
 }
 
@@ -332,6 +333,31 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateUserProfile = (updates: Partial<RoleUser>) => {
+    setUserProfile((prev) => {
+      const activeRole = currentRole || 'student';
+      const base = prev || ROLE_PERSONAS[activeRole];
+      const updated: RoleUser = {
+        ...base,
+        ...updates,
+      };
+      if (updates.name) {
+        const trimmed = updates.name.trim();
+        updated.name = trimmed;
+        updated.initials = trimmed.slice(0, 2).toUpperCase();
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('csc_user_profile', JSON.stringify(updated));
+          setSessionCookies(updated.role, updated);
+        } catch {
+          // ignore
+        }
+      }
+      return updated;
+    });
+  };
+
   const signOut = async () => {
     try {
       const supabase = createClient();
@@ -367,6 +393,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         login,
         switchRole,
+        updateUserProfile,
         signOut,
       }}
     >
@@ -385,6 +412,7 @@ export function useRole() {
       currentUser: null,
       login: () => {},
       switchRole: () => {},
+      updateUserProfile: () => {},
       signOut: async () => {},
     };
   }

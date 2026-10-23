@@ -49,7 +49,7 @@ export default async function HomePage() {
               {/* Kicker Pill */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 mb-6 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-[#1b59f8] animate-pulse" />
-                <span>#1 Campus Proof-of-Work Platform 2026</span>
+                <span>Verified Campus Proof-of-Work Platform</span>
               </div>
 
               {/* Bold Display Headline */}
@@ -124,7 +124,7 @@ export default async function HomePage() {
                   />
                 </div>
 
-                {/* Floating Electric Blue Badge 1: Top-Right (50,000+ Students) */}
+                {/* Floating Electric Blue Badge 1: Top-Right (Campus Network) */}
                 <div className="absolute top-6 right-4 sm:right-6 z-20 bg-[#1b59f8] text-white p-3 sm:p-3.5 rounded-2xl shadow-xl flex items-center gap-3">
                   <div className="flex -space-x-2">
                     <div className="w-7 h-7 rounded-full bg-blue-300 ring-2 ring-white flex items-center justify-center text-[9px] font-bold text-blue-900">AR</div>
@@ -134,16 +134,16 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-blue-200 uppercase tracking-wider">Federated</p>
-                    <p className="text-xs font-black text-white leading-tight">50,000+ Students</p>
+                    <p className="text-xs font-black text-white leading-tight">Campus Network</p>
                   </div>
                 </div>
 
-                {/* Floating Electric Blue Badge 2: Middle-Right (Best Collaboration) */}
+                {/* Floating Electric Blue Badge 2: Middle-Right (Peer Collaboration) */}
                 <div className="absolute top-1/2 -right-1 sm:right-4 -translate-y-1/2 z-20 bg-[#1b59f8] text-white px-3.5 py-2 rounded-full shadow-lg flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                     <Sparkles className="w-3 h-3 text-white" />
                   </div>
-                  <span className="text-xs font-bold whitespace-nowrap">Best Collaboration</span>
+                  <span className="text-xs font-bold whitespace-nowrap">Peer Collaboration</span>
                 </div>
 
                 {/* Floating Electric Blue Badge 3: Bottom-Left ($0 Free For Students) */}
@@ -161,32 +161,32 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 2. METRICS RIBBON (Directly matching 100% · 12+ · 20k+ · 90+ container) ── */}
+      {/* ── 2. TRUST PILLARS RIBBON ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-10 sm:my-14 w-full">
         <div className="bg-[#f8fafc] border border-slate-200/90 rounded-[32px] p-8 sm:p-12 shadow-xs">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center items-center">
             
             <div>
-              <p className="text-3xl sm:text-5xl font-black text-[#0f172a] tracking-tight">100%</p>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Verified Work Proofs</p>
+              <p className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">Verified Proofs</p>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Institutional Attestation</p>
             </div>
 
             <div className="relative">
               <span className="hidden md:block absolute -left-4 top-1/2 -translate-y-1/2 text-2xl text-slate-300 font-bold">·</span>
-              <p className="text-3xl sm:text-5xl font-black text-[#0f172a] tracking-tight">48+</p>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Federated Campuses</p>
+              <p className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">Open Portfolio</p>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Link-First Evidence</p>
             </div>
 
             <div className="relative">
               <span className="hidden md:block absolute -left-4 top-1/2 -translate-y-1/2 text-2xl text-slate-300 font-bold">·</span>
-              <p className="text-3xl sm:text-5xl font-black text-[#0f172a] tracking-tight">1,480+</p>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Peer-Reviewed Projects</p>
+              <p className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">Peer Sprints</p>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Live Collab Rooms</p>
             </div>
 
             <div className="relative">
               <span className="hidden md:block absolute -left-4 top-1/2 -translate-y-1/2 text-2xl text-slate-300 font-bold">·</span>
-              <p className="text-3xl sm:text-5xl font-black text-[#0f172a] tracking-tight">85+</p>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Verified Skill Domains</p>
+              <p className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">Privacy Control</p>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">4-Level Sovereignty</p>
             </div>
 
           </div>
@@ -262,14 +262,14 @@ export default async function HomePage() {
                   className="w-full h-full object-cover object-top"
                 />
 
-                {/* Floating Metric Badge (+2520% Profile Views) */}
+                {/* Floating Metric Badge (Domain Identity) */}
                 <div className="absolute top-6 left-6 z-20 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200 shadow-xl flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
-                    ↗
+                    <Check className="w-4 h-4 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-black text-slate-900">+2520%</p>
-                    <p className="text-[10px] text-slate-500 font-medium">Recruiter Profile Views</p>
+                    <p className="text-xs font-black text-slate-900">Verified</p>
+                    <p className="text-[10px] text-slate-500 font-medium">Domain Identity Confirmed</p>
                   </div>
                 </div>
 
@@ -356,26 +356,26 @@ export default async function HomePage() {
             
             <div className="space-y-2">
               <span className="text-xs font-mono uppercase tracking-wider text-[#1b59f8] font-bold">
-                Our Journey to Excellence
+                Standards of Excellence
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a] tracking-tight">
-                Verified Scale Backed By Real Commits.
+                Authentic Proof Backed By Real Commits.
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Every metric is derived directly from genuine student submissions, validated against accredited institutions.
+                Every project is derived directly from student repositories and validated against accredited university domains.
               </p>
             </div>
 
             <div className="text-center p-6 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-              <p className="text-4xl sm:text-5xl font-black text-[#0f172a] tracking-tight">20M+</p>
-              <p className="text-xs font-semibold text-slate-600 mt-1">Lines of Code Indexed</p>
+              <p className="text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">Direct Source</p>
+              <p className="text-xs font-semibold text-slate-600 mt-1">Repository Verification</p>
               <p className="text-[11px] text-slate-400 mt-0.5">Across GitHub &amp; GitLab</p>
             </div>
 
             <div className="text-center p-6 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
-              <p className="text-4xl sm:text-5xl font-black text-[#1b59f8] tracking-tight">250+</p>
-              <p className="text-xs font-semibold text-slate-600 mt-1">Corporate Recruiters</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Vetted Corporate Accounts</p>
+              <p className="text-2xl sm:text-3xl font-black text-[#1b59f8] tracking-tight">Vetted Recruiter</p>
+              <p className="text-xs font-semibold text-slate-600 mt-1">Screened Access</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Corporate Domain Screening</p>
             </div>
 
           </div>

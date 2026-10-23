@@ -50,10 +50,10 @@ export const MOCK_ZONES: Zone[] = [
 ];
 
 export const MOCK_SKILLS: Skill[] = [
-  { id: 'sk-1', name: 'React 19', category: 'software', is_verified: true },
-  { id: 'sk-2', name: 'Next.js App Router', category: 'software', is_verified: true },
-  { id: 'sk-3', name: 'Redis Cache & PubSub', category: 'software', is_verified: true },
-  { id: 'sk-4', name: 'PostgreSQL & RLS', category: 'software', is_verified: true },
+  { id: 'sk-1', name: 'Frontend Architecture', category: 'software', is_verified: true },
+  { id: 'sk-2', name: 'Cloud Infrastructure', category: 'software', is_verified: true },
+  { id: 'sk-3', name: 'Distributed Systems', category: 'software', is_verified: true },
+  { id: 'sk-4', name: 'Data Security & Storage', category: 'software', is_verified: true },
   { id: 'sk-5', name: 'PyTorch / Deep Learning', category: 'research', is_verified: true },
   { id: 'sk-6', name: 'Figma System Design', category: 'design', is_verified: true },
   { id: 'sk-7', name: 'WebRTC & Audio Streams', category: 'software', is_verified: true },
@@ -69,7 +69,7 @@ export const MOCK_PROFILES: Profile[] = [
     id: 'user-1',
     display_name: 'Alex Rivera',
     headline: 'Full-Stack Engineer & Distributed Systems Explorer',
-    bio: 'MCA final-year researcher passionate about Redis caching layers, PostgreSQL RLS security, and real-time collaborative web applications. Open to full-stack engineering roles.',
+    bio: 'MCA final-year researcher passionate about distributed caching systems, high-concurrency data security, and real-time collaborative web applications. Open to software engineering roles.',
     role: 'student',
     institution_id: 'comm-1',
     campus_id: 'camp-1',
@@ -235,9 +235,9 @@ export const MOCK_WORKS: Work[] = [
   {
     id: 'work-1',
     owner_id: 'user-1',
-    title: 'HyperCache: In-Memory Redis Optimization Engine for Edge Next.js',
+    title: 'HyperCache: In-Memory Optimization Engine for High-Concurrency Networks',
     description:
-      'Engineered an ultra-fast cache-aside layer with atomic Redis invalidation, sliding-window rate limiting, and 99.4% cache hit rates under 10k concurrent simulated requests.',
+      'Engineered an ultra-fast cache-aside layer with atomic memory invalidation, sliding-window rate limiting, and 99.4% cache hit rates under 10k concurrent simulated requests.',
     category: 'software',
     external_url: 'https://github.com/alexrivera-dev/hypercache',
     storage_path: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=80',
@@ -397,8 +397,8 @@ export const MOCK_COLLAB_ROOMS: CollaborationRoom[] = [
   },
   {
     id: 'room-2',
-    title: 'Distributed Systems & Redis Pub/Sub Study Room',
-    description: 'Deep dive into cache invalidation patterns, SSE vs WebSockets, and database RLS benchmarks.',
+    title: 'Distributed Systems & State Synchronization Study Room',
+    description: 'Deep dive into cache invalidation patterns, event streaming vs sockets, and database security benchmarks.',
     creator_id: 'user-1',
     room_slug: 'distributed-systems-study',
     is_active: true,

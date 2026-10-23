@@ -3,7 +3,7 @@ import MessagesClient from './MessagesClient';
 
 export const metadata = {
   title: 'Direct Messages — Campus Skill Connect',
-  description: 'Real-time in-app peer communication powered by Redis Pub/Sub.',
+  description: 'Real-time secure peer-to-peer student & mentor communication.',
 };
 
 export default function MessagesPage() {

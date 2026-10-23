@@ -107,20 +107,20 @@ export default function GeneralDashboardClient({
         {/* Platform-wide Quick Stats */}
         <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-6 font-mono">
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900">4,820+</p>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">Verified Student Builders</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-slate-900">Student Profiles</p>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">Verified Academic Network</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#1b59f8]">{communities.length} Campuses</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-[#1b59f8]">{communities.length} Campuses</p>
             <p className="text-xs text-slate-500 font-sans mt-0.5">Federated Universities</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-700">142</p>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">Enterprise Tech Recruiters</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-emerald-700">Corporate Access</p>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">Screened Tech Recruiters</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-indigo-700">PostgreSQL</p>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">RLS Row-Level Security</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-indigo-700">Data Isolation</p>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">Strict Tenant Security</p>
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function GeneralDashboardClient({
                 Admin &amp; Operations Dashboard
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Full root governance over the campus network. Review plagiarism flags in the moderation queue, whitelist university domains, inspect PostgreSQL RLS policies, and monitor Redis cache telemetry.
+                Full root governance over the campus network. Review plagiarism flags in the moderation queue, whitelist university domains, inspect access security policies, and monitor real-time network telemetry.
               </p>
 
               <div className="mt-5 space-y-2 text-xs font-mono text-slate-700">

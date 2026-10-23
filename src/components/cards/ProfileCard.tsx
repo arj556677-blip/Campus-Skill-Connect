@@ -43,17 +43,10 @@ export default function ProfileCard({ profile, matchScore }: ProfileCardProps) {
           {profile.role}
         </span>
 
-        {matchScore !== undefined ? (
-          <span className="flex items-center gap-1 text-[11px] font-mono font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
-            <Sparkles className="w-3 h-3 text-blue-600" />
-            {matchScore}% Match
-          </span>
-        ) : (
-          <span className="text-[11px] text-slate-500 flex items-center gap-1.5 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Active
-          </span>
-        )}
+        <span className="text-[11px] text-slate-500 flex items-center gap-1.5 font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Active
+        </span>
       </div>
 
       {/* Main Avatar & Headline */}

@@ -348,7 +348,7 @@ export default function NewWorkPage() {
                   type="text"
                   value={skillSearchQuery}
                   onChange={(e) => setSkillSearchQuery(e.target.value)}
-                  placeholder="Search skills (e.g. React, PostgreSQL, Docker, Academic Writing)..."
+                  placeholder="Search skills (e.g. Data Analytics, Machine Learning, Research, Academic Writing)..."
                   className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>

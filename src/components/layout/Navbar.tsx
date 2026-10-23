@@ -17,6 +17,7 @@ import {
   X,
   ChevronDown,
   User,
+  UserCog,
   LogOut,
   CircleHelp as HelpCircle,
   LayoutDashboard,
@@ -35,9 +36,6 @@ export default function Navbar() {
 
   const toolsRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
-
-  // Unread message indicator
-  const unreadCount = 3;
 
   // Scroll detection for dynamic elevation
   useEffect(() => {
@@ -268,9 +266,6 @@ export default function Navbar() {
               className="relative p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               <MessageSquare className="w-4 h-4" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
-              )}
             </Link>
           )}
 
@@ -386,6 +381,14 @@ export default function Navbar() {
                         <span>Candidate Radar</span>
                       </Link>
                     )}
+
+                    <Link
+                      href="/profile/edit"
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                    >
+                      <UserCog className="w-3.5 h-3.5 text-[#1b59f8]" />
+                      <span>Edit Profile</span>
+                    </Link>
 
                     <Link
                       href="/connections"
@@ -528,6 +531,16 @@ export default function Navbar() {
               <Plus className="w-4 h-4" />
               <span>Share New Work</span>
             </Link>
+
+            {isMounted && isLoggedIn && (
+              <Link
+                href="/profile/edit"
+                className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors"
+              >
+                <UserCog className="w-3.5 h-3.5 text-[#1b59f8]" />
+                <span>Edit Profile</span>
+              </Link>
+            )}
 
             {(!isMounted || !isLoggedIn) && (
               <div className="grid grid-cols-2 gap-2 pt-1">

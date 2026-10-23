@@ -93,8 +93,8 @@ export async function checkRateLimit(
     };
   } catch (err) {
     console.warn('[RateLimit] Storage unavailable:', err);
-    // Per specification: Fail closed for sensitive (auth, AI) endpoints, fail open for read routes
-    if (options?.failClosed) {
+    // Fail closed for sensitive endpoints in production; allow in dev mode when running without Redis
+    if (options?.failClosed && process.env.NODE_ENV === 'production') {
       return {
         allowed: false,
         remaining: 0,

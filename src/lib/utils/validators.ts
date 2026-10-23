@@ -103,3 +103,43 @@ export function validateCvFile(
     error: 'Invalid file format. Upload must be a valid PDF or DOCX file verified by file signature.',
   };
 }
+
+export interface PasswordValidationResult {
+  valid: boolean;
+  match: boolean;
+  hasMinLength: boolean;
+  error?: string;
+}
+
+export function validatePasswordMatch(
+  password: string,
+  confirmPassword: string,
+  minLength: number = 6
+): PasswordValidationResult {
+  const hasMinLength = (password || '').length >= minLength;
+  const match = Boolean(password && confirmPassword && password === confirmPassword);
+
+  if (!hasMinLength) {
+    return {
+      valid: false,
+      match,
+      hasMinLength: false,
+      error: `Password must be at least ${minLength} characters long`,
+    };
+  }
+
+  if (!match) {
+    return {
+      valid: false,
+      match: false,
+      hasMinLength: true,
+      error: 'Passwords do not match',
+    };
+  }
+
+  return {
+    valid: true,
+    match: true,
+    hasMinLength: true,
+  };
+}

@@ -94,9 +94,17 @@ export default function PrivacyDashboardPage() {
             <span>Return to Profile Settings</span>
           </Link>
 
-          <span className="text-[10px] uppercase tracking-wider text-emerald-800 font-bold px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-            DPDPA 2023 Compliant
-          </span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/privacy"
+              className="text-xs font-bold text-[#1b59f8] hover:underline"
+            >
+              Full Legal Privacy Policy ↗
+            </Link>
+            <span className="text-[10px] uppercase tracking-wider text-emerald-800 font-bold px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+              DPDPA 2023 Compliant
+            </span>
+          </div>
         </div>
 
         {/* Header */}

@@ -72,6 +72,23 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    // Admins manage the platform and do not share/publish work items
+    if (request.nextUrl.pathname.startsWith('/works/new')) {
+      if (cscRole === 'admin') {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (profile?.role === 'admin') {
+          return NextResponse.redirect(new URL('/admin', request.url));
+        }
+      }
+    }
+
     // Admin routes — strictly enforced by verified database role check or admin role session
     if (request.nextUrl.pathname.startsWith('/admin')) {
       if (!isAuthenticated) {

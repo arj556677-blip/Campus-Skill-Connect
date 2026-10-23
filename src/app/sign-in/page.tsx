@@ -13,6 +13,8 @@ import {
   Zap,
   CheckCircle2,
   Sparkles,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/client';
@@ -60,6 +62,7 @@ function SignInContent() {
   // Unified form state
   const [email, setEmail] = useState(() => searchParams.get('email') || '');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'github' | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -345,13 +348,22 @@ function SignInContent() {
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password or passkey"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-mono"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-mono"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5 focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
@@ -416,7 +428,10 @@ function SignInContent() {
               </Link>
             </p>
             <p className="text-[11px] text-slate-400">
-              Encrypted institutional authentication &amp; university privacy compliance (DPDP Act 2023).
+              Encrypted institutional authentication &amp; university privacy compliance (DPDP Act 2023).{' '}
+              <Link href="/privacy" className="text-slate-500 hover:text-[#1b59f8] underline">
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </div>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRole } from '@/lib/auth/role-context';
-import { ArrowLeft, Mail, Lock, User, Building, ArrowRight, GraduationCap, Briefcase, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, User, Building, ArrowRight, GraduationCap, Briefcase, ShieldAlert, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { MOCK_COMMUNITIES } from '@/lib/data/mock-data';
 import { signInWithFirebaseGoogle, signInWithFirebaseGithub } from '@/lib/firebase/config';
 
@@ -46,6 +46,9 @@ export default function SignUpPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [communityId, setCommunityId] = useState(MOCK_COMMUNITIES[0].id);
   const [companyName, setCompanyName] = useState('Stripe');
   const [consentGiven, setConsentGiven] = useState(false);
@@ -54,8 +57,22 @@ export default function SignUpPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const passwordsMatch = password.length > 0 && confirmPassword.length > 0 && password === confirmPassword;
+  const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify and re-enter your password.');
+      return;
+    }
+
     if (!consentGiven) {
       setErrorMsg('You must review and consent to data processing under the DPDP Act 2023 to proceed.');
       return;
@@ -322,20 +339,89 @@ export default function SignUpPage() {
               </div>
             )}
 
+            {/* Password */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">
+                  Password
+                </label>
+                {password.length > 0 && password.length < 6 && (
+                  <span className="text-[10px] text-amber-600 font-mono font-semibold">
+                    Min 6 characters
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Choose a strong passkey"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-mono"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-mono"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5 focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">
+                  Confirm Password
+                </label>
+                {confirmPassword.length > 0 && (
+                  <span
+                    className={`text-[10px] font-mono font-bold flex items-center gap-1 ${
+                      passwordsMatch ? 'text-emerald-600' : 'text-rose-500'
+                    }`}
+                  >
+                    {passwordsMatch ? (
+                      <>
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Passwords match</span>
+                      </>
+                    ) : (
+                      <span>✕ Passwords do not match</span>
+                    )}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password to confirm"
+                  className={`w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#f8fafc] border text-slate-900 placeholder-slate-400 text-xs focus:outline-none transition-all font-mono ${
+                    passwordsMismatch
+                      ? 'border-rose-300 focus:border-rose-500 bg-rose-50/20'
+                      : passwordsMatch
+                      ? 'border-emerald-300 focus:border-emerald-500 bg-emerald-50/20'
+                      : 'border-slate-200 focus:border-[#1b59f8]'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5 focus:outline-none"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
@@ -350,14 +436,22 @@ export default function SignUpPage() {
                   className="mt-0.5 rounded border-slate-300 text-[#1b59f8] focus:ring-[#1b59f8]"
                 />
                 <span className="leading-tight text-[11px] text-slate-500">
-                  I consent to the collection and processing of my name, institutional email, and portfolio evidence for the sole purpose of campus discovery and talent verification in compliance with the Digital Personal Data Protection Act, 2023 (India).
+                  I consent to the collection and processing of my data in accordance with the{' '}
+                  <Link href="/privacy" target="_blank" className="text-[#1b59f8] font-bold hover:underline">
+                    Privacy Policy
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/terms" target="_blank" className="text-[#1b59f8] font-bold hover:underline">
+                    Terms of Service
+                  </Link>
+                  , under the Digital Personal Data Protection Act, 2023 (India).
                 </span>
               </label>
             </div>
 
             <button
               type="submit"
-              disabled={loading || socialLoading !== null}
+              disabled={loading || socialLoading !== null || passwordsMismatch}
               className="w-full py-3 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <span>{loading ? 'Creating Account...' : `Register as ${accountType === 'student' ? 'Student' : 'Recruiter'}`}</span>

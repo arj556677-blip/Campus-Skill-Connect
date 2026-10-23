@@ -17,6 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { WorkCategory, Visibility } from '@/lib/types';
+import { useRole } from '@/lib/auth/role-context';
 
 interface ControlledSkill {
   id: string;
@@ -39,6 +40,13 @@ const CATEGORIES: { id: WorkCategory; label: string }[] = [
 
 export default function NewWorkPage() {
   const router = useRouter();
+  const { currentRole, isMounted } = useRole();
+
+  useEffect(() => {
+    if (isMounted && currentRole === 'admin') {
+      router.replace('/admin');
+    }
+  }, [isMounted, currentRole, router]);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -156,6 +164,19 @@ export default function NewWorkPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isMounted && currentRole === 'admin') {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center py-20">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-600" aria-hidden="true" />
+          <p className="text-sm text-slate-600 font-medium">
+            Administrators manage platform governance and do not share work items. Redirecting to Admin Console...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-10">

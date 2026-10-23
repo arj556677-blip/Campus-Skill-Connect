@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateSecureHttpsUrl, validateCvFile } from '@/lib/utils/validators';
+import { validateSecureHttpsUrl, validateCvFile, validatePasswordMatch } from '@/lib/utils/validators';
 
 describe('Secure URL and File Validators', () => {
   describe('validateSecureHttpsUrl', () => {
@@ -63,6 +63,37 @@ describe('Secure URL and File Validators', () => {
       const result = validateCvFile(hugeBytes, 'huge.pdf');
       expect(result.valid).toBe(false);
       expect(result.error).toContain('exceeds maximum allowed size');
+    });
+  });
+
+  describe('validatePasswordMatch', () => {
+    it('approves matching passwords meeting minimum length', () => {
+      const result = validatePasswordMatch('CampusPass@2026', 'CampusPass@2026');
+      expect(result.valid).toBe(true);
+      expect(result.match).toBe(true);
+      expect(result.hasMinLength).toBe(true);
+      expect(result.error).toBeUndefined();
+    });
+
+    it('rejects passwords below the minimum length threshold', () => {
+      const result = validatePasswordMatch('12345', '12345', 6);
+      expect(result.valid).toBe(false);
+      expect(result.hasMinLength).toBe(false);
+      expect(result.error).toContain('at least 6 characters');
+    });
+
+    it('detects mismatched passwords', () => {
+      const result = validatePasswordMatch('Secret123!', 'SecretDifferent!');
+      expect(result.valid).toBe(false);
+      expect(result.match).toBe(false);
+      expect(result.hasMinLength).toBe(true);
+      expect(result.error).toBe('Passwords do not match');
+    });
+
+    it('handles empty confirm password safely', () => {
+      const result = validatePasswordMatch('Secret123!', '');
+      expect(result.valid).toBe(false);
+      expect(result.match).toBe(false);
     });
   });
 });

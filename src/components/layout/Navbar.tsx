@@ -249,14 +249,16 @@ export default function Navbar() {
 
         {/* Action Center (Right Side) */}
         <div className="flex items-center gap-2.5">
-          {/* Primary CTA: Share Work */}
-          <Link
-            href="/works/new"
-            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Share Work</span>
-          </Link>
+          {/* Primary CTA: Share Work (Not applicable for Admin) */}
+          {(!isMounted || currentRole !== 'admin') && (
+            <Link
+              href="/works/new"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Share Work</span>
+            </Link>
+          )}
 
           {/* Messages Notification Button */}
           {isMounted && isLoggedIn && (
@@ -524,13 +526,15 @@ export default function Navbar() {
 
           {/* Quick Actions in Mobile Drawer */}
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-            <Link
-              href="/works/new"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Share New Work</span>
-            </Link>
+            {(!isMounted || currentRole !== 'admin') && (
+              <Link
+                href="/works/new"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Share New Work</span>
+              </Link>
+            )}
 
             {isMounted && isLoggedIn && (
               <Link

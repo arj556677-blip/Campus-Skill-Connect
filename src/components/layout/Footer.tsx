@@ -134,24 +134,47 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/privacy" className="hover:text-[#1b59f8] transition-colors font-medium flex items-center gap-1.5">
+                  <span>Privacy Policy</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-bold">DPDP</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/terms" className="hover:text-[#1b59f8] transition-colors">
-                  Privacy &amp; Data Rights
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/profile/privacy" className="hover:text-[#1b59f8] transition-colors">
+                  Privacy Dashboard
                 </Link>
               </li>
               <li>
                 <span className="inline-flex items-center gap-1 text-[11px] text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full font-mono font-semibold">
-                  v2.0.0 Production
+                  v2.4.0 Production
                 </span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Campus Skill Connect. Engineered for student creators and developers.</p>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
-              Encrypted Proof-of-Work Architecture • DPDP Act 2023 Aligned
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link href="/privacy" className="hover:text-[#1b59f8] transition-colors">
+              Privacy
+            </Link>
+            <span className="text-slate-300">•</span>
+            <Link href="/terms" className="hover:text-[#1b59f8] transition-colors">
+              Terms
+            </Link>
+            <span className="text-slate-300">•</span>
+            <Link href="/profile/privacy" className="hover:text-[#1b59f8] transition-colors">
+              Data Rights
+            </Link>
+            <span className="text-slate-300">•</span>
+            <span className="text-slate-400 font-mono text-[11px]">
+              DPDP Act 2023 Aligned
             </span>
           </div>
         </div>

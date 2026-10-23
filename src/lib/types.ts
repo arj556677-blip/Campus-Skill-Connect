@@ -268,6 +268,9 @@ export interface AiCopilotMessage {
   timestamp: string;
 }
 
+export type MeetingProvider = 'webrtc_jitsi' | 'google_meet';
+export type ConfidentialityLevel = 'public' | 'confidential' | 'restricted_nda' | 'recruiter_private';
+
 export interface CollaborationRoom {
   id: string;
   title: string;
@@ -278,6 +281,14 @@ export interface CollaborationRoom {
   meeting_link: string | null;
   created_at: string;
   creator?: Profile;
+  provider?: MeetingProvider;
+  is_confidential?: boolean;
+  confidentiality_level?: ConfidentialityLevel;
+  google_meet_code?: string | null;
+  passcode?: string | null;
+  host_approval_required?: boolean;
+  nda_required?: boolean;
+  authorized_roles?: Array<'admin' | 'recruiter' | 'student'>;
 }
 
 export interface Report {

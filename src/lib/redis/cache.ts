@@ -1,6 +1,7 @@
 /* ─────────────────────────────────────────────────────
  * Redis — Cache-Aside Layer for Supabase Optimization
  * Transparent caching with TTL-based invalidation
+ * Graceful fallback when Redis is offline
  * ───────────────────────────────────────────────────── */
 
 import { getRedisClient } from './client';
@@ -30,24 +31,28 @@ export async function cacheGet<T>(
   const redis = getRedisClient();
   const cacheKey = PREFIX + key;
 
-  try {
-    // 1. Try cache
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      return JSON.parse(cached) as T;
+  // 1. Try cache if Redis connection is active
+  if (redis.status === 'ready') {
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached) as T;
+      }
+    } catch {
+      // Redis read failed, fall through smoothly to source
     }
-  } catch (err) {
-    console.warn('[Cache] Read error, falling through to DB:', err);
   }
 
-  // 2. Fetch from source (Supabase)
+  // 2. Fetch from source (Supabase / local data store)
   const data = await fetcher();
 
-  // 3. Store in cache
-  try {
-    await redis.setex(cacheKey, ttlSeconds, JSON.stringify(data));
-  } catch (err) {
-    console.warn('[Cache] Write error:', err);
+  // 3. Store in cache if Redis is active
+  if (redis.status === 'ready') {
+    try {
+      await redis.setex(cacheKey, ttlSeconds, JSON.stringify(data));
+    } catch {
+      // Non-blocking write failure
+    }
   }
 
   return data;
@@ -56,33 +61,39 @@ export async function cacheGet<T>(
 /** Invalidate a specific cache key */
 export async function cacheInvalidate(key: string): Promise<void> {
   const redis = getRedisClient();
-  try {
-    await redis.del(PREFIX + key);
-  } catch (err) {
-    console.warn('[Cache] Invalidate error:', err);
+  if (redis.status === 'ready') {
+    try {
+      await redis.del(PREFIX + key);
+    } catch {
+      // Non-blocking
+    }
   }
 }
 
 /** Invalidate all keys matching a pattern */
 export async function cacheInvalidatePattern(pattern: string): Promise<void> {
   const redis = getRedisClient();
-  try {
-    const keys = await redis.keys(PREFIX + pattern);
-    if (keys.length > 0) {
-      await redis.del(...keys);
+  if (redis.status === 'ready') {
+    try {
+      const keys = await redis.keys(PREFIX + pattern);
+      if (keys.length > 0) {
+        await redis.del(...keys);
+      }
+    } catch {
+      // Non-blocking
     }
-  } catch (err) {
-    console.warn('[Cache] Pattern invalidate error:', err);
   }
 }
 
 /** Manually set a cache value */
 export async function cacheSet(key: string, value: unknown, ttlSeconds: number = 300): Promise<void> {
   const redis = getRedisClient();
-  try {
-    await redis.setex(PREFIX + key, ttlSeconds, JSON.stringify(value));
-  } catch (err) {
-    console.warn('[Cache] Set error:', err);
+  if (redis.status === 'ready') {
+    try {
+      await redis.setex(PREFIX + key, ttlSeconds, JSON.stringify(value));
+    } catch {
+      // Non-blocking
+    }
   }
 }
 

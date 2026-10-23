@@ -17,7 +17,6 @@ import {
   TrendingUp,
   ArrowRight,
   ShieldCheck,
-  Github,
   MessageSquare,
   Award,
   Zap,
@@ -323,7 +322,7 @@ export default function StudentDashboardClient({
                   </span>
                   <span className="text-xs text-zinc-400 font-mono flex items-center gap-1">
                     <Eye className="w-3 h-3 text-zinc-500" />
-                    <span>{work.view_count || 120}</span>
+                    <span>{work.views_count || 120}</span>
                   </span>
                 </div>
 

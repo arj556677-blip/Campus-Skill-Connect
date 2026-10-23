@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRole, UserRoleType, ROLE_PERSONAS } from '@/lib/auth/role-context';
@@ -22,7 +22,7 @@ import {
   Terminal,
 } from 'lucide-react';
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useRole();
@@ -456,5 +456,21 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-65px)] bg-[#08090d] flex items-center justify-center">
+          <div className="text-xs font-mono text-violet-400 animate-pulse">
+            Loading authentication portal...
+          </div>
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }

@@ -181,7 +181,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     key={skill.id}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/[0.04] text-xs font-mono font-medium text-zinc-200 border border-white/[0.08]"
                   >
-                    #{skill.name}
+                    #{(skill as any).skill?.name || (skill as any).name || 'Skill'}
                   </span>
                 ))}
               </div>

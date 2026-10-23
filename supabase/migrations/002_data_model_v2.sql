@@ -105,12 +105,15 @@ CREATE INDEX IF NOT EXISTS idx_blocks_blocked ON blocks(blocked_id);
 
 ALTER TABLE blocks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Blocks: users can view their own blocks" ON blocks;
 CREATE POLICY "Blocks: users can view their own blocks" ON blocks FOR
 SELECT USING (blocker_id = auth.uid());
 
+DROP POLICY IF EXISTS "Blocks: users can block" ON blocks;
 CREATE POLICY "Blocks: users can block" ON blocks FOR
 INSERT WITH CHECK (blocker_id = auth.uid());
 
+DROP POLICY IF EXISTS "Blocks: users can unblock" ON blocks;
 CREATE POLICY "Blocks: users can unblock" ON blocks FOR
 DELETE USING (blocker_id = auth.uid());
 
@@ -153,12 +156,14 @@ CREATE INDEX IF NOT EXISTS idx_connections_status ON connections(status);
 
 ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Connections: participants can view" ON connections;
 CREATE POLICY "Connections: participants can view" ON connections FOR
 SELECT USING (
   (user_low = auth.uid() OR user_high = auth.uid())
   AND NOT is_blocked(user_low, user_high)
 );
 
+DROP POLICY IF EXISTS "Connections: participants can insert" ON connections;
 CREATE POLICY "Connections: participants can insert" ON connections FOR
 INSERT WITH CHECK (
   auth.uid() = requested_by
@@ -166,6 +171,7 @@ INSERT WITH CHECK (
   AND NOT is_blocked(user_low, user_high)
 );
 
+DROP POLICY IF EXISTS "Connections: participants can update" ON connections;
 CREATE POLICY "Connections: participants can update" ON connections FOR
 UPDATE USING (
   (user_low = auth.uid() OR user_high = auth.uid())
@@ -337,10 +343,12 @@ CREATE INDEX IF NOT EXISTS idx_skill_endorsements_endorser ON skill_endorsements
 
 ALTER TABLE skill_endorsements ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Skill Endorsements: viewable by all" ON skill_endorsements;
 CREATE POLICY "Skill Endorsements: viewable by all" ON skill_endorsements FOR
 SELECT USING (true);
 
 -- Endorsements allowed only from accepted, unblocked connections
+DROP POLICY IF EXISTS "Skill Endorsements: accepted connections can endorse" ON skill_endorsements;
 CREATE POLICY "Skill Endorsements: accepted connections can endorse" ON skill_endorsements FOR
 INSERT WITH CHECK (
   auth.uid() = endorser_id
@@ -353,6 +361,7 @@ INSERT WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "Skill Endorsements: endorser can delete" ON skill_endorsements;
 CREATE POLICY "Skill Endorsements: endorser can delete" ON skill_endorsements FOR
 DELETE USING (endorser_id = auth.uid());
 
@@ -430,6 +439,7 @@ CREATE INDEX IF NOT EXISTS idx_user_roles_role ON user_roles(role);
 ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
 
 -- Users can only select their own roles. No insert/update/delete for authenticated role (service_role only).
+DROP POLICY IF EXISTS "User Roles: users can view own roles" ON user_roles;
 CREATE POLICY "User Roles: users can view own roles" ON user_roles FOR
 SELECT USING (user_id = auth.uid());
 

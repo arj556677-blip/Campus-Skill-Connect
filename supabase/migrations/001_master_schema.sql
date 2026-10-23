@@ -444,6 +444,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 -- ── PROFILES ──
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Profiles: viewable based on visibility" ON profiles;
 CREATE POLICY "Profiles: viewable based on visibility" ON profiles FOR
 SELECT USING (
     profile_visibility = 'worldwide'
@@ -457,27 +458,36 @@ SELECT USING (
       AND shares_campus(auth.uid(), id)
     )
   );
+DROP POLICY IF EXISTS "Profiles: users can update own" ON profiles;
 CREATE POLICY "Profiles: users can update own" ON profiles FOR
 UPDATE USING (id = auth.uid()) WITH CHECK (id = auth.uid());
+DROP POLICY IF EXISTS "Profiles: insert own" ON profiles;
 CREATE POLICY "Profiles: insert own" ON profiles FOR
 INSERT WITH CHECK (id = auth.uid());
 -- ── SKILLS ──
 ALTER TABLE skills ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Skills: viewable by all" ON skills;
 CREATE POLICY "Skills: viewable by all" ON skills FOR
 SELECT USING (true);
+DROP POLICY IF EXISTS "Skills: authenticated can insert" ON skills;
 CREATE POLICY "Skills: authenticated can insert" ON skills FOR
 INSERT WITH CHECK (auth.uid() IS NOT NULL);
 -- ── USER_SKILLS ──
 ALTER TABLE user_skills ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User Skills: viewable by all" ON user_skills;
 CREATE POLICY "User Skills: viewable by all" ON user_skills FOR
 SELECT USING (true);
+DROP POLICY IF EXISTS "User Skills: own only" ON user_skills;
 CREATE POLICY "User Skills: own only" ON user_skills FOR
 INSERT WITH CHECK (user_id = auth.uid());
+DROP POLICY IF EXISTS "User Skills: delete own only" ON user_skills;
 CREATE POLICY "User Skills: delete own only" ON user_skills FOR DELETE USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "User Skills: update own only" ON user_skills;
 CREATE POLICY "User Skills: update own only" ON user_skills FOR
 UPDATE USING (user_id = auth.uid());
 -- ── WORKS ──
 ALTER TABLE works ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Works: viewable based on visibility" ON works;
 CREATE POLICY "Works: viewable based on visibility" ON works FOR
 SELECT USING (
     visibility = 'worldwide'
@@ -500,15 +510,20 @@ SELECT USING (
       )
     )
   );
+DROP POLICY IF EXISTS "Works: owner can insert" ON works;
 CREATE POLICY "Works: owner can insert" ON works FOR
 INSERT WITH CHECK (owner_id = auth.uid());
+DROP POLICY IF EXISTS "Works: owner can update" ON works;
 CREATE POLICY "Works: owner can update" ON works FOR
 UPDATE USING (owner_id = auth.uid());
+DROP POLICY IF EXISTS "Works: owner can delete" ON works;
 CREATE POLICY "Works: owner can delete" ON works FOR DELETE USING (owner_id = auth.uid());
 -- ── WORK_SKILLS ──
 ALTER TABLE work_skills ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Work Skills: viewable by all" ON work_skills;
 CREATE POLICY "Work Skills: viewable by all" ON work_skills FOR
 SELECT USING (true);
+DROP POLICY IF EXISTS "Work Skills: work owner can manage" ON work_skills;
 CREATE POLICY "Work Skills: work owner can manage" ON work_skills FOR
 INSERT WITH CHECK (
     EXISTS (
@@ -518,6 +533,7 @@ INSERT WITH CHECK (
         AND owner_id = auth.uid()
     )
   );
+DROP POLICY IF EXISTS "Work Skills: work owner can delete" ON work_skills;
 CREATE POLICY "Work Skills: work owner can delete" ON work_skills FOR DELETE USING (
   EXISTS (
     SELECT 1
@@ -528,6 +544,7 @@ CREATE POLICY "Work Skills: work owner can delete" ON work_skills FOR DELETE USI
 );
 -- ── WORK_ACCESS ──
 ALTER TABLE work_access ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Work Access: work owner can manage" ON work_access;
 CREATE POLICY "Work Access: work owner can manage" ON work_access FOR ALL USING (
   EXISTS (
     SELECT 1
@@ -536,26 +553,32 @@ CREATE POLICY "Work Access: work owner can manage" ON work_access FOR ALL USING 
       AND owner_id = auth.uid()
   )
 );
+DROP POLICY IF EXISTS "Work Access: granted user can view" ON work_access;
 CREATE POLICY "Work Access: granted user can view" ON work_access FOR
 SELECT USING (granted_user_id = auth.uid());
 -- ── CONNECTION_REQUESTS ──
 ALTER TABLE connection_requests ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Connections: involved users can view" ON connection_requests;
 CREATE POLICY "Connections: involved users can view" ON connection_requests FOR
 SELECT USING (
     sender_id = auth.uid()
     OR receiver_id = auth.uid()
   );
+DROP POLICY IF EXISTS "Connections: authenticated can send" ON connection_requests;
 CREATE POLICY "Connections: authenticated can send" ON connection_requests FOR
 INSERT WITH CHECK (sender_id = auth.uid());
+DROP POLICY IF EXISTS "Connections: receiver can update status" ON connection_requests;
 CREATE POLICY "Connections: receiver can update status" ON connection_requests FOR
 UPDATE USING (receiver_id = auth.uid());
 -- ── CONVERSATIONS ──
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Conversations: participants can view" ON conversations;
 CREATE POLICY "Conversations: participants can view" ON conversations FOR
 SELECT USING (
     user_one = auth.uid()
     OR user_two = auth.uid()
   );
+DROP POLICY IF EXISTS "Conversations: authenticated can create" ON conversations;
 CREATE POLICY "Conversations: authenticated can create" ON conversations FOR
 INSERT WITH CHECK (
     user_one = auth.uid()
@@ -563,6 +586,7 @@ INSERT WITH CHECK (
   );
 -- ── MESSAGES ──
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Messages: conversation participants can view" ON messages;
 CREATE POLICY "Messages: conversation participants can view" ON messages FOR
 SELECT USING (
     EXISTS (
@@ -575,8 +599,10 @@ SELECT USING (
         )
     )
   );
+DROP POLICY IF EXISTS "Messages: sender can insert" ON messages;
 CREATE POLICY "Messages: sender can insert" ON messages FOR
 INSERT WITH CHECK (sender_id = auth.uid());
+DROP POLICY IF EXISTS "Messages: recipient can mark read" ON messages;
 CREATE POLICY "Messages: recipient can mark read" ON messages FOR
 UPDATE USING (
     sender_id != auth.uid()
@@ -592,28 +618,38 @@ UPDATE USING (
   );
 -- ── CV_UPLOADS ──
 ALTER TABLE cv_uploads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "CV Uploads: own only" ON cv_uploads;
 CREATE POLICY "CV Uploads: own only" ON cv_uploads FOR ALL USING (user_id = auth.uid());
 -- ── CV_RESUMES ──
 ALTER TABLE cv_resumes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "CV Resumes: own only" ON cv_resumes;
 CREATE POLICY "CV Resumes: own only" ON cv_resumes FOR ALL USING (user_id = auth.uid());
 -- ── AI_COPILOT_CONVERSATIONS ──
 ALTER TABLE ai_copilot_conversations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "AI Copilot: own only" ON ai_copilot_conversations;
 CREATE POLICY "AI Copilot: own only" ON ai_copilot_conversations FOR ALL USING (user_id = auth.uid());
 -- ── COLLABORATION_ROOMS ──
 ALTER TABLE collaboration_rooms ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Rooms: viewable by all authenticated" ON collaboration_rooms;
 CREATE POLICY "Rooms: viewable by all authenticated" ON collaboration_rooms FOR
 SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Rooms: creator can manage" ON collaboration_rooms;
 CREATE POLICY "Rooms: creator can manage" ON collaboration_rooms FOR
 INSERT WITH CHECK (creator_id = auth.uid());
+DROP POLICY IF EXISTS "Rooms: creator can update" ON collaboration_rooms;
 CREATE POLICY "Rooms: creator can update" ON collaboration_rooms FOR
 UPDATE USING (creator_id = auth.uid());
+DROP POLICY IF EXISTS "Rooms: creator can delete" ON collaboration_rooms;
 CREATE POLICY "Rooms: creator can delete" ON collaboration_rooms FOR DELETE USING (creator_id = auth.uid());
 -- ── REPORTS ──
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Reports: reporter can view own" ON reports;
 CREATE POLICY "Reports: reporter can view own" ON reports FOR
 SELECT USING (reporter_id = auth.uid());
+DROP POLICY IF EXISTS "Reports: authenticated can submit" ON reports;
 CREATE POLICY "Reports: authenticated can submit" ON reports FOR
 INSERT WITH CHECK (reporter_id = auth.uid());
+DROP POLICY IF EXISTS "Reports: admin can view all" ON reports;
 CREATE POLICY "Reports: admin can view all" ON reports FOR
 SELECT USING (
     EXISTS (
@@ -623,6 +659,7 @@ SELECT USING (
         AND role = 'admin'
     )
   );
+DROP POLICY IF EXISTS "Reports: admin can update" ON reports;
 CREATE POLICY "Reports: admin can update" ON reports FOR
 UPDATE USING (
     EXISTS (
@@ -634,6 +671,7 @@ UPDATE USING (
   );
 -- ── MODERATION_ACTIONS ──
 ALTER TABLE moderation_actions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Moderation: admin only" ON moderation_actions;
 CREATE POLICY "Moderation: admin only" ON moderation_actions FOR ALL USING (
   EXISTS (
     SELECT 1
@@ -644,6 +682,7 @@ CREATE POLICY "Moderation: admin only" ON moderation_actions FOR ALL USING (
 );
 -- ── SUPPORT_TICKETS ──
 ALTER TABLE support_tickets ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Tickets: own or admin" ON support_tickets;
 CREATE POLICY "Tickets: own or admin" ON support_tickets FOR
 SELECT USING (
     user_id = auth.uid()
@@ -654,8 +693,10 @@ SELECT USING (
         AND role = 'admin'
     )
   );
+DROP POLICY IF EXISTS "Tickets: user can create" ON support_tickets;
 CREATE POLICY "Tickets: user can create" ON support_tickets FOR
 INSERT WITH CHECK (user_id = auth.uid());
+DROP POLICY IF EXISTS "Tickets: admin can update" ON support_tickets;
 CREATE POLICY "Tickets: admin can update" ON support_tickets FOR
 UPDATE USING (
     user_id = auth.uid()
@@ -668,6 +709,7 @@ UPDATE USING (
   );
 -- ── SUPPORT_TICKET_MESSAGES ──
 ALTER TABLE support_ticket_messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Ticket Messages: participants and admin" ON support_ticket_messages;
 CREATE POLICY "Ticket Messages: participants and admin" ON support_ticket_messages FOR
 SELECT USING (
     sender_id = auth.uid()
@@ -684,10 +726,12 @@ SELECT USING (
         AND role = 'admin'
     )
   );
+DROP POLICY IF EXISTS "Ticket Messages: authenticated can insert" ON support_ticket_messages;
 CREATE POLICY "Ticket Messages: authenticated can insert" ON support_ticket_messages FOR
 INSERT WITH CHECK (sender_id = auth.uid());
 -- ── AUDIT_LOGS ──
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Audit Logs: admin only" ON audit_logs;
 CREATE POLICY "Audit Logs: admin only" ON audit_logs FOR
 SELECT USING (
     EXISTS (
@@ -697,23 +741,30 @@ SELECT USING (
         AND role = 'admin'
     )
   );
+DROP POLICY IF EXISTS "Audit Logs: system can insert" ON audit_logs;
 CREATE POLICY "Audit Logs: system can insert" ON audit_logs FOR
 INSERT WITH CHECK (auth.uid() IS NOT NULL);
 -- ── NOTIFICATIONS ──
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Notifications: own only" ON notifications;
 CREATE POLICY "Notifications: own only" ON notifications FOR
 SELECT USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "Notifications: system can insert" ON notifications;
 CREATE POLICY "Notifications: system can insert" ON notifications FOR
 INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Notifications: own can update" ON notifications;
 CREATE POLICY "Notifications: own can update" ON notifications FOR
 UPDATE USING (user_id = auth.uid());
 -- ── USER_SETTINGS ──
 ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Settings: own only" ON user_settings;
 CREATE POLICY "Settings: own only" ON user_settings FOR ALL USING (user_id = auth.uid());
 -- ── COMMUNITIES ──
 ALTER TABLE communities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Communities: viewable by all" ON communities;
 CREATE POLICY "Communities: viewable by all" ON communities FOR
 SELECT USING (true);
+DROP POLICY IF EXISTS "Communities: admin can manage" ON communities;
 CREATE POLICY "Communities: admin can manage" ON communities FOR ALL USING (
   EXISTS (
     SELECT 1
@@ -724,8 +775,10 @@ CREATE POLICY "Communities: admin can manage" ON communities FOR ALL USING (
 );
 -- ── CAMPUSES ──
 ALTER TABLE campuses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Campuses: viewable by all" ON campuses;
 CREATE POLICY "Campuses: viewable by all" ON campuses FOR
 SELECT USING (true);
+DROP POLICY IF EXISTS "Campuses: admin can manage" ON campuses;
 CREATE POLICY "Campuses: admin can manage" ON campuses FOR ALL USING (
   EXISTS (
     SELECT 1
@@ -736,8 +789,10 @@ CREATE POLICY "Campuses: admin can manage" ON campuses FOR ALL USING (
 );
 -- ── ZONES ──
 ALTER TABLE zones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Zones: viewable by all" ON zones;
 CREATE POLICY "Zones: viewable by all" ON zones FOR
 SELECT USING (true);
+DROP POLICY IF EXISTS "Zones: admin can manage" ON zones;
 CREATE POLICY "Zones: admin can manage" ON zones FOR ALL USING (
   EXISTS (
     SELECT 1

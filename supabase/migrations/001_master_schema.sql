@@ -66,23 +66,64 @@ CREATE TABLE IF NOT EXISTS profiles (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 -- Auto-create profile on user signup
-CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS TRIGGER AS $$ BEGIN
-INSERT INTO public.profiles (id, display_name, role)
-VALUES (
-    NEW.id,
-    COALESCE(
-      NEW.raw_user_meta_data->>'display_name',
-      NEW.email
-    ),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'student')
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_display_name TEXT;
+  v_role TEXT;
+BEGIN
+  v_display_name := COALESCE(
+    NEW.raw_user_meta_data->>'display_name',
+    split_part(NEW.email, '@', 1),
+    'Member'
   );
-RETURN NEW;
+
+  v_role := COALESCE(NEW.raw_user_meta_data->>'role', 'student');
+  IF v_role NOT IN ('student', 'faculty', 'recruiter', 'admin') THEN
+    v_role := 'student';
+  END IF;
+
+  INSERT INTO public.profiles (
+    id, 
+    display_name, 
+    role, 
+    profile_visibility, 
+    is_campus_verified, 
+    is_verified
+  )
+  VALUES (
+    NEW.id,
+    v_display_name,
+    v_role,
+    'public',
+    false,
+    false
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    display_name = EXCLUDED.display_name,
+    role = EXCLUDED.role;
+
+  -- Create default user settings directly
+  INSERT INTO public.user_settings (user_id)
+  VALUES (NEW.id)
+  ON CONFLICT (user_id) DO NOTHING;
+
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  -- Never crash auth.users signup transaction
+  RAISE WARNING 'handle_new_user encountered non-fatal error: %', SQLERRM;
+  RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
-AFTER
-INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+AFTER INSERT ON auth.users 
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 -- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now();
 RETURN NEW;

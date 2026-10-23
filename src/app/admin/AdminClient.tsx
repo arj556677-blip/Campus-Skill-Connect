@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRole } from '@/lib/auth/role-context';
 import {
   ShieldAlert,
@@ -11,29 +10,20 @@ import {
   Server,
   Users,
   CheckCircle2,
-  XCircle,
   AlertTriangle,
   Building,
-  Eye,
   Check,
   RefreshCw,
-  Search,
-  Filter,
   Lock,
-  Zap,
-  Radio,
-  FileCheck,
-  Download,
   GraduationCap,
   Briefcase,
-  ExternalLink,
 } from 'lucide-react';
-import { AuditLog, Community } from '@/lib/types';
+import { AuditLog, Community, Report } from '@/lib/types';
 
 interface AdminClientProps {
   auditLogs: AuditLog[];
   communities: Community[];
-  reports: any[];
+  reports: Report[];
 }
 
 export default function AdminClient({
@@ -53,7 +43,7 @@ export default function AdminClient({
   const [newUniName, setNewUniName] = useState('');
   const [showAddUni, setShowAddUni] = useState(false);
 
-  const handleResolveReport = (reportId: string, action: string) => {
+  const handleResolveReport = (reportId: string, _action?: string) => {
     setResolvedReports((prev) => [...prev, reportId]);
   };
 
@@ -101,7 +91,7 @@ export default function AdminClient({
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-mono font-bold uppercase tracking-wider mb-3">
               <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-              <span>Root Operations & Governance • Alex Rivera (Me)</span>
+              <span>Root Operations &amp; Governance • Platform Administrator</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               Trust, Safety & Security Control
@@ -222,11 +212,11 @@ export default function AdminClient({
             <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">
               Integrity Index
             </span>
-            <ShieldCheck className="w-4 h-4 text-rose-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-2xl font-black text-white">99.4%</div>
-          <p className="text-[11px] text-rose-300 mt-1 font-mono">
-            Anti-plagiarism hash verification
+          <div className="text-2xl font-black text-white">Active</div>
+          <p className="text-[11px] text-emerald-300 mt-1 font-mono">
+            Append-only audit log protection
           </p>
         </div>
       </div>
@@ -241,7 +231,7 @@ export default function AdminClient({
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'reports' | 'audit' | 'institutions' | 'health')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
               activeTab === tab.id
                 ? 'bg-white/10 text-white border border-white/15 shadow-sm font-bold'
@@ -522,8 +512,8 @@ export default function AdminClient({
             <h3 className="text-2xl font-black text-white">Redis 7 Alpine</h3>
             <div className="space-y-2 text-xs font-mono text-zinc-400">
               <div className="flex justify-between">
-                <span>Cache Hit Rate:</span>
-                <span className="font-bold text-emerald-400">99.4%</span>
+                <span>Limiter Status:</span>
+                <span className="font-bold text-emerald-400">Operational</span>
               </div>
               <div className="flex justify-between">
                 <span>Avg Cache Latency:</span>

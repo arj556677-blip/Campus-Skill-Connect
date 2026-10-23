@@ -49,60 +49,30 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
     setIsSubmitting(true);
 
     try {
-      if (roomType === 'google_meet') {
-        const res = await fetch('/api/collab/google-meet', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: newTitle,
-            description: newDesc,
-            confidentialityLevel,
-            passcode: passcode || undefined,
-            customMeetUrl: customMeetUrl || undefined,
-            hostApprovalRequired: hostApproval,
-            ndaRequired,
-          }),
-        });
-        const data = await res.json();
-        if (data.room) {
-          setRooms((prev) => [data.room, ...prev]);
-        }
-      } else {
-        const slug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random() * 1000);
-        const newRoom: CollaborationRoom = {
-          id: 'room-' + Date.now(),
-          title: newTitle.trim(),
-          description: newDesc.trim() || 'Open peer sprint and code pairing room.',
-          creator_id: 'user-current',
-          room_slug: slug,
-          is_active: true,
-          provider: 'webrtc_jitsi',
-          is_confidential: false,
-          confidentiality_level: 'public',
-          meeting_link: `https://meet.jit.si/CampusSkillConnect-${slug}`,
-          created_at: new Date().toISOString(),
-          creator: {
-            id: 'user-current',
-            display_name: 'Alex Rivera',
-            avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-            headline: 'MCA Final Year',
-            bio: '',
-            role: 'student',
-            institution_id: null,
-            campus_id: null,
-            zone_id: null,
-            field: 'Computer Applications',
-            profile_visibility: 'worldwide',
-            is_verified: true,
-            github_username: null,
-            linkedin_url: null,
-            website_url: null,
-            created_at: '',
-            updated_at: '',
-            skills: [],
-          },
-        };
-        setRooms((prev) => [newRoom, ...prev]);
+      const res = await fetch('/api/collab/google-meet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newTitle,
+          description: newDesc,
+          confidentialityLevel,
+          passcode: passcode || undefined,
+          customMeetUrl: roomType === 'webrtc_jitsi' 
+            ? `https://meet.jit.si/CampusSkillConnect-${newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` 
+            : (customMeetUrl || undefined),
+          hostApprovalRequired: hostApproval,
+          ndaRequired,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Failed to create room. Please ensure you are signed in.');
+        return;
+      }
+
+      if (data.room) {
+        setRooms((prev) => [data.room, ...prev]);
       }
 
       setNewTitle('');

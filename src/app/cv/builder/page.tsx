@@ -12,18 +12,13 @@ import {
   Plus,
   Trash2,
   AlertCircle,
-  Eye,
-  RefreshCw,
-  Layout,
   Briefcase,
   GraduationCap,
   FolderGit2,
   Copy,
   Check,
   Zap,
-  ExternalLink,
   ShieldCheck,
-  ChevronRight,
 } from 'lucide-react';
 import { CvTemplate } from '@/lib/types';
 
@@ -200,8 +195,24 @@ const PRESET_PRIYA: ResumeData = {
   ],
 };
 
+const EMPTY_RESUME: ResumeData = {
+  fullName: '',
+  headline: '',
+  email: '',
+  phone: '',
+  location: '',
+  github: '',
+  linkedin: '',
+  portfolio: '',
+  summary: '',
+  education: [],
+  experience: [],
+  projects: [],
+  skills: [],
+};
+
 const SUGGESTED_SKILLS = [
-  'Next.js 15',
+  'Next.js 16',
   'React 19',
   'TypeScript',
   'PostgreSQL',
@@ -221,78 +232,78 @@ const SUGGESTED_SKILLS = [
 
 export default function CvBuilderPage() {
   const [template, setTemplate] = useState<CvTemplate>('technical');
-  const [resume, setResume] = useState<ResumeData>(PRESET_ALEX);
+  const [resume, setResume] = useState<ResumeData>(EMPTY_RESUME);
+  const [exportFields, setExportFields] = useState({
+    phone: true,
+    location: true,
+    gpa: true,
+    summary: true,
+    education: true,
+    experience: true,
+    projects: true,
+  });
   const [activeTab, setActiveTab] = useState<'contact' | 'education' | 'experience' | 'projects' | 'skills'>('contact');
   const [copiedText, setCopiedText] = useState(false);
   const [newSkillInput, setNewSkillInput] = useState('');
   const [importNotice, setImportNotice] = useState<string | null>(null);
 
-  // ATS Diagnostic Analysis Engine
-  const atsAnalysis = useMemo(() => {
-    let score = 0;
-    const feedback: { text: string; passed: boolean }[] = [];
+  type SectionTab = 'contact' | 'education' | 'experience' | 'projects' | 'skills';
 
-    // 1. Contact Info check (max 20 pts)
-    let contactPts = 0;
-    if (resume.fullName.trim().length > 2) contactPts += 5;
-    if (resume.email && resume.email.includes('@')) contactPts += 5;
-    if (resume.phone && resume.phone.length > 5) contactPts += 5;
-    if (resume.github || resume.linkedin) contactPts += 5;
-    score += contactPts;
-    feedback.push({
-      text: contactPts === 20 ? 'Contact links & identifiers complete (+20)' : 'Complete full contact details (email, phone, GitHub/LinkedIn)',
-      passed: contactPts === 20,
+  // Rule-based ATS Structure Checklist (replaces artificial single score per specification)
+  const atsChecklist = useMemo(() => {
+    const rules: { name: string; description: string; passed: boolean }[] = [];
+
+    // 1. Contact Information
+    const contactComplete = Boolean(
+      resume.fullName.trim().length > 2 &&
+      resume.email && resume.email.includes('@') &&
+      resume.phone && resume.phone.length > 5 &&
+      (resume.github || resume.linkedin)
+    );
+    rules.push({
+      name: 'Contact Information Complete',
+      description: 'Full name, valid email, phone number, and professional profile link present',
+      passed: contactComplete,
     });
 
-    // 2. Summary & Headline (max 15 pts)
-    let summaryPts = 0;
-    if (resume.headline && resume.headline.length > 10) summaryPts += 5;
-    if (resume.summary && resume.summary.length >= 60) summaryPts += 10;
-    else if (resume.summary && resume.summary.length >= 30) summaryPts += 5;
-    score += summaryPts;
-    feedback.push({
-      text: summaryPts === 15 ? 'High-signal professional headline & summary (+15)' : 'Expand professional summary to at least 60 characters with technical focus',
-      passed: summaryPts === 15,
+    // 2. Summary
+    const summaryComplete = Boolean(resume.summary && resume.summary.length >= 60);
+    rules.push({
+      name: 'Professional Technical Summary',
+      description: 'Clear career summary with at least 60 characters explaining engineering focus',
+      passed: summaryComplete,
     });
 
-    // 3. Technical Skills density (max 20 pts)
-    let skillPts = 0;
-    if (resume.skills.length >= 8) skillPts = 20;
-    else if (resume.skills.length >= 4) skillPts = 12;
-    else skillPts = resume.skills.length * 3;
-    score += skillPts;
-    feedback.push({
-      text: skillPts === 20 ? `High keyword density: ${resume.skills.length} technical skills (+20)` : 'Include at least 8 verified skills or frameworks for ATS matching',
-      passed: skillPts === 20,
+    // 3. Technical Skills Vocabulary
+    const skillsComplete = resume.skills.length >= 8;
+    rules.push({
+      name: 'Skills Vocabulary Breadth',
+      description: `${resume.skills.length} skills listed (8+ recommended for recruiter keyword coverage)`,
+      passed: skillsComplete,
     });
 
-    // 4. Quantified metrics in bullets / projects (max 25 pts)
+    // 4. Quantified Metrics in Projects & Bullets
     const allText = JSON.stringify(resume);
-    const metricMatches = allText.match(/\d+[\%kK]|\b\d+\b/g);
-    let metricPts = 0;
-    if (metricMatches && metricMatches.length >= 5) metricPts = 25;
-    else if (metricMatches && metricMatches.length >= 2) metricPts = 15;
-    else metricPts = 5;
-    score += metricPts;
-    feedback.push({
-      text: metricPts === 25 ? `Quantified achievements detected: ${metricMatches?.length || 0} metrics found (+25)` : 'Quantify bullets with numbers (e.g., "reduced latency by 64%", "handled 10k requests")',
-      passed: metricPts === 25,
+    const metricMatches = allText.match(/\d+[%kK]|\b\d+\b/g);
+    const metricsComplete = Boolean(metricMatches && metricMatches.length >= 3);
+    rules.push({
+      name: 'Quantified Metrics',
+      description: 'Specific numbers, benchmarks, or percentages in project descriptions',
+      passed: metricsComplete,
     });
 
-    // 5. Strong action verbs (max 20 pts)
+    // 5. Action Verbs
     const actionVerbs = ['Architected', 'Engineered', 'Implemented', 'Developed', 'Configured', 'Optimized', 'Deployed', 'Benchmarked', 'Quantized'];
     const foundVerbs = actionVerbs.filter((v) => allText.toLowerCase().includes(v.toLowerCase()));
-    let verbPts = 0;
-    if (foundVerbs.length >= 4) verbPts = 20;
-    else if (foundVerbs.length >= 2) verbPts = 12;
-    else verbPts = foundVerbs.length * 5;
-    score += verbPts;
-    feedback.push({
-      text: verbPts === 20 ? `High-impact action verbs used (${foundVerbs.join(', ')}) (+20)` : 'Start bullets with strong action verbs: Architected, Engineered, Optimized, Deployed',
-      passed: verbPts === 20,
+    const verbsComplete = foundVerbs.length >= 2;
+    rules.push({
+      name: 'Action Verbs in Bullets',
+      description: `Project bullets use strong engineering verbs (${foundVerbs.slice(0, 3).join(', ') || 'e.g. Architected, Engineered'})`,
+      passed: verbsComplete,
     });
 
-    return { score: Math.min(score, 100), feedback };
+    const passedCount = rules.filter((r) => r.passed).length;
+    return { rules, passedCount, totalCount: rules.length };
   }, [resume]);
 
   const handlePrint = () => {
@@ -302,37 +313,82 @@ export default function CvBuilderPage() {
   };
 
   const handleExportJson = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(resume, null, 2));
+    const exportedData: Partial<ResumeData> = {
+      fullName: resume.fullName,
+      headline: resume.headline,
+      email: resume.email,
+      github: resume.github,
+      linkedin: resume.linkedin,
+      portfolio: resume.portfolio,
+      skills: resume.skills,
+    };
+
+    if (exportFields.phone) exportedData.phone = resume.phone;
+    if (exportFields.location) exportedData.location = resume.location;
+    if (exportFields.summary) exportedData.summary = resume.summary;
+    if (exportFields.education) {
+      exportedData.education = resume.education.map((e) => ({
+        institution: e.institution,
+        degree: e.degree,
+        year: e.year,
+        gpa: exportFields.gpa ? e.gpa : '',
+      }));
+    }
+    if (exportFields.experience) exportedData.experience = resume.experience;
+    if (exportFields.projects) exportedData.projects = resume.projects;
+
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportedData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `${resume.fullName.replace(/\s+/g, '_')}_ATS_Resume.json`);
+    downloadAnchor.setAttribute('download', `${(resume.fullName || 'Resume').replace(/\s+/g, '_')}_ATS_Resume.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
   const handleCopyPlainText = () => {
+    const contactParts = [resume.email];
+    if (exportFields.phone && resume.phone) contactParts.push(resume.phone);
+    if (exportFields.location && resume.location) contactParts.push(resume.location);
+
+    const linkParts = [resume.github, resume.linkedin, resume.portfolio].filter(Boolean);
+
     const lines = [
-      resume.fullName.toUpperCase(),
+      resume.fullName.toUpperCase() || 'ANONYMOUS CANDIDATE',
       resume.headline,
-      `${resume.email} | ${resume.phone} | ${resume.location}`,
-      `${resume.github} | ${resume.linkedin} | ${resume.portfolio}`,
+      contactParts.join(' | '),
+      linkParts.join(' | '),
       '',
-      'PROFESSIONAL SUMMARY',
-      resume.summary,
-      '',
-      'EDUCATION',
-      ...resume.education.map((e) => `${e.institution} - ${e.degree} (${e.year}) [GPA: ${e.gpa}]`),
-      '',
-      'EXPERIENCE',
-      ...resume.experience.map((exp) => `${exp.role} | ${exp.company} (${exp.duration})\n` + exp.bullets.map((b) => `  * ${b}`).join('\n')),
-      '',
-      'VERIFIED PROJECTS',
-      ...resume.projects.map((p) => `${p.title} (${p.technologies})\n  ${p.description}\n  Link: ${p.link}`),
-      '',
-      'TECHNICAL COMPETENCIES',
-      resume.skills.join(', '),
     ];
+
+    if (exportFields.summary && resume.summary) {
+      lines.push('PROFESSIONAL SUMMARY', resume.summary, '');
+    }
+
+    lines.push(
+      'EDUCATION',
+      ...resume.education.map((e) => `${e.institution} - ${e.degree} (${e.year})${exportFields.gpa && e.gpa ? ` [GPA: ${e.gpa}]` : ''}`),
+      ''
+    );
+
+    if (exportFields.experience && resume.experience.length > 0) {
+      lines.push(
+        'EXPERIENCE',
+        ...resume.experience.map((exp) => `${exp.role} | ${exp.company} (${exp.duration})\n` + exp.bullets.map((b) => `  * ${b}`).join('\n')),
+        ''
+      );
+    }
+
+    if (exportFields.projects && resume.projects.length > 0) {
+      lines.push(
+        'VERIFIED PROJECTS',
+        ...resume.projects.map((p) => `${p.title} (${p.technologies})\n  ${p.description}\n  Link: ${p.link}`),
+        ''
+      );
+    }
+
+    lines.push('TECHNICAL COMPETENCIES', resume.skills.join(', '));
+
     navigator.clipboard.writeText(lines.join('\n'));
     setCopiedText(true);
     setTimeout(() => setCopiedText(false), 2500);
@@ -453,7 +509,7 @@ export default function CvBuilderPage() {
                 </span>
               </div>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Real-time ATS parsing score, verified campus project integration, and 4 high-signal templates.
+                Rule-based ATS section validator, custom field export selector, and 4 high-signal templates.
               </p>
             </div>
           </div>
@@ -462,27 +518,38 @@ export default function CvBuilderPage() {
           <div className="flex flex-wrap items-center gap-2">
             {/* Presets */}
             <div className="flex items-center gap-1 p-1 bg-[#10121a] border border-white/10 rounded-xl">
+              <span className="text-[10px] font-mono text-zinc-500 px-1.5 uppercase font-bold">Samples:</span>
               <button
                 type="button"
                 onClick={() => setResume(PRESET_ALEX)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all ${
                   resume.fullName === 'Alex Rivera'
                     ? 'bg-violet-600 text-white shadow-sm'
                     : 'text-zinc-400 hover:text-white'
                 }`}
+                title="Load sample distributed systems resume"
               >
-                Alex (MCA)
+                Systems
               </button>
               <button
                 type="button"
                 onClick={() => setResume(PRESET_PRIYA)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all ${
                   resume.fullName === 'Priya Sharma'
                     ? 'bg-violet-600 text-white shadow-sm'
                     : 'text-zinc-400 hover:text-white'
                 }`}
+                title="Load sample AI/ML researcher resume"
               >
-                Priya (AI/ML)
+                AI/ML
+              </button>
+              <button
+                type="button"
+                onClick={() => setResume(EMPTY_RESUME)}
+                className="px-2 py-1 rounded-lg text-[11px] font-bold text-zinc-400 hover:text-rose-400 transition-all"
+                title="Clear all fields to type your own details"
+              >
+                Clear
               </button>
             </div>
 
@@ -558,39 +625,39 @@ export default function CvBuilderPage() {
         <div className="no-print rounded-2xl bg-[#0e1017] border border-white/10 p-4 sm:p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div
-              className={`relative w-14 h-14 rounded-full flex items-center justify-center font-black text-lg border-4 ${
-                atsAnalysis.score >= 85
+              className={`relative w-14 h-14 rounded-full flex items-center justify-center font-black text-sm border-4 ${
+                atsChecklist.passedCount >= 4
                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
-                  : atsAnalysis.score >= 65
+                  : atsChecklist.passedCount >= 3
                   ? 'bg-amber-500/10 text-amber-400 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
                   : 'bg-rose-500/10 text-rose-400 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.25)]'
               }`}
             >
-              {atsAnalysis.score}
+              {atsChecklist.passedCount}/{atsChecklist.totalCount}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-sm text-white">
-                  ATS Readiness Score: {atsAnalysis.score}/100
+                  ATS Structure Checklist: {atsChecklist.passedCount} of {atsChecklist.totalCount} Rules Met
                 </h3>
                 <span
                   className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
-                    atsAnalysis.score >= 85
+                    atsChecklist.passedCount >= 4
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                      : atsAnalysis.score >= 65
+                      : atsChecklist.passedCount >= 3
                       ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                       : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
                   }`}
                 >
-                  {atsAnalysis.score >= 85
-                    ? '98% Parser Compatibility (Tier 1)'
-                    : atsAnalysis.score >= 65
-                    ? 'Good Signal — Minor Optimizations Needed'
-                    : 'Low Signal — Add Keywords & Metrics'}
+                  {atsChecklist.passedCount >= 4
+                    ? 'All Essential Sections Complete'
+                    : atsChecklist.passedCount >= 3
+                    ? 'Recommended Sections Pending'
+                    : 'Missing Core Structural Sections'}
                 </span>
               </div>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Evaluated against action verbs, quantified metrics, tech stack density, and standard contact structure.
+                Rule-based rubric: contact completeness, action verbs, quantified metrics, and skills vocabulary.
               </p>
             </div>
           </div>
@@ -628,7 +695,7 @@ export default function CvBuilderPage() {
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => setActiveTab(tab.id as SectionTab)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
                       isActive
                         ? 'bg-violet-600 text-white shadow-md'
@@ -1098,16 +1165,21 @@ export default function CvBuilderPage() {
                 <span>ATS Quality Checklist & Rubric</span>
               </div>
               <div className="space-y-1.5">
-                {atsAnalysis.feedback.map((item, idx) => (
+                {atsChecklist.rules.map((rule, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-[11.5px]">
-                    {item.passed ? (
+                    {rule.passed ? (
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                     ) : (
                       <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                     )}
-                    <span className={item.passed ? 'text-zinc-300' : 'text-amber-300/90'}>
-                      {item.text}
-                    </span>
+                    <div className="flex-1">
+                      <span className={`font-semibold ${rule.passed ? 'text-zinc-200' : 'text-amber-300'}`}>
+                        {rule.name}:
+                      </span>{' '}
+                      <span className={rule.passed ? 'text-zinc-400' : 'text-amber-300/80'}>
+                        {rule.description}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1119,19 +1191,27 @@ export default function CvBuilderPage() {
           <div className="lg:col-span-7">
             <div className="cv-preview-sheet sticky top-24 rounded-2xl bg-white border border-zinc-200 p-8 sm:p-12 shadow-2xl text-black min-h-[960px] font-sans transition-all duration-300">
               
+              {/* Sample Data Notice */}
+              {(resume.fullName === 'Alex Rivera' || resume.fullName === 'Priya Sharma') && (
+                <div className="no-print mb-4 p-2.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-[11px] font-mono flex items-center justify-between">
+                  <span>Notice: Currently displaying [Sample Demonstration Profile]. Enter your verified details to personalize.</span>
+                  <button type="button" onClick={() => setResume(EMPTY_RESUME)} className="underline font-bold text-amber-950 ml-2">Clear</button>
+                </div>
+              )}
+
               {/* HEADER RENDERING PER TEMPLATE */}
               {template === 'technical' && (
                 <div className="border-b-2 border-zinc-900 pb-5 mb-5 text-center">
                   <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-zinc-950 font-mono">
-                    {resume.fullName}
+                    {resume.fullName || 'YOUR NAME'}
                   </h1>
                   <p className="text-xs font-bold text-zinc-800 mt-1 uppercase tracking-wide">
-                    {resume.headline}
+                    {resume.headline || 'Your Professional Headline'}
                   </p>
                   <div className="mt-2 text-[11px] font-mono text-zinc-700 flex flex-wrap items-center justify-center gap-2">
                     {resume.email && <span>{resume.email}</span>}
-                    {resume.phone && <span>| {resume.phone}</span>}
-                    {resume.location && <span>| {resume.location}</span>}
+                    {exportFields.phone && resume.phone && <span>| {resume.phone}</span>}
+                    {exportFields.location && resume.location && <span>| {resume.location}</span>}
                     {resume.github && <span>| {resume.github}</span>}
                     {resume.linkedin && <span>| {resume.linkedin}</span>}
                   </div>

@@ -183,15 +183,15 @@ export default function RecruiterDashboardClient({
                     Distributed Systems Engineer (New Grad)
                   </h4>
                   <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                    98% Match
+                    Filter Active
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400 mt-1">
-                  Stripe Core Infrastructure • Redis, Rust, Raft
+                  Core Infrastructure • Redis, Rust, Raft
                 </p>
                 <div className="mt-2.5 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                  <span>14 Matched Builders</span>
-                  <span className="text-violet-400 font-bold">Top: Alex Rivera</span>
+                  <span>Candidate Search Criteria</span>
+                  <span className="text-violet-400 font-bold">Skill Match</span>
                 </div>
               </div>
 
@@ -201,15 +201,15 @@ export default function RecruiterDashboardClient({
                     Full-Stack Web Architect (Campus)
                   </h4>
                   <span className="text-[10px] font-mono text-cyan-400 font-bold">
-                    94% Match
+                    Filter Active
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400 mt-1">
-                  Stripe Apps & Dashboard • Next.js, TypeScript, Tailwind
+                  Web Applications • Next.js, TypeScript, PostgreSQL
                 </p>
                 <div className="mt-2.5 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                  <span>21 Matched Builders</span>
-                  <span className="text-violet-400 font-bold">Top: Karan Verma</span>
+                  <span>Candidate Search Criteria</span>
+                  <span className="text-violet-400 font-bold">Campus Verified</span>
                 </div>
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function RecruiterDashboardClient({
                         </div>
 
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-bold">
-                          98% MATCH
+                          VERIFIED
                         </span>
                       </div>
 
@@ -387,7 +387,7 @@ export default function RecruiterDashboardClient({
 
                     <td className="py-3 px-3">
                       <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono text-[10px]">
-                        98% MATCH
+                        ACTIVE
                       </span>
                     </td>
 

@@ -4,11 +4,7 @@ import React, { useState } from 'react';
 import {
   CircleHelp as HelpCircle,
   Plus,
-  CheckCircle2,
   Clock,
-  AlertCircle,
-  MessageSquare,
-  ShieldCheck,
   Send,
   X,
 } from 'lucide-react';
@@ -281,7 +277,7 @@ export default function SupportClient({ initialTickets }: SupportClientProps) {
                   </label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value as any)}
+                    onChange={(e) => setCategory(e.target.value as TicketCategory)}
                     className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-xs text-white focus:outline-none focus:border-violet-500"
                   >
                     <option value="account">Account &amp; Domain</option>
@@ -297,7 +293,7 @@ export default function SupportClient({ initialTickets }: SupportClientProps) {
                   </label>
                   <select
                     value={priority}
-                    onChange={(e) => setPriority(e.target.value as any)}
+                    onChange={(e) => setPriority(e.target.value as TicketPriority)}
                     className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-xs text-white focus:outline-none focus:border-violet-500"
                   >
                     <option value="low">Low</option>

@@ -1,376 +1,699 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import {
   MessageSquare,
   Send,
-  Video,
   Search,
   Check,
   CheckCheck,
-  Sparkles,
-  Paperclip,
-  MoreVertical,
-  ShieldCheck,
-  User,
+  ShieldAlert,
+  Ban,
+  AlertCircle,
+  RefreshCw,
+  X,
 } from 'lucide-react';
-import { MOCK_PROFILES } from '@/lib/data/mock-data';
+import { createBrowserClient } from '@supabase/ssr';
 
-interface Conversation {
+interface ParticipantProfile {
   id: string;
-  user: (typeof MOCK_PROFILES)[0];
+  display_name: string;
+  username?: string;
+  headline?: string;
+  avatar_url?: string | null;
+  avatar_path?: string | null;
+}
+
+interface ConversationItem {
+  id: string;
+  otherUser: ParticipantProfile;
   lastMessage: string;
-  time: string;
-  unread: number;
-  online: boolean;
+  lastMessageAt: string;
+  unreadCount: number;
 }
 
 interface MessageItem {
   id: string;
-  senderId: string;
+  conversation_id: string;
+  sender_id: string;
   content: string;
-  time: string;
+  is_read: boolean;
+  created_at: string;
 }
 
-const INITIAL_CONVERSATIONS: Conversation[] = [
-  {
-    id: 'conv-1',
-    user: MOCK_PROFILES[1], // Priya Sharma
-    lastMessage: 'Hey! Loved your Redis cache implementation. Are you free to collab on YOLOv9?',
-    time: '10:42 AM',
-    unread: 2,
-    online: true,
-  },
-  {
-    id: 'conv-2',
-    user: MOCK_PROFILES[2], // Karan Verma
-    lastMessage: 'I pushed the updated Figma tokens for the editorial dark mode.',
-    time: 'Yesterday',
-    unread: 0,
-    online: true,
-  },
-  {
-    id: 'conv-3',
-    user: MOCK_PROFILES[4], // Marcus Chen (Recruiter)
-    lastMessage: 'Hi Alex, we reviewed your HyperCache work on Campus Skill Connect and want to schedule a call.',
-    time: 'Oct 19',
-    unread: 1,
-    online: false,
-  },
-];
-
-const INITIAL_MESSAGES: Record<string, MessageItem[]> = {
-  'conv-1': [
-    {
-      id: 'm-1',
-      senderId: 'user-2',
-      content: 'Hey Alex! I saw your HyperCache project on the showcase. The 99.4% cache hit benchmark is incredible.',
-      time: '10:30 AM',
-    },
-    {
-      id: 'm-2',
-      senderId: 'user-1',
-      content: 'Thanks Priya! Using Redis sorted sets for sliding-window rate limiting made a huge difference under high concurrency.',
-      time: '10:35 AM',
-    },
-    {
-      id: 'm-3',
-      senderId: 'user-2',
-      content: 'Are you free to jump into a collaboration room to discuss hooking that into our drone vision inference pipeline?',
-      time: '10:42 AM',
-    },
-  ],
-  'conv-2': [
-    {
-      id: 'm-201',
-      senderId: 'user-3',
-      content: 'Hey! How do the new typography scales feel on mobile?',
-      time: 'Yesterday',
-    },
-    {
-      id: 'm-202',
-      senderId: 'user-1',
-      content: 'They look super clean and high-contrast. The Syne + Space Grotesk combination gives a premium editorial feel.',
-      time: 'Yesterday',
-    },
-  ],
-  'conv-3': [
-    {
-      id: 'm-301',
-      senderId: 'user-5',
-      content: 'Hi Alex, I am Marcus Chen from University Talent Acquisition at Stripe. Your proof-of-work caught our eye.',
-      time: 'Oct 19',
-    },
-  ],
-};
+const MAX_MESSAGE_LENGTH = 2000;
 
 export default function MessagesClient() {
-  const [conversations, setConversations] = useState<Conversation[]>(INITIAL_CONVERSATIONS);
-  const [activeConvId, setActiveConvId] = useState<string>('conv-1');
-  const [messages, setMessages] = useState<Record<string, MessageItem[]>>(INITIAL_MESSAGES);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<MessageItem[]>([]);
   const [inputVal, setInputVal] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
+  const [isLoadingConvs, setIsLoadingConvs] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [liveAnnouncement, setLiveAnnouncement] = useState('');
+
+  // Report & Block Modal State
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('Harassment or Spam');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reportSubmitting, setReportSubmitting] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const convListRef = useRef<HTMLDivElement>(null);
 
-  const activeConv = conversations.find((c) => c.id === activeConvId) || conversations[0];
-  const activeMessages = messages[activeConvId] || [];
+  // Initialize Supabase browser client for Realtime subscription
+  const supabase = useMemo(
+    () =>
+      createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+      ),
+    []
+  );
 
+  // 1. Fetch current user and conversations on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    async function initConvs() {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!isMounted) return;
+        if (user) {
+          setCurrentUserId(user.id);
+        }
+
+        const res = await fetch('/api/conversations');
+        const data = await res.json();
+        if (!isMounted) return;
+        if (res.ok && data.conversations) {
+          setConversations(data.conversations);
+          if (data.conversations.length > 0) {
+            setActiveConvId((curr) => curr || data.conversations[0].id);
+          }
+        }
+      } catch {
+        if (isMounted) setErrorMsg('Failed to load conversations.');
+      } finally {
+        if (isMounted) setIsLoadingConvs(false);
+      }
+    }
+
+    initConvs();
+    return () => {
+      isMounted = false;
+    };
+  }, [supabase]);
+
+  // 2. Fetch messages for selected conversation
+  useEffect(() => {
+    if (!activeConvId) return;
+    let isMounted = true;
+
+    async function fetchMsgs() {
+      try {
+        const res = await fetch(`/api/messages?conversationId=${encodeURIComponent(activeConvId!)}`);
+        const data = await res.json();
+        if (!isMounted) return;
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to load messages');
+        }
+        setMessages(data.messages || []);
+
+        // Decrement unread count locally
+        setConversations((prev) =>
+          prev.map((c) => (c.id === activeConvId ? { ...c, unreadCount: 0 } : c))
+        );
+      } catch (err: unknown) {
+        if (!isMounted) return;
+        const msg = err instanceof Error ? err.message : 'Error fetching messages';
+        setErrorMsg(msg);
+      } finally {
+        if (isMounted) setIsLoadingMessages(false);
+      }
+    }
+
+    fetchMsgs();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeConvId]);
+
+  // 3. Setup Supabase Realtime subscription filtered by conversation_id
+  useEffect(() => {
+    if (!activeConvId) return;
+
+    const channel = supabase
+      .channel(`chat:${activeConvId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${activeConvId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as MessageItem;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+
+          // Accessible screen reader live region announcement
+          if (newMsg.sender_id !== currentUserId) {
+            setLiveAnnouncement(`New message: ${newMsg.content}`);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [activeConvId, currentUserId, supabase]);
+
+  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeMessages]);
+  }, [messages]);
 
+  // 4. Send Message with Optimistic Update and Rate Limit Error Handling
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputVal.trim()) return;
+    if (!inputVal.trim() || !activeConvId || !currentUserId || isSending) return;
 
-    const newMsg: MessageItem = {
-      id: 'm-' + Date.now(),
-      senderId: 'user-1',
-      content: inputVal.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    const contentToSend = inputVal.trim();
+    if (contentToSend.length > MAX_MESSAGE_LENGTH) {
+      setErrorMsg(`Message exceeds ${MAX_MESSAGE_LENGTH} characters limit.`);
+      return;
+    }
+
+    const optimisticId = `optimistic-${Date.now()}`;
+    const optimisticMsg: MessageItem = {
+      id: optimisticId,
+      conversation_id: activeConvId,
+      sender_id: currentUserId,
+      content: contentToSend,
+      is_read: false,
+      created_at: new Date().toISOString(),
     };
 
-    setMessages((prev) => ({
-      ...prev,
-      [activeConvId]: [...(prev[activeConvId] || []), newMsg],
-    }));
-
-    // Update conversation snippet
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === activeConvId
-          ? { ...c, lastMessage: inputVal.trim(), time: 'Just now' }
-          : c
-      )
-    );
-
-    const textToSend = inputVal.trim();
+    // Optimistic UI append
+    setMessages((prev) => [...prev, optimisticMsg]);
     setInputVal('');
+    setErrorMsg(null);
+    setIsSending(true);
 
-    // Fire API route in background
     try {
-      await fetch('/api/messages', {
+      const res = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conversationId: activeConvId,
-          content: textToSend,
-          senderId: 'user-1',
+          content: contentToSend,
         }),
       });
-    } catch {
-      // Handled gracefully
+
+      const data = await res.json();
+      if (!res.ok) {
+        // Rollback optimistic message on error (e.g. 429 rate limit exceeded)
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+        setInputVal(contentToSend);
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      // Replace optimistic message with actual persisted record
+      if (data.message) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === optimisticId ? data.message : m))
+        );
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error sending message';
+      setErrorMsg(msg);
+    } finally {
+      setIsSending(false);
     }
   };
 
-  const filteredConversations = conversations.filter(
-    (c) =>
-      c.user.display_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      c.lastMessage.toLowerCase().includes(searchFilter.toLowerCase())
+  // 5. Block User Action
+  const handleBlockUser = async () => {
+    const active = conversations.find((c) => c.id === activeConvId);
+    if (!active) return;
+
+    if (!confirm(`Block ${active.otherUser.display_name}? This will immediately hide conversations and cancel connections.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId: active.otherUser.id }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to block user');
+      }
+
+      alert('User blocked. All connections and conversations have been severed.');
+      // Remove conversation locally
+      setConversations((prev) => prev.filter((c) => c.id !== activeConvId));
+      setActiveConvId(null);
+      setMessages([]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error blocking user';
+      alert(msg);
+    }
+  };
+
+  // 6. Submit Report Action
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const active = conversations.find((c) => c.id === activeConvId);
+    if (!active) return;
+
+    setReportSubmitting(true);
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetType: 'message',
+          targetId: active.otherUser.id,
+          reason: reportReason,
+          details: reportDetails,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to submit report');
+      }
+
+      alert('Report dispatched to moderation queue.');
+      setShowReportModal(false);
+      setReportDetails('');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Report failed';
+      alert(msg);
+    } finally {
+      setReportSubmitting(false);
+    }
+  };
+
+  // 7. Keyboard Navigation across Conversation List
+  const handleKeyDownList = (e: React.KeyboardEvent, currentIndex: number) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const nextIndex = Math.min(conversations.length - 1, currentIndex + 1);
+      setActiveConvId(conversations[nextIndex].id);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prevIndex = Math.max(0, currentIndex - 1);
+      setActiveConvId(conversations[prevIndex].id);
+    }
+  };
+
+  const filteredConversations = conversations.filter((c) =>
+    c.otherUser.display_name.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
+  const activeConv = conversations.find((c) => c.id === activeConvId);
+
   return (
-    <div className="h-full rounded-3xl bg-white border border-[var(--color-border)] shadow-elevated flex overflow-hidden">
-      {/* ── Left Sidebar: Conversations List ── */}
-      <div className="w-80 md:w-96 border-r border-[var(--color-border)] flex flex-col bg-zinc-50/50">
-        <div className="p-4 border-b border-[var(--color-border-subtle)] space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-extrabold text-base text-[var(--color-ink)] flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-[var(--color-brand-primary)]" />
-              <span>Messages</span>
-            </h2>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
-              Redis Pub/Sub
-            </span>
-          </div>
-
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input
-              type="text"
-              value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value)}
-              placeholder="Search conversations..."
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white border border-[var(--color-border)] text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-primary)]"
-            />
-          </div>
-        </div>
-
-        {/* Conversations Scrollable List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-[var(--color-border-subtle)]">
-          {filteredConversations.map((conv) => {
-            const isActive = conv.id === activeConvId;
-            return (
-              <button
-                key={conv.id}
-                onClick={() => {
-                  setActiveConvId(conv.id);
-                  // Clear unread
-                  setConversations((prev) =>
-                    prev.map((c) => (c.id === conv.id ? { ...c, unread: 0 } : c))
-                  );
-                }}
-                className={`w-full p-4 flex items-start gap-3 text-left transition-colors ${
-                  isActive
-                    ? 'bg-white border-l-4 border-[var(--color-brand-primary)] shadow-sm'
-                    : 'hover:bg-zinc-100/60'
-                }`}
-              >
-                <div className="relative shrink-0">
-                  <img
-                    src={conv.user.avatar_url!}
-                    alt={conv.user.display_name}
-                    className="w-11 h-11 rounded-xl object-cover ring-1 ring-zinc-200"
-                  />
-                  {conv.online && (
-                    <span
-                      title="Online (Redis Presence Heartbeat)"
-                      className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white"
-                    />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-bold text-xs text-[var(--color-ink)] truncate">
-                      {conv.user.display_name}
-                    </span>
-                    <span className="text-[10px] text-zinc-400 font-mono shrink-0">
-                      {conv.time}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] text-[var(--color-ink-muted)] truncate mt-0.5">
-                    {conv.lastMessage}
-                  </p>
-
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <span
-                      className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full uppercase ${
-                        conv.user.role === 'recruiter'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
-                      {conv.user.role}
-                    </span>
-                    {conv.unread > 0 && (
-                      <span className="ml-auto w-4 h-4 rounded-full bg-[var(--color-brand-coral)] text-white text-[10px] font-bold flex items-center justify-center">
-                        {conv.unread}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+    <div className="min-h-screen bg-[#08090d] text-white py-6">
+      {/* Screen Reader Accessible Live Region for New Messages */}
+      <div aria-live="polite" aria-atomic="false" className="sr-only">
+        {liveAnnouncement}
       </div>
 
-      {/* ── Right Main: Active Chat Thread ── */}
-      <div className="flex-1 flex flex-col bg-white">
-        {/* Thread Header */}
-        <div className="p-4 border-b border-[var(--color-border)] flex items-center justify-between bg-white z-10">
-          <div className="flex items-center gap-3">
-            <Link href={`/profile/${activeConv.user.id}`} className="relative">
-              <img
-                src={activeConv.user.avatar_url!}
-                alt={activeConv.user.display_name}
-                className="w-10 h-10 rounded-xl object-cover ring-1 ring-zinc-200"
-              />
-              {activeConv.online && (
-                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
-              )}
-            </Link>
-
-            <div>
-              <div className="flex items-center gap-1.5">
-                <Link
-                  href={`/profile/${activeConv.user.id}`}
-                  className="font-bold text-sm text-[var(--color-ink)] hover:text-[var(--color-brand-primary)]"
-                >
-                  {activeConv.user.display_name}
-                </Link>
-                {activeConv.user.is_verified && (
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl bg-[#0e1017] border border-white/10 overflow-hidden shadow-2xl h-[calc(100vh-8rem)] flex flex-col md:flex-row">
+          
+          {/* ── LEFT SIDEBAR: CONVERSATION LIST ── */}
+          <div className="w-full md:w-80 lg:w-96 border-r border-white/10 flex flex-col shrink-0 bg-[#0b0c12]">
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-white/10 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-violet-400" />
+                  <h1 className="text-sm font-extrabold uppercase tracking-wider text-white">
+                    Direct Messages
+                  </h1>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 font-bold">
+                  Connections Only
+                </span>
               </div>
-              <p className="text-[11px] text-[var(--color-ink-muted)]">
-                {activeConv.user.headline || activeConv.user.field}
-              </p>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Filter connections..."
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                />
+              </div>
+            </div>
+
+            {/* Conversation Items */}
+            <div
+              ref={convListRef}
+              role="listbox"
+              aria-label="Active conversations"
+              className="flex-1 overflow-y-auto divide-y divide-white/[0.04]"
+            >
+              {isLoadingConvs ? (
+                <div className="p-8 text-center text-zinc-500 text-xs font-mono">
+                  <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2 text-violet-400" />
+                  <span>Loading connections...</span>
+                </div>
+              ) : filteredConversations.length === 0 ? (
+                <div className="p-8 text-center space-y-3">
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    No active direct conversations. Messaging is permitted between accepted, unblocked connections.
+                  </p>
+                  <Link
+                    href="/showcase"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-600/20 text-violet-300 border border-violet-500/30 text-xs font-bold hover:bg-violet-600/30 transition-all"
+                  >
+                    <span>Discover Peers</span>
+                  </Link>
+                </div>
+              ) : (
+                filteredConversations.map((c, idx) => {
+                  const isActive = c.id === activeConvId;
+                  return (
+                    <button
+                      key={c.id}
+                      role="option"
+                      aria-selected={isActive}
+                      tabIndex={0}
+                      onClick={() => setActiveConvId(c.id)}
+                      onKeyDown={(e) => handleKeyDownList(e, idx)}
+                      className={`w-full text-left p-3.5 flex items-start gap-3 transition-colors ${
+                        isActive
+                          ? 'bg-violet-600/15 border-l-4 border-l-violet-500'
+                          : 'hover:bg-white/[0.02]'
+                      }`}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0 text-violet-300 font-bold text-xs">
+                        {c.otherUser.avatar_url ? (
+                          <img
+                            src={c.otherUser.avatar_url}
+                            alt=""
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <span>{c.otherUser.display_name.slice(0, 2).toUpperCase()}</span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <h2 className="text-xs font-bold text-white truncate">
+                            {c.otherUser.display_name}
+                          </h2>
+                          <span className="text-[10px] font-mono text-zinc-500">
+                            {new Date(c.lastMessageAt).toLocaleDateString([], {
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 truncate">
+                          {c.lastMessage}
+                        </p>
+                      </div>
+
+                      {c.unreadCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-violet-600 text-[10px] font-bold text-white font-mono">
+                          {c.unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/collaborate"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-brand-primary-light)] text-[var(--color-brand-primary)] text-xs font-semibold hover:bg-[var(--color-brand-primary)] hover:text-white transition-all"
-            >
-              <Video className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Launch WebRTC Room</span>
-            </Link>
-          </div>
-        </div>
+          {/* ── RIGHT MAIN PANEL: ACTIVE THREAD ── */}
+          <div className="flex-1 flex flex-col bg-[#0e1017] min-w-0">
+            {activeConv ? (
+              <>
+                {/* Thread Header */}
+                <div className="p-4 border-b border-white/10 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0 text-violet-300 font-bold text-xs">
+                      {activeConv.otherUser.avatar_url ? (
+                        <img
+                          src={activeConv.otherUser.avatar_url}
+                          alt=""
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span>{activeConv.otherUser.display_name.slice(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/profile/${activeConv.otherUser.id}`}
+                          className="text-sm font-bold text-white hover:underline truncate"
+                        >
+                          {activeConv.otherUser.display_name}
+                        </Link>
+                        {activeConv.otherUser.username && (
+                          <span className="text-[10px] font-mono text-zinc-500">
+                            @{activeConv.otherUser.username}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-zinc-400 truncate">
+                        {activeConv.otherUser.headline || 'Verified Campus Connection'}
+                      </p>
+                    </div>
+                  </div>
 
-        {/* Messages Stream */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-zinc-50/30">
-          <div className="text-center my-2">
-            <span className="text-[10px] font-mono text-zinc-400 bg-white px-3 py-1 rounded-full border border-zinc-200">
-              Encrypted 1-on-1 Session • Redis Pub/Sub Active
-            </span>
-          </div>
+                  {/* Actions: Report and Block */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowReportModal(true)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-rose-500/10 text-zinc-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/20 text-xs font-mono transition-all"
+                      title="Report thread to moderation"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Report</span>
+                    </button>
 
-          {activeMessages.map((msg) => {
-            const isMe = msg.senderId === 'user-1';
-            return (
-              <div
-                key={msg.id}
-                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
-              >
-                <div
-                  className={`max-w-md sm:max-w-lg rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-soft ${
-                    isMe
-                      ? 'bg-[var(--color-brand-primary)] text-white rounded-br-xs'
-                      : 'bg-white border border-[var(--color-border)] text-[var(--color-ink)] rounded-bl-xs'
-                  }`}
+                    <button
+                      type="button"
+                      onClick={handleBlockUser}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-rose-500/15 text-zinc-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/30 text-xs font-mono transition-all"
+                      title="Block user symmetrically"
+                    >
+                      <Ban className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Block</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Message Stream */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                  {isLoadingMessages ? (
+                    <div className="p-8 text-center text-zinc-500 text-xs font-mono">
+                      <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2 text-violet-400" />
+                      <span>Loading messages...</span>
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="p-12 text-center text-zinc-500 text-xs font-mono">
+                      <span>No messages yet. Send a note to start the conversation!</span>
+                    </div>
+                  ) : (
+                    messages.map((m) => {
+                      const isMe = m.sender_id === currentUserId;
+                      return (
+                        <div
+                          key={m.id}
+                          className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[75%] rounded-2xl p-3.5 text-xs leading-relaxed space-y-1 shadow-md ${
+                              isMe
+                                ? 'bg-violet-600 text-white rounded-br-none'
+                                : 'bg-[#141722] text-zinc-200 border border-white/10 rounded-bl-none'
+                            }`}
+                          >
+                            <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                            <div
+                              className={`flex items-center justify-end gap-1 text-[9px] font-mono ${
+                                isMe ? 'text-violet-200' : 'text-zinc-500'
+                              }`}
+                            >
+                              <span>
+                                {new Date(m.created_at).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                              {isMe && (
+                                m.is_read ? (
+                                  <CheckCheck className="w-3 h-3 text-emerald-300" />
+                                ) : (
+                                  <Check className="w-3 h-3 text-violet-300" />
+                                )
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Error Banner */}
+                {errorMsg && (
+                  <div className="px-4 py-2 bg-rose-500/10 border-t border-rose-500/20 text-rose-300 text-xs font-mono flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                      <span>{errorMsg}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setErrorMsg(null)}
+                      className="text-rose-400 hover:text-white"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Message Input & Character Counter */}
+                <form
+                  onSubmit={handleSendMessage}
+                  className="p-3 sm:p-4 border-t border-white/10 bg-[#0b0c12] space-y-2"
                 >
-                  {msg.content}
-                </div>
-                <div className="flex items-center gap-1 mt-1 text-[10px] font-mono text-zinc-400 px-1">
-                  <span>{msg.time}</span>
-                  {isMe && <CheckCheck className="w-3 h-3 text-blue-500" />}
-                </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      maxLength={MAX_MESSAGE_LENGTH}
+                      placeholder="Type a direct message to your connection (Enter to send)..."
+                      value={inputVal}
+                      onChange={(e) => setInputVal(e.target.value)}
+                      className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSending || !inputVal.trim()}
+                      className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white transition-all shadow-md active:scale-95 shrink-0"
+                      aria-label="Send message"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                    <span>Direct Message Encrypted Session • Realtime Sync</span>
+                    <span className={inputVal.length > 1800 ? 'text-amber-400 font-bold' : ''}>
+                      {inputVal.length} / {MAX_MESSAGE_LENGTH} characters
+                    </span>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-zinc-500">
+                <MessageSquare className="w-10 h-10 text-zinc-600 mb-3" />
+                <h2 className="text-sm font-bold text-zinc-300">No Conversation Selected</h2>
+                <p className="text-xs text-zinc-500 max-w-sm mt-1">
+                  Choose a peer connection from the sidebar to inspect verified messages or discuss project sprints.
+                </p>
               </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
+            )}
+          </div>
         </div>
-
-        {/* Message Input Footer */}
-        <form
-          onSubmit={handleSendMessage}
-          className="p-3 sm:p-4 border-t border-[var(--color-border)] bg-white flex items-center gap-2"
-        >
-          <input
-            type="text"
-            value={inputVal}
-            onChange={(e) => setInputVal(e.target.value)}
-            placeholder={`Message ${activeConv.user.display_name}...`}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-xs sm:text-sm text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)]"
-          />
-
-          <button
-            type="submit"
-            disabled={!inputVal.trim()}
-            className="p-2.5 rounded-xl bg-[var(--color-brand-primary)] text-white hover:bg-[var(--color-brand-primary-hover)] active:scale-95 transition-all disabled:opacity-50"
-            title="Send Message"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </form>
       </div>
+
+      {/* ── REPORT MODAL ── */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0e1017] border border-white/10 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase font-mono">
+                <ShieldAlert className="w-4 h-4" />
+                <span>Report Communication</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                className="text-zinc-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleReportSubmit} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-zinc-300 font-bold mb-1">Reason for report</label>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full bg-[#141722] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-rose-500"
+                >
+                  <option value="Harassment or Spam">Harassment or Spam</option>
+                  <option value="Inappropriate Content">Inappropriate Content</option>
+                  <option value="Impersonation or Fraud">Impersonation or Fraud</option>
+                  <option value="Other Policy Violation">Other Policy Violation</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-zinc-300 font-bold mb-1">Details / Specific Context</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={reportDetails}
+                  onChange={(e) => setReportDetails(e.target.value)}
+                  placeholder="Explain why this message thread requires moderation review..."
+                  className="w-full bg-[#141722] border border-white/10 rounded-xl p-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-rose-500"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowReportModal(false)}
+                  className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={reportSubmitting}
+                  className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all disabled:opacity-50"
+                >
+                  {reportSubmitting ? 'Submitting...' : 'Send to Moderation'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

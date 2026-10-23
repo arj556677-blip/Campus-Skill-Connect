@@ -12,16 +12,16 @@ export default function CvHubPage() {
     {
       id: 'technical',
       name: 'Technical (FAANG / Systems)',
-      desc: 'Single-column high-density layout. Strict ATS parser compliance, bold metrics, and monospace metadata.',
+      desc: 'Single-column high-density layout. Strict ATS section compliance, clear metrics, and monospace metadata.',
       icon: Code2,
-      badge: '98% ATS MATCH',
+      badge: 'STANDARD ATS',
       badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
       tag: 'Best for Distributed Systems, Backend & Core Dev',
     },
     {
       id: 'modern',
       name: 'Modern (Silicon Valley)',
-      desc: 'Dynamic 2-tone header with violet accent bar, structured skill chips, and clear section hierarchy.',
+      desc: 'Dynamic 2-tone header with accent bar, structured skill chips, and clear section hierarchy.',
       icon: Layout,
       badge: 'HIGH SIGNAL',
       badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
@@ -54,7 +54,7 @@ export default function CvHubPage() {
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono font-bold text-emerald-400">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>ATS Engine V2.0 • 98% Parser Compatibility</span>
+            <span>Rule-Based ATS Section &amp; Keyword Validator</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             Campus CV Studio &amp; ATS Analyzer
@@ -90,12 +90,12 @@ export default function CvHubPage() {
                 </h2>
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Build your resume step-by-step with real-time ATS scoring. Choose between 4 clean templates, edit all education and experiences, and auto-sync verified campus works.
+                Build your resume step-by-step with rule-based ATS verification. Choose between 4 clean templates, edit education and experiences, and attach verified campus works.
               </p>
               <ul className="space-y-2 text-xs text-zinc-300 pt-2 font-mono">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Real-time ATS Score Gauge (0-100)</span>
+                  <span>Rule-Based ATS Section &amp; Heading Checklist</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />

@@ -4,22 +4,16 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRole, ROLE_PERSONAS } from '@/lib/auth/role-context';
 import {
-  Sparkles,
-  GraduationCap,
   FileText,
   ExternalLink,
   Plus,
   Video,
   Eye,
-  ThumbsUp,
   Briefcase,
   CheckCircle2,
-  TrendingUp,
   ArrowRight,
   ShieldCheck,
-  MessageSquare,
   Award,
-  Zap,
 } from 'lucide-react';
 import { Work, Profile } from '@/lib/types';
 
@@ -30,11 +24,10 @@ interface StudentDashboardClientProps {
 
 export default function StudentDashboardClient({
   myWorks: initialWorks,
-  profiles,
-}: StudentDashboardClientProps) {
-  const { currentUser: authUser, switchRole } = useRole();
+}: { myWorks: Work[]; profiles?: Profile[] }) {
+  const { currentUser: authUser } = useRole();
   const currentUser = authUser || ROLE_PERSONAS.student;
-  const [works, setWorks] = useState(initialWorks);
+  const works = initialWorks;
 
   return (
     <div className="space-y-8">
@@ -137,41 +130,46 @@ export default function StudentDashboardClient({
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5" />
-                <span>ATS Resume Readiness</span>
+                <span>ATS Checklist Status</span>
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-bold">
-                TIER-1 OPTIMIZED
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-bold">
+                CHECKLIST PASSING
               </span>
             </div>
 
-            <div className="mt-6 flex items-center gap-6">
-              {/* Radial gauge representation */}
-              <div className="relative w-24 h-24 rounded-full border-4 border-cyan-500/20 flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(6,182,212,0.25)]">
-                <div className="absolute inset-1 rounded-full border-4 border-cyan-400 border-t-transparent border-r-cyan-400 -rotate-45" />
-                <div className="text-center">
-                  <span className="text-2xl font-black text-white">98</span>
-                  <span className="text-[10px] text-cyan-300 block font-mono">/100</span>
+            <div className="mt-4 space-y-2 text-xs">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                <div className="flex items-center gap-2 text-zinc-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Standard Section Headings</span>
                 </div>
+                <span className="text-[10px] font-mono text-emerald-400">Present</span>
               </div>
-
-              <div className="space-y-1.5 text-xs">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
                 <div className="flex items-center gap-2 text-zinc-300">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Single-Column Parser Pass: 100%</span>
+                  <span>Contact Information &amp; Links</span>
                 </div>
+                <span className="text-[10px] font-mono text-emerald-400">Validated</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
                 <div className="flex items-center gap-2 text-zinc-300">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Verified GitHub Commit Proof: 98%</span>
+                  <span>Date Format Consistency</span>
                 </div>
+                <span className="text-[10px] font-mono text-emerald-400">Standard</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
                 <div className="flex items-center gap-2 text-zinc-300">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Distributed Systems Density: 96%</span>
+                  <span>Verified Campus Works Attached</span>
                 </div>
+                <span className="text-[10px] font-mono text-emerald-400">Linked</span>
               </div>
             </div>
 
             <p className="mt-4 text-xs text-zinc-400 leading-relaxed font-sans">
-              Your resume layout conforms to standard enterprise ATS parsers (Workday, Greenhouse, Lever). No multi-column parsing traps detected.
+              Rule-based checks confirm your resume uses standard headings and single-column formatting without unverified score assumptions.
             </p>
           </div>
 
@@ -225,7 +223,7 @@ export default function StudentDashboardClient({
                   </div>
 
                   <p className="mt-3 text-xs text-zinc-300 italic">
-                    "Saw your HyperCache Redis architecture and benchmark graphs. We're hiring for Distributed Systems New Grads. Would love to connect!"
+                    &ldquo;Saw your Redis architecture and benchmark graphs. We&apos;re hiring for Distributed Systems New Grads. Would love to connect!&rdquo;
                   </p>
                 </div>
 

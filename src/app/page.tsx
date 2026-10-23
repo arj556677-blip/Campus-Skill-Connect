@@ -10,18 +10,13 @@ import {
   Users,
   Video,
   ArrowRight,
-  CheckCircle2,
   Cpu,
-  Database,
   Building,
   MapPin,
   Terminal,
   Code2,
   Check,
   ArrowUpRight,
-  Server,
-  Layers,
-  Zap,
   LayoutDashboard,
 } from 'lucide-react';
 import WorkCard from '@/components/cards/WorkCard';
@@ -109,8 +104,8 @@ export default async function HomePage() {
                 <p className="text-xs text-zinc-400 font-sans mt-0.5">Campuses Active</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-emerald-400">99.4%</p>
-                <p className="text-xs text-zinc-400 font-sans mt-0.5">Redis Cache Hit (&lt;5ms)</p>
+                <p className="text-2xl sm:text-3xl font-extrabold text-emerald-400">Pub/Sub</p>
+                <p className="text-xs text-zinc-400 font-sans mt-0.5">Redis Rate Limiting</p>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-extrabold text-violet-400">23</p>
@@ -162,7 +157,7 @@ export default async function HomePage() {
 
                 {/* Code Body */}
                 <div className="bg-[#090b10] rounded-xl p-4 font-mono text-xs text-zinc-300 leading-relaxed border border-white/[0.05] overflow-x-auto">
-                  <p className="text-zinc-500">// 1. Query verified proof-of-work with cache-aside</p>
+                  <p className="text-zinc-500">{'// 1. Query verified proof-of-work with cache-aside'}</p>
                   <p>
                     <span className="text-violet-400">const</span> proof = <span className="text-cyan-400">await</span>{' '}
                     <span className="text-yellow-300">cacheGet</span>(
@@ -175,7 +170,7 @@ export default async function HomePage() {
                     <span className="text-emerald-300">&apos;*, skills(*), owner(*)&apos;</span>);
                   </p>
                   <p>&#125;, <span className="text-amber-400">300</span>);</p>
-                  <p className="text-zinc-500 mt-2">// 2. Real-time telemetry check</p>
+                  <p className="text-zinc-500 mt-2">{'// 2. Real-time telemetry check'}</p>
                   <p className="text-emerald-400">
                     ✓ Cache hit in <span className="text-white font-bold">2.4ms</span> | RLS validation: <span className="text-white font-bold">Passed</span>
                   </p>
@@ -311,24 +306,24 @@ export default async function HomePage() {
                     CV Studio &amp; ATS
                   </span>
                   <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
-                    98% Pass Rate
+                    Rule-Based Checklist
                   </span>
                 </div>
 
-                <h3 className="text-base font-bold text-white mb-2">Automated ATS Optimization</h3>
+                <h3 className="text-base font-bold text-white mb-2">Rule-Based ATS Optimization</h3>
                 <p className="text-xs text-zinc-400 leading-relaxed mb-4">
-                  Format real engineering achievements into ATS-proof resumes with quantifiable metrics and verified project badges.
+                  Format real engineering achievements into clean resumes with standard headings, clear contact info, and verified project badges.
                 </p>
 
-                {/* Score Dial Preview */}
+                {/* Checklist Preview */}
                 <div className="p-3.5 rounded-xl bg-[#090b10] border border-white/[0.06] flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-white">Technical FAANG Template</p>
-                    <p className="text-[11px] text-zinc-400 font-mono">Verified Works Attached</p>
+                    <p className="text-[11px] text-zinc-400 font-mono">Headings, Contact &amp; Works Checked</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-base font-black text-emerald-400 font-mono">98/100</span>
-                    <p className="text-[10px] text-zinc-400 font-mono">Parser Score</p>
+                    <span className="text-xs font-bold text-emerald-400 font-mono">PASSING</span>
+                    <p className="text-[10px] text-zinc-400 font-mono">Rule Checklist</p>
                   </div>
                 </div>
               </div>

@@ -130,8 +130,8 @@ export default function GeneralDashboardClient({
             <p className="text-xs text-zinc-400 font-sans mt-0.5">Enterprise Tech Recruiters</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-violet-400">99.4%</p>
-            <p className="text-xs text-zinc-400 font-sans mt-0.5">Proof-of-Skill Authenticity</p>
+            <p className="text-2xl sm:text-3xl font-extrabold text-violet-400">PostgreSQL</p>
+            <p className="text-xs text-zinc-400 font-sans mt-0.5">RLS Row-Level Security</p>
           </div>
         </div>
       </div>
@@ -241,13 +241,13 @@ export default function GeneralDashboardClient({
                 Student Builder Command Center
               </h3>
               <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
-                Empower your career through verified proof of work. Inspect your 98% ATS resume compatibility gauge, track incoming recruiter profile views from Stripe and Google, and launch live pair-programming sprints.
+                Empower your career through verified proof of work. Build with rule-based ATS resume validation, inspect incoming recruiter profile views, and launch collaboration sprint rooms.
               </p>
 
               <div className="mt-5 space-y-2 text-xs font-mono text-zinc-300">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-violet-400" />
-                  <span>Live 98% ATS Resume Readiness Gauge</span>
+                  <span>Rule-Based ATS Resume Checklist</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-violet-400" />

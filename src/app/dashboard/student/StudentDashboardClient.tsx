@@ -307,49 +307,78 @@ export default function StudentDashboardClient({
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {works.map((work) => (
-            <div
-              key={work.id}
-              className="p-5 rounded-2xl bg-[#f8fafc] border border-slate-200/70 hover:border-[#1b59f8]/40 hover:bg-white transition-all flex flex-col justify-between group shadow-xs"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200 font-bold">
-                    {work.category}
-                  </span>
-                  <span className="text-xs text-slate-500 font-mono flex items-center gap-1">
-                    <Eye className="w-3 h-3 text-slate-400" />
-                    <span>{work.views_count || 120}</span>
-                  </span>
-                </div>
-
-                <h3 className="font-bold text-sm text-slate-900 group-hover:text-[#1b59f8] transition-colors line-clamp-2">
-                  {work.title}
-                </h3>
-
-                <p className="text-xs text-slate-600 mt-2 line-clamp-3 leading-relaxed">
-                  {work.description}
-                </p>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-mono font-medium">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Verified Repo</span>
-                </div>
-
-                <Link
-                  href={`/works/${work.id}`}
-                  className="text-xs font-bold text-slate-700 hover:text-[#1b59f8] flex items-center gap-1"
-                >
-                  <span>Inspect</span>
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
+        {works.length === 0 ? (
+          <div className="py-12 px-6 rounded-2xl bg-[#f8fafc] border border-dashed border-slate-300 text-center space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#1b59f8] flex items-center justify-center mx-auto">
+              <ShieldCheck className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <div className="max-w-md mx-auto space-y-1">
+              <h3 className="text-base font-bold text-slate-900">Welcome to your Student Command Center!</h3>
+              <p className="text-xs text-slate-500">
+                You haven&apos;t published a proof of work yet. Publish your first project repository, technical paper, or benchmark to start getting recruiter visibility.
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <Link
+                href="/works/new"
+                className="px-5 py-2.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Publish First Proof</span>
+              </Link>
+              <Link
+                href="/showcase"
+                className="px-4 py-2.5 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold transition-all"
+              >
+                Explore Showcase
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {works.map((work) => (
+              <div
+                key={work.id}
+                className="p-5 rounded-2xl bg-[#f8fafc] border border-slate-200/70 hover:border-[#1b59f8]/40 hover:bg-white transition-all flex flex-col justify-between group shadow-xs"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200 font-bold">
+                      {work.category}
+                    </span>
+                    <span className="text-xs text-slate-500 font-mono flex items-center gap-1">
+                      <Eye className="w-3 h-3 text-slate-400" />
+                      <span>{work.views_count || 120}</span>
+                    </span>
+                  </div>
+
+                  <h3 className="font-bold text-sm text-slate-900 group-hover:text-[#1b59f8] transition-colors line-clamp-2">
+                    {work.title}
+                  </h3>
+
+                  <p className="text-xs text-slate-600 mt-2 line-clamp-3 leading-relaxed">
+                    {work.description}
+                  </p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-mono font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Verified Repo</span>
+                  </div>
+
+                  <Link
+                    href={`/works/${work.id}`}
+                    className="text-xs font-bold text-slate-700 hover:text-[#1b59f8] flex items-center gap-1"
+                  >
+                    <span>Inspect</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── BENTO TILES ROW 3: REAL-TIME COLLAB & HACKATHONS ── */}

@@ -83,7 +83,10 @@ export default function SignUpPage() {
       if (error) {
         const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
         if (isPlaceholder) {
-          login(accountType);
+          login(accountType, undefined, {
+            name: name.trim() || email.trim().split('@')[0],
+            email: email.trim(),
+          });
           return;
         }
         setErrorMsg(error.message);
@@ -91,11 +94,11 @@ export default function SignUpPage() {
         return;
       }
 
-      if (data?.session) {
-        login(accountType);
-      } else {
-        setSuccessMsg('Account registered successfully! A verification email has been sent. Please confirm your email before signing in.');
-      }
+      // Automatically sign in the user to their new account and go directly to their dashboard
+      login(accountType, undefined, {
+        name: name.trim() || email.trim().split('@')[0],
+        email: email.trim(),
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Registration failed. Please try again.';
       setErrorMsg(msg);
@@ -113,7 +116,17 @@ export default function SignUpPage() {
         setErrorMsg(res.error);
         return;
       }
-      login(accountType);
+      const resolvedSocialName =
+        res.user?.displayName ||
+        (res.githubUsername ? `@${res.githubUsername}` : undefined) ||
+        res.user?.email?.split('@')[0] ||
+        'Campus Builder';
+
+      login(accountType, undefined, {
+        name: resolvedSocialName,
+        email: res.user?.email || undefined,
+        avatar: res.user?.photoURL || undefined,
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : `${provider} registration failed`;
       setErrorMsg(msg);

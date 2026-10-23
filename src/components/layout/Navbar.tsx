@@ -294,10 +294,10 @@ export default function Navbar() {
                       : 'bg-gradient-to-tr from-emerald-600 to-teal-500'
                   }`}
                 >
-                  {currentUser.initials}
+                  {currentUser.initials || (currentUser.name || 'U').slice(0, 2).toUpperCase()}
                 </div>
                 <span className="hidden md:inline text-xs font-semibold text-slate-800 max-w-[100px] truncate">
-                  {currentUser.name.split(' ')[0]}
+                  {(currentUser.name || 'Builder').split(' ')[0]}
                 </span>
                 <ChevronDown
                   className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${
@@ -311,7 +311,7 @@ export default function Navbar() {
                   {/* User Profile Info Card */}
                   <div className="px-3 py-2.5 border-b border-slate-100">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
+                      <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name || 'Campus Member'}</p>
                       <span
                         className={`text-[9px] font-mono px-2 py-0.5 rounded-full uppercase border font-bold ${
                           currentRole === 'admin'

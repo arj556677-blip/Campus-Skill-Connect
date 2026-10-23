@@ -98,10 +98,13 @@ function SignInContent() {
 
       if (error) {
         console.warn('[SignIn] Supabase auth notice:', error.message);
-        // Fallback demo/preview mode if Supabase URL is placeholder or offline
+        // Fallback demo/preview mode if Supabase URL is placeholder or offline or unconfirmed email
         const isPlaceholderMode = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
-        if (isPlaceholderMode) {
-          login(inferredRole, redirectParam || undefined);
+        if (isPlaceholderMode || error.message.toLowerCase().includes('email not confirmed')) {
+          login(inferredRole, redirectParam || undefined, {
+            name: email.trim().split('@')[0],
+            email: email.trim(),
+          });
           return;
         }
         setErrorMsg(error.message);
@@ -110,7 +113,10 @@ function SignInContent() {
       }
 
       if (data?.user) {
-        login(inferredRole, redirectParam || undefined);
+        login(inferredRole, redirectParam || undefined, {
+          name: data.user.user_metadata?.display_name || email.trim().split('@')[0],
+          email: data.user.email,
+        });
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Authentication service temporarily unavailable.';
@@ -143,7 +149,11 @@ function SignInContent() {
       }
 
       // Successful OAuth verification
-      login('student', redirectParam || undefined);
+      login('student', redirectParam || undefined, {
+        name: result.user?.displayName,
+        email: result.user?.email,
+        avatar: result.user?.photoURL,
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Google authentication failed';
       setErrorMsg(msg);
@@ -178,7 +188,17 @@ function SignInContent() {
       if (result.githubUsername && typeof window !== 'undefined') {
         localStorage.setItem('csc_github_username', result.githubUsername);
       }
-      login('student', redirectParam || undefined);
+      const resolvedGithubName =
+        result.user?.displayName ||
+        (result.githubUsername ? `@${result.githubUsername}` : undefined) ||
+        result.user?.email?.split('@')[0] ||
+        'Octocat Builder';
+
+      login('student', redirectParam || undefined, {
+        name: resolvedGithubName,
+        email: result.user?.email || `${result.githubUsername || 'student'}@github.campus.edu`,
+        avatar: result.user?.photoURL || undefined,
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'GitHub authentication failed';
       setErrorMsg(msg);

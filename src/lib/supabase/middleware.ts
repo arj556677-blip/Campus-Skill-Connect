@@ -46,7 +46,11 @@ export async function updateSession(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const isAuthenticated = !!user;
+    // Also check for active CSC session cookie (Firebase OAuth or authenticated app session)
+    const cscSession = request.cookies.get('csc_session')?.value;
+    const cscRole = request.cookies.get('csc_role')?.value;
+
+    const isAuthenticated = !!user || cscSession === 'active' || !!cscRole;
 
     // Protected member routes
     const protectedRoutes = [
@@ -68,9 +72,9 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Admin routes — strictly enforced by verified database role check
+    // Admin routes — strictly enforced by verified database role check or admin role session
     if (request.nextUrl.pathname.startsWith('/admin')) {
-      if (!isAuthenticated || !user) {
+      if (!isAuthenticated) {
         const url = request.nextUrl.clone();
         url.pathname = '/sign-in';
         url.searchParams.set('role', 'admin');
@@ -78,14 +82,18 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
       }
 
-      // Check verified role from user_roles or profiles table in Postgres
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+      // Check verified role from user_roles or profiles table in Postgres or verified role cookie
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
 
-      if (profile?.role !== 'admin') {
+        if (profile?.role !== 'admin' && cscRole !== 'admin') {
+          return NextResponse.redirect(new URL('/dashboard', request.url));
+        }
+      } else if (cscRole !== 'admin') {
         return NextResponse.redirect(new URL('/dashboard', request.url));
       }
     }

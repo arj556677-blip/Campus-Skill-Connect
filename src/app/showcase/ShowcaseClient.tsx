@@ -89,7 +89,7 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
 
         <Link
           href="/works/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius-sm)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold shadow-sm transition-colors self-start md:self-end focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-colors self-start md:self-end active:scale-95"
         >
           <Plus className="w-4 h-4" aria-hidden="true" />
           <span>Publish Work Item</span>
@@ -100,18 +100,18 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => updateParams({ q: e.target.value, page: '1' })}
             placeholder="Search projects, skills, or authors..."
-            className="w-full pl-10 pr-10 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--focus)] transition-colors"
+            className="w-full pl-10 pr-10 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1b59f8] focus:bg-white transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => updateParams({ q: null, page: '1' })}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
               aria-label="Clear search"
             >
               <X className="w-4 h-4" aria-hidden="true" />
@@ -121,16 +121,16 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
 
         {/* Sort & Count */}
         <div className="flex items-center justify-between sm:justify-end gap-4">
-          <span className="text-xs font-mono text-[var(--text-secondary)]">
-            Showing <strong className="text-[var(--text-primary)]">{totalResults}</strong> {totalResults === 1 ? 'work' : 'works'}
+          <span className="text-xs font-mono text-slate-500">
+            Showing <strong className="text-slate-900">{totalResults}</strong> {totalResults === 1 ? 'work' : 'works'}
           </span>
 
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+            <SlidersHorizontal className="w-4 h-4 text-slate-400" aria-hidden="true" />
             <select
               value={sortBy}
               onChange={(e) => updateParams({ sort: e.target.value, page: '1' })}
-              className="px-2.5 py-1.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--focus)]"
+              className="px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-[#1b59f8]"
             >
               <option value="newest">Latest Published</option>
               <option value="trending">Most Endorsed</option>
@@ -150,10 +150,10 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
               role="tab"
               aria-selected={isActive}
               onClick={() => updateParams({ category: cat.id, page: '1' })}
-              className={`px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-[var(--focus)] ${
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                 isActive
-                  ? 'bg-[var(--accent)] text-white font-semibold'
-                  : 'bg-[var(--surface-sunken)] text-[var(--text-secondary)] border border-[var(--border)] hover:bg-[var(--surface-hover)] hover:text-white'
+                  ? 'bg-[#1b59f8] text-white shadow-2xs font-bold'
+                  : 'bg-slate-100 text-slate-600 border border-slate-200/80 hover:bg-slate-200 hover:text-slate-900'
               }`}
             >
               {cat.label}

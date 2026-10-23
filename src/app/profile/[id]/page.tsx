@@ -42,18 +42,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const userWorks = allWorks.filter((w) => w.owner_id === profile.id);
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-white py-10">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <Link
           href="/people"
-          className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-zinc-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Talent Directory</span>
         </Link>
 
         {/* Hero Portfolio Card */}
-        <div className="rounded-2xl bento-card p-6 sm:p-10 space-y-6">
+        <div className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-10 space-y-6 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             {/* Avatar & Main Credentials */}
             <div className="flex flex-col sm:flex-row items-start gap-5">
@@ -62,17 +62,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <img
                     src={profile.avatar_url}
                     alt={profile.display_name}
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-white/10"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-slate-200"
                   />
                 ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-bold text-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#1b59f8] text-white font-bold text-2xl flex items-center justify-center shadow-xs">
                     {profile.display_name.slice(0, 2)}
                   </div>
                 )}
                 {profile.is_verified && (
                   <span
                     title="Verified Institutional Student"
-                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-violet-600 text-white flex items-center justify-center ring-2 ring-[#0d0f17]"
+                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#1b59f8] text-white flex items-center justify-center ring-2 ring-white"
                   >
                     <ShieldCheck className="w-3.5 h-3.5" />
                   </span>
@@ -81,32 +81,32 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                     {profile.display_name}
                   </h1>
-                  <span className="text-[10px] font-mono uppercase font-bold px-2.5 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/25">
+                  <span className="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200">
                     {profile.role}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Online (Redis Active)
                   </span>
                 </div>
 
-                <p className="text-sm font-semibold text-zinc-300">
+                <p className="text-sm font-semibold text-slate-700">
                   {profile.headline || profile.field}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400 pt-1 font-mono">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
                   {profile.institution && (
                     <span className="flex items-center gap-1.5">
-                      <Building className="w-4 h-4 text-zinc-500" />
+                      <Building className="w-4 h-4 text-slate-400" />
                       <span>{profile.institution.name}</span>
                     </span>
                   )}
                   {profile.zone && (
                     <span className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-zinc-500" />
+                      <MapPin className="w-4 h-4 text-slate-400" />
                       <span>{profile.zone.name}</span>
                     </span>
                   )}
@@ -124,7 +124,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     href={`https://github.com/${profile.github_username}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
+                    className="p-2.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-colors"
                     title="GitHub Repositories"
                   >
                     <Github className="w-4 h-4" />
@@ -135,7 +135,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     href={profile.linkedin_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-colors"
+                    className="p-2.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 hover:text-[#1b59f8] hover:bg-slate-200 transition-colors"
                     title="LinkedIn Profile"
                   >
                     <Linkedin className="w-4 h-4" />
@@ -146,7 +146,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     href={profile.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-400 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
+                    className="p-2.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 hover:text-emerald-600 hover:bg-slate-200 transition-colors"
                     title="Personal Site"
                   >
                     <Globe className="w-4 h-4" />
@@ -158,11 +158,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
           {/* Bio statement */}
           {profile.bio && (
-            <div className="pt-4 border-t border-white/[0.06]">
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2">
+            <div className="pt-4 border-t border-slate-100">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
                 Engineering Statement &amp; Research Focus
               </h3>
-              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-3xl">
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed max-w-3xl">
                 {profile.bio}
               </p>
             </div>
@@ -170,9 +170,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
           {/* Endorsed Skills Pill Matrix */}
           {profile.skills && profile.skills.length > 0 && (
-            <div className="pt-4 border-t border-white/[0.06]">
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 mb-3 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+            <div className="pt-4 border-t border-slate-100">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#1b59f8]" />
                 <span>Verified Technical Competencies</span>
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -181,7 +181,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   return (
                     <span
                       key={skill.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/[0.04] text-xs font-mono font-medium text-zinc-200 border border-white/[0.08]"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-800 border border-slate-200"
                     >
                       #{name}
                     </span>
@@ -196,23 +196,23 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         <div className="space-y-6 pt-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Verified Proof of Work Repositories
               </h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Submissions, live prototypes, and engineering documentation published by {profile.display_name}.
               </p>
             </div>
-            <span className="text-xs font-mono text-zinc-400">
+            <span className="text-xs font-semibold text-slate-500">
               {userWorks.length} Item{userWorks.length === 1 ? '' : 's'}
             </span>
           </div>
 
           {userWorks.length === 0 ? (
-            <div className="rounded-2xl bento-card border-dashed p-12 text-center max-w-md mx-auto">
-              <Sparkles className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-              <h4 className="text-sm font-bold text-white">No published work items yet</h4>
-              <p className="text-xs text-zinc-400 mt-1">
+            <div className="rounded-3xl bg-white border border-slate-200 p-12 text-center max-w-md mx-auto shadow-xs">
+              <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <h4 className="text-sm font-bold text-slate-900">No published work items yet</h4>
+              <p className="text-xs text-slate-500 mt-1">
                 This creator hasn&apos;t shared public work items.
               </p>
             </div>

@@ -36,29 +36,29 @@ export default function WorkActions({ workId, initialLikes, externalUrl }: WorkA
     <div className="flex items-center gap-2">
       <button
         onClick={toggleLike}
-        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+        className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
           liked
-            ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
-            : 'bg-white/[0.06] text-white border-white/10 hover:border-white/20 hover:bg-white/[0.1]'
+            ? 'bg-rose-50 text-rose-600 border-rose-200 font-bold'
+            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 shadow-xs'
         }`}
       >
-        <Heart className={`w-4 h-4 ${liked ? 'fill-rose-500 text-rose-500' : 'text-zinc-400'}`} />
+        <Heart className={`w-4 h-4 ${liked ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
         <span>{likes} Endorsements</span>
       </button>
 
       <button
         onClick={copyShareLink}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-white/[0.06] text-zinc-300 border border-white/10 hover:border-white/20 hover:text-white hover:bg-white/[0.1] transition-all"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-all shadow-xs"
         title="Copy Share Link"
       >
         {copied ? (
           <>
-            <Check className="w-4 h-4 text-emerald-400" />
-            <span className="text-emerald-400 font-semibold font-mono">Copied</span>
+            <Check className="w-4 h-4 text-emerald-600" />
+            <span className="text-emerald-700 font-semibold font-mono">Copied</span>
           </>
         ) : (
           <>
-            <Share2 className="w-4 h-4 text-zinc-400" />
+            <Share2 className="w-4 h-4 text-slate-400" />
             <span>Share</span>
           </>
         )}
@@ -69,9 +69,9 @@ export default function WorkActions({ workId, initialLikes, externalUrl }: WorkA
           href={externalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 transition-all shadow-[0_0_15px_rgba(139,92,246,0.15)]"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#0f172a] hover:bg-black text-white transition-all shadow-sm active:scale-95"
         >
-          <ExternalLink className="w-3.5 h-3.5 text-violet-400" />
+          <ExternalLink className="w-3.5 h-3.5 text-white" />
           <span>Demo</span>
         </a>
       )}

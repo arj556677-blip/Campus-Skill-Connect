@@ -114,28 +114,24 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
   return (
     <div className="space-y-8">
       {/* Top Banner / Hero */}
-      <div className="relative rounded-3xl bg-gradient-to-b from-[#131726] to-[#0c0e17] border border-white/10 p-6 sm:p-8 overflow-hidden shadow-2xl">
-        {/* Ambient Glows */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
+      <div className="relative rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 overflow-hidden shadow-xs">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/25 text-violet-300 text-xs font-mono font-bold tracking-wide">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[#1b59f8] text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>DUAL-ENGINE COLLABORATION HUB</span>
-              <span className="text-white/30">•</span>
-              <span className="text-amber-300 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Google Meet API Confidentiality
+              <span className="text-slate-300">•</span>
+              <span className="text-amber-700 flex items-center gap-1">
+                <Lock className="w-3 h-3 text-amber-600" /> Google Meet API Confidentiality
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Virtual Collab &amp; Confidential Rooms
             </h1>
 
-            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              Launch instant <strong className="text-white">WebRTC open sprint rooms</strong> for student hackathons, or host secure, closed-door <strong className="text-amber-300">Confidential Google Meet sessions</strong> with verified NDA agreements, knock-to-enter access control, and recruiter 1:1 encryption.
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Launch instant <strong className="text-slate-900">WebRTC open sprint rooms</strong> for student hackathons, or host secure, closed-door <strong className="text-slate-900">Confidential Google Meet sessions</strong> with verified NDA agreements, knock-to-enter access control, and recruiter 1:1 encryption.
             </p>
           </div>
 
@@ -145,9 +141,9 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                 setRoomType('google_meet');
                 setShowCreateModal(true);
               }}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 text-white text-xs font-bold shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:opacity-95 active:scale-95 transition-all flex items-center gap-2 border border-amber-400/30"
+              className="px-5 py-3 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 active:scale-95"
             >
-              <Lock className="w-4 h-4 text-amber-200" />
+              <Lock className="w-4 h-4 text-amber-400" />
               <span>Create Confidential Meet</span>
             </button>
 
@@ -156,95 +152,95 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                 setRoomType('webrtc_jitsi');
                 setShowCreateModal(true);
               }}
-              className="px-5 py-3 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] text-white text-xs font-bold border border-white/10 active:scale-95 transition-all flex items-center gap-2"
+              className="px-5 py-3 rounded-full bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-200 active:scale-95 transition-all shadow-xs flex items-center gap-2"
             >
-              <Video className="w-4 h-4 text-emerald-400" />
+              <Video className="w-4 h-4 text-emerald-600" />
               <span>Open Sprint Room</span>
             </button>
           </div>
         </div>
 
         {/* Live Metrics Row */}
-        <div className="mt-8 pt-6 border-t border-white/[0.08] grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-            <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+        <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200/80">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
               Total Active
             </div>
-            <div className="text-xl font-bold text-white mt-1">{rooms.length} Rooms</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-1">{rooms.length} Rooms</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20">
-            <div className="text-[11px] font-mono text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 text-amber-400" />
+          <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80">
+            <div className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-amber-600" />
               Confidential Meets
             </div>
-            <div className="text-xl font-bold text-amber-200 mt-1">{confidentialCount} Sessions</div>
+            <div className="text-2xl font-extrabold text-amber-900 mt-1">{confidentialCount} Sessions</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
-            <div className="text-[11px] font-mono text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Video className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80">
+            <div className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Video className="w-3.5 h-3.5 text-emerald-600" />
               WebRTC Sprints
             </div>
-            <div className="text-xl font-bold text-emerald-200 mt-1">{webrtcCount} Mesh Rooms</div>
+            <div className="text-2xl font-extrabold text-emerald-900 mt-1">{webrtcCount} Mesh Rooms</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-purple-500/5 border border-purple-500/20">
-            <div className="text-[11px] font-mono text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
+          <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-200/80">
+            <div className="text-[11px] font-semibold text-blue-800 uppercase tracking-wider flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#1b59f8]" />
               Protection Level
             </div>
-            <div className="text-xl font-bold text-purple-200 mt-1">E2EE • Google Meet API</div>
+            <div className="text-sm font-bold text-blue-950 mt-2">E2EE • Google Meet API</div>
           </div>
         </div>
       </div>
 
       {/* Control Bar: Filters & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#0f111a] border border-white/10 w-fit">
+        <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 border border-slate-200 w-fit">
           <button
             onClick={() => setSelectedFilter('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
               selectedFilter === 'all'
-                ? 'bg-violet-600 text-white shadow-soft'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             All Rooms ({rooms.length})
           </button>
           <button
             onClick={() => setSelectedFilter('confidential')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
               selectedFilter === 'confidential'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-white text-amber-800 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
-            <span>Confidential Google Meets ({confidentialCount})</span>
+            <Lock className="w-3.5 h-3.5 text-amber-600" />
+            <span>Confidential ({confidentialCount})</span>
           </button>
           <button
             onClick={() => setSelectedFilter('webrtc')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
               selectedFilter === 'webrtc'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-white text-emerald-800 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Video className="w-3.5 h-3.5 text-emerald-400" />
-            <span>WebRTC Sprints ({webrtcCount})</span>
+            <Video className="w-3.5 h-3.5 text-emerald-600" />
+            <span>WebRTC ({webrtcCount})</span>
           </button>
         </div>
 
-        <div className="relative min-w-[260px]">
-          <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <div className="relative min-w-[280px]">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search rooms or topics..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0e1017] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1b59f8] shadow-xs"
           />
         </div>
       </div>
@@ -257,18 +253,14 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
           return (
             <div
               key={room.id}
-              className={`rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-all duration-300 relative overflow-hidden group ${
-                isGoogleMeet
-                  ? 'bg-gradient-to-b from-[#14121a] to-[#0c0d14] border border-amber-500/25 hover:border-amber-400/50 shadow-[0_4px_25px_rgba(0,0,0,0.6)]'
-                  : 'bg-[#0f111a] border border-white/10 hover:border-violet-500/40 shadow-soft'
-              }`}
+              className={`rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-all duration-300 relative overflow-hidden bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-slate-300 group`}
             >
               {/* Top Accent Strip */}
               <div
                 className={`absolute top-0 left-0 right-0 h-1 ${
                   isGoogleMeet
-                    ? 'bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600'
-                    : 'bg-gradient-to-r from-violet-600 to-indigo-600'
+                    ? 'bg-gradient-to-r from-amber-500 to-rose-500'
+                    : 'bg-[#1b59f8]'
                 }`}
               />
 
@@ -276,24 +268,24 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                 {/* Header Badges */}
                 <div className="flex items-center justify-between gap-2">
                   {isGoogleMeet ? (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold">
-                      <Lock className="w-3 h-3 text-amber-400" />
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-[11px] font-bold">
+                      <Lock className="w-3 h-3 text-amber-600" />
                       <span>Google Meet API • Confidential</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       <span>WebRTC Live Mesh</span>
                     </div>
                   )}
 
                   <button
                     onClick={() => copyRoomLink(room)}
-                    className="text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors"
+                    className="text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
                     title="Copy Invite Link"
                   >
                     {copiedSlug === room.room_slug ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
+                      <Check className="w-4 h-4 text-emerald-600" />
                     ) : (
                       <Copy className="w-4 h-4" />
                     )}
@@ -301,63 +293,63 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                 </div>
 
                 {/* Title */}
-                <h3 className="font-bold text-base text-white group-hover:text-violet-200 transition-colors line-clamp-2">
+                <h3 className="font-bold text-base text-slate-900 group-hover:text-[#1b59f8] transition-colors line-clamp-2">
                   {room.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                   {room.description}
                 </p>
 
                 {/* Confidential Security Pills */}
                 {isGoogleMeet && (
-                  <div className="space-y-1.5 pt-1">
-                    <div className="flex flex-wrap gap-1.5 text-[10px] font-mono">
+                  <div className="space-y-2 pt-1">
+                    <div className="flex flex-wrap gap-1.5 text-[10px]">
                       {room.confidentiality_level && (
-                        <span className="px-2 py-0.5 rounded-md bg-amber-950/60 border border-amber-600/30 text-amber-300 uppercase font-bold">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 uppercase font-bold">
                           {room.confidentiality_level.replace('_', ' ')}
                         </span>
                       )}
                       {room.host_approval_required && (
-                        <span className="px-2 py-0.5 rounded-md bg-blue-950/60 border border-blue-500/30 text-blue-300 flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 flex items-center gap-1 font-semibold">
                           <ShieldCheck className="w-2.5 h-2.5" /> Knock Required
                         </span>
                       )}
                       {room.nda_required && (
-                        <span className="px-2 py-0.5 rounded-md bg-rose-950/60 border border-rose-500/30 text-rose-300 flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-1 font-semibold">
                           <FileCheck className="w-2.5 h-2.5" /> NDA Active
                         </span>
                       )}
                     </div>
 
                     {room.passcode && (
-                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-300 bg-white/[0.03] px-2.5 py-1 rounded-lg border border-white/[0.05]">
-                        <KeyRound className="w-3 h-3 text-amber-400" />
-                        <span>Passcode: <strong className="text-amber-300">{room.passcode}</strong></span>
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-700 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <KeyRound className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Passcode: <strong className="text-slate-900">{room.passcode}</strong></span>
                       </div>
                     )}
                   </div>
                 )}
               </div>
 
-                {/* Room Footer & Actions */}
-              <div className="pt-4 border-t border-white/[0.08] space-y-3">
+              {/* Room Footer & Actions */}
+              <div className="pt-4 border-t border-slate-100 space-y-3">
                 {room.creator && (
                   <div className="flex items-center gap-2">
                     {room.creator.avatar_url ? (
                       <img
                         src={room.creator.avatar_url}
                         alt={room.creator.display_name}
-                        className="w-5 h-5 rounded-full object-cover ring-1 ring-white/20"
+                        className="w-5 h-5 rounded-full object-cover ring-1 ring-slate-200"
                       />
                     ) : (
-                      <div className="w-5 h-5 rounded-full bg-violet-600 text-white text-[9px] font-bold flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-[#1b59f8] text-white text-[9px] font-bold flex items-center justify-center">
                         {room.creator.display_name.slice(0, 2)}
                       </div>
                     )}
-                    <span className="text-[11px] text-zinc-400 truncate font-mono">
-                      Host: <strong className="text-zinc-200">{room.creator.display_name}</strong>
+                    <span className="text-[11px] text-slate-500 truncate">
+                      Host: <strong className="text-slate-800">{room.creator.display_name}</strong>
                     </span>
                   </div>
                 )}
@@ -373,23 +365,23 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white text-xs font-bold transition-all shadow-[0_0_15px_rgba(245,158,11,0.25)] active:scale-95"
+                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-xs active:scale-95"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>Launch Google Meet</span>
                       </a>
                       <Link
                         href={`/collaborate/${room.room_slug}`}
-                        className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 hover:text-white text-[11px] font-medium transition-colors"
+                        className="flex items-center justify-center gap-1.5 w-full py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-colors"
                       >
-                        <Lock className="w-3 h-3 text-amber-400" />
+                        <Lock className="w-3 h-3 text-amber-600" />
                         <span>Session Console &amp; Security Brief</span>
                       </Link>
                     </>
                   ) : (
                     <Link
                       href={`/collaborate/${room.room_slug}`}
-                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 text-white text-xs font-semibold transition-all shadow-sm"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-xs active:scale-95"
                     >
                       <Video className="w-3.5 h-3.5 text-emerald-400" />
                       <span>Enter Room &amp; Join Call</span>
@@ -403,47 +395,47 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
       </div>
 
       {filteredRooms.length === 0 && (
-        <div className="text-center py-16 rounded-3xl bg-[#0e1017] border border-white/10 space-y-3">
-          <Lock className="w-10 h-10 text-zinc-600 mx-auto" />
-          <h3 className="text-base font-bold text-white">No rooms match your filter</h3>
-          <p className="text-xs text-zinc-400">Try adjusting your search query or create a new confidential meeting.</p>
+        <div className="text-center py-16 rounded-3xl bg-white border border-slate-200 space-y-3 shadow-xs">
+          <Lock className="w-10 h-10 text-slate-300 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">No rooms match your filter</h3>
+          <p className="text-xs text-slate-500">Try adjusting your search query or create a new confidential meeting.</p>
         </div>
       )}
 
       {/* Create Room Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in">
-          <div className="rounded-3xl bg-[#121420] border border-white/15 p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div>
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-violet-400 mb-1">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#1b59f8] mb-1">
+                <Sparkles className="w-4 h-4 text-amber-500" />
                 <span>MEETING PROVISIONING CONSOLE</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 Launch Collaboration Session
               </h2>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Configure your meeting engine, privacy classification, and access restrictions.
               </p>
             </div>
 
             {/* Provider Switcher Tabs */}
-            <div className="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-black/40 border border-white/10">
+            <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200">
               <button
                 type="button"
                 onClick={() => setRoomType('google_meet')}
                 className={`py-3 px-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
                   roomType === 'google_meet'
-                    ? 'bg-gradient-to-r from-amber-500/20 to-purple-600/20 border border-amber-500/40 text-amber-300'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-white shadow-xs text-slate-900 border border-slate-200'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <Lock className="w-3.5 h-3.5 text-amber-600" />
                   <span>Google Meet API</span>
                 </div>
-                <span className="text-[10px] text-zinc-400 font-normal">Confidential • NDA • Knock</span>
+                <span className="text-[10px] text-slate-500 font-normal">Confidential • NDA • Knock</span>
               </button>
 
               <button
@@ -451,21 +443,21 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                 onClick={() => setRoomType('webrtc_jitsi')}
                 className={`py-3 px-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
                   roomType === 'webrtc_jitsi'
-                    ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-white shadow-xs text-slate-900 border border-slate-200'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <Video className="w-3.5 h-3.5 text-emerald-400" />
+                  <Video className="w-3.5 h-3.5 text-emerald-600" />
                   <span>WebRTC Sprint</span>
                 </div>
-                <span className="text-[10px] text-zinc-400 font-normal">Open Peer Mesh • Instant</span>
+                <span className="text-[10px] text-slate-500 font-normal">Open Peer Mesh • Instant</span>
               </button>
             </div>
 
             <form onSubmit={handleCreateRoom} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Meeting Topic / Sprint Title *
                 </label>
                 <input
@@ -478,12 +470,12 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                       ? 'e.g. Confidential Staff Recruiter 1:1 Architecture Review'
                       : 'e.g. Distributed Task Queue Code Review'
                   }
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#090b10] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Description / Agenda (Optional)
                 </label>
                 <textarea
@@ -491,26 +483,26 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
                   placeholder="Outline the agenda, expected outcomes, or candidate profile..."
-                  className="w-full px-4 py-2 rounded-xl bg-[#090b10] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>
 
               {/* Google Meet Confidential Options */}
               {roomType === 'google_meet' && (
-                <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3.5">
-                  <div className="text-xs font-mono font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-3.5">
+                  <div className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                     <span>Confidential Meeting Security Controls</span>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                       Classification Level
                     </label>
                     <select
                       value={confidentialityLevel}
                       onChange={(e) => setConfidentialityLevel(e.target.value as ConfidentialityLevel)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#090b10] border border-white/10 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-amber-500"
                     >
                       <option value="recruiter_private">Private Recruiter 1:1 (Interview &amp; Offer)</option>
                       <option value="restricted_nda">Restricted NDA (IP, Thesis &amp; Patent Disclosure)</option>
@@ -520,14 +512,14 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+                      <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider">
                         Google Meet URL / Code (Optional)
                       </label>
                       <a
                         href="https://meet.google.com/new"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] font-mono text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1"
+                        className="text-[10px] font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1"
                       >
                         <ExternalLink className="w-3 h-3" />
                         <span>Launch New Meet</span>
@@ -538,15 +530,15 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                       value={customMeetUrl}
                       onChange={(e) => setCustomMeetUrl(e.target.value)}
                       placeholder="e.g. meet.google.com/abc-defg-hij (or leave blank to auto-launch)"
-                      className="w-full px-3 py-2 rounded-xl bg-[#090b10] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 font-mono"
                     />
-                    <p className="text-[10px] text-zinc-500 mt-1">
-                      Leave blank to auto-launch a fresh meeting via <span className="text-amber-300 font-mono">meet.google.com/new</span>.
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Leave blank to auto-launch a fresh meeting via <span className="text-amber-700 font-mono">meet.google.com/new</span>.
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1">
                       Custom Passcode (Optional - Auto-generated if blank)
                     </label>
                     <input
@@ -554,27 +546,27 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                       value={passcode}
                       onChange={(e) => setPasscode(e.target.value)}
                       placeholder="e.g. FAANG-CONF-2026"
-                      className="w-full px-3 py-2 rounded-xl bg-[#090b10] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
                   <div className="space-y-2 pt-1">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-700">
                       <input
                         type="checkbox"
                         checked={hostApproval}
                         onChange={(e) => setHostApproval(e.target.checked)}
-                        className="rounded border-white/20 bg-black text-amber-500 focus:ring-amber-500"
+                        className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
                       />
                       <span>Enforce host admission knock (no unauthorized entry)</span>
                     </label>
 
-                    <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-700">
                       <input
                         type="checkbox"
                         checked={ndaRequired}
                         onChange={(e) => setNdaRequired(e.target.checked)}
-                        className="rounded border-white/20 bg-black text-amber-500 focus:ring-amber-500"
+                        className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
                       />
                       <span>Require digital NDA acceptance before unlocking meeting URL</span>
                     </label>
@@ -582,21 +574,21 @@ export default function CollaborateClient({ initialRooms }: CollaborateClientPro
                 </div>
               )}
 
-              <div className="pt-3 flex items-center justify-end gap-3 border-t border-white/10">
+              <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white"
+                  className="px-4 py-2.5 rounded-full text-xs font-semibold text-slate-600 hover:text-slate-900"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || !newTitle.trim()}
-                  className={`px-6 py-2.5 rounded-xl text-white text-xs font-bold transition-all disabled:opacity-50 ${
+                  className={`px-6 py-2.5 rounded-full text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50 ${
                     roomType === 'google_meet'
-                      ? 'bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 shadow-[0_0_20px_rgba(245,158,11,0.3)]'
-                      : 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-soft'
+                      ? 'bg-[#0f172a] hover:bg-black'
+                      : 'bg-[#1b59f8] hover:bg-[#174ed8]'
                   }`}
                 >
                   {isSubmitting ? 'Provisioning...' : roomType === 'google_meet' ? 'Launch Confidential Meet' : 'Create Sprint Room'}

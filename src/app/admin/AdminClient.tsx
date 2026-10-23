@@ -33,7 +33,7 @@ export default function AdminClient({
 }: AdminClientProps) {
   const { switchRole } = useRole();
   const [activeTab, setActiveTab] = useState<'reports' | 'audit' | 'institutions' | 'health'>('reports');
-  const [reports, setReports] = useState(initialReports);
+  const [reports] = useState(initialReports);
   const [communities, setCommunities] = useState(initialCommunities);
   const [auditLogs] = useState(initialAuditLogs);
   const [resolvedReports, setResolvedReports] = useState<string[]>([]);
@@ -83,49 +83,49 @@ export default function AdminClient({
   return (
     <div className="space-y-8">
       {/* ── TOP HERO HEADER ── */}
-      <div className="rounded-3xl bg-[#10121a]/90 border border-white/10 p-6 sm:p-8 backdrop-blur-2xl shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden">
-        {/* Glow backdrop */}
-        <div className="absolute top-0 right-0 w-[400px] h-[300px] bg-rose-600/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        {/* Soft subtle glow wash */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-rose-50/70 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-mono font-bold uppercase tracking-wider mb-3">
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+              <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
               <span>Root Operations &amp; Governance • Platform Administrator</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Trust, Safety & Security Control
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Trust, Safety &amp; Security Control
             </h1>
-            <p className="mt-1.5 text-sm text-zinc-400 max-w-2xl">
+            <p className="mt-1.5 text-xs sm:text-sm text-slate-600 max-w-2xl">
               Inspect student proof-of-work integrity, moderate flagged repositories, verify academic email federations, and audit cryptographic security logs.
             </p>
           </div>
 
           {/* Quick Persona Switcher for Admin testing */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="p-2 rounded-2xl bg-black/40 border border-white/10 flex items-center gap-1.5">
-              <span className="text-[10px] font-mono uppercase text-zinc-500 px-2 font-bold">
+            <div className="p-1.5 rounded-full bg-slate-100 border border-slate-200 flex items-center gap-1.5">
+              <span className="text-[10px] font-mono uppercase text-slate-500 px-2 font-bold">
                 Test View As:
               </span>
               <button
                 onClick={() => switchRole('student', true)}
-                className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-violet-500/20 text-violet-300 hover:bg-violet-500/30 border border-violet-500/30 transition-all flex items-center gap-1.5"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-700 hover:text-[#1b59f8] border border-slate-200 transition-all flex items-center gap-1.5 shadow-xs"
               >
-                <GraduationCap className="w-3.5 h-3.5" />
+                <GraduationCap className="w-3.5 h-3.5 text-[#1b59f8]" />
                 <span>Student</span>
               </button>
               <button
                 onClick={() => switchRole('recruiter', true)}
-                className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 transition-all flex items-center gap-1.5"
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-700 hover:text-emerald-700 border border-slate-200 transition-all flex items-center gap-1.5 shadow-xs"
               >
-                <Briefcase className="w-3.5 h-3.5" />
+                <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Recruiter</span>
               </button>
             </div>
 
             <button
               onClick={handleFlushCache}
-              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all flex items-center gap-2 shrink-0"
+              className="px-4 py-2 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 shrink-0 active:scale-95"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${cacheFlushed ? 'animate-spin text-emerald-400' : ''}`} />
               <span>{cacheFlushed ? 'Cache Re-indexed' : 'Purge Redis Cache'}</span>
@@ -134,33 +134,33 @@ export default function AdminClient({
         </div>
 
         {/* Real-time System Status Ticker */}
-        <div className="mt-6 pt-5 border-t border-white/[0.08] grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-zinc-400 uppercase">PostgreSQL RLS</p>
-              <p className="text-xs font-bold text-white">100% Strict Enforced</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">PostgreSQL RLS</p>
+              <p className="text-xs font-bold text-slate-800">100% Strict Enforced</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-zinc-400 uppercase">Redis 7 Cluster</p>
-              <p className="text-xs font-bold text-white">1.2ms Avg Latency</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Redis 7 Cluster</p>
+              <p className="text-xs font-bold text-slate-800">1.2ms Avg Latency</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#1b59f8] animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-zinc-400 uppercase">WebRTC SFU</p>
-              <p className="text-xs font-bold text-white">14 Active Sprint Rooms</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">WebRTC SFU</p>
+              <p className="text-xs font-bold text-slate-800">14 Active Sprint Rooms</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
             <div>
-              <p className="text-[10px] font-mono text-zinc-400 uppercase">Zero-Trust Audit</p>
-              <p className="text-xs font-bold text-white">SHA-256 Tamper-Proof</p>
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-semibold">Zero-Trust Audit</p>
+              <p className="text-xs font-bold text-slate-800">SHA-256 Tamper-Proof</p>
             </div>
           </div>
         </div>
@@ -168,61 +168,61 @@ export default function AdminClient({
 
       {/* ── BENTO PLATFORM METRICS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-[#10121a]/80 border border-white/10 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">
               Verified Builders
             </span>
-            <Users className="w-4 h-4 text-violet-400" />
+            <Users className="w-4 h-4 text-[#1b59f8]" />
           </div>
-          <div className="text-2xl font-black text-white">4,820</div>
-          <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1 font-mono">
+          <div className="text-2xl font-black text-slate-900">4,820</div>
+          <p className="text-[11px] text-emerald-700 mt-1 flex items-center gap-1 font-mono font-medium">
             <span>+342 new students this month</span>
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#10121a]/80 border border-white/10 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">
               Verified Recruiters
             </span>
-            <Briefcase className="w-4 h-4 text-emerald-400" />
+            <Briefcase className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-white">142</div>
-          <p className="text-[11px] text-zinc-400 mt-1 font-mono">
+          <div className="text-2xl font-black text-slate-900">142</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-mono">
             Stripe, Google, Scale AI, Datadog
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#10121a]/80 border border-white/10 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">
               College Domains
             </span>
-            <Building className="w-4 h-4 text-cyan-400" />
+            <Building className="w-4 h-4 text-cyan-600" />
           </div>
-          <div className="text-2xl font-black text-white">{communities.length}</div>
-          <p className="text-[11px] text-cyan-300 mt-1 font-mono">
+          <div className="text-2xl font-black text-slate-900">{communities.length}</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-mono">
             IISc, IIT Bombay, BITS, DTU
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#10121a]/80 border border-white/10 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">
               Integrity Index
             </span>
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-white">Active</div>
-          <p className="text-[11px] text-emerald-300 mt-1 font-mono">
+          <div className="text-2xl font-black text-emerald-700">Active</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-mono">
             Append-only audit log protection
           </p>
         </div>
       </div>
 
       {/* ── TAB NAVIGATION ── */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-black/40 border border-white/10 w-fit">
+      <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-slate-100 border border-slate-200 w-fit">
         {[
           { id: 'reports', label: 'Moderation Queue', count: reports.filter((r) => !resolvedReports.includes(r.id)).length },
           { id: 'audit', label: 'Security Audit Log' },
@@ -232,15 +232,15 @@ export default function AdminClient({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as 'reports' | 'audit' | 'institutions' | 'health')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white/10 text-white border border-white/15 shadow-sm font-bold'
-                : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-xs font-bold'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <span>{tab.label}</span>
             {tab.count !== undefined && tab.count > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-bold">
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-bold">
                 {tab.count}
               </span>
             )}
@@ -252,12 +252,12 @@ export default function AdminClient({
       {activeTab === 'reports' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
               <span>Pending Moderation Reports ({reports.length})</span>
             </h2>
-            <span className="text-xs text-zinc-400 font-mono">
-              Zero-Tolerance Code Plagiarism & Bot Scraping
+            <span className="text-xs text-slate-500 font-mono">
+              Zero-Tolerance Code Plagiarism &amp; Bot Scraping
             </span>
           </div>
 
@@ -269,53 +269,53 @@ export default function AdminClient({
                   key={report.id}
                   className={`rounded-2xl p-5 border transition-all ${
                     isResolved
-                      ? 'bg-emerald-500/5 border-emerald-500/20 opacity-70'
-                      : 'bg-[#10121a]/80 border-white/10 shadow-lg'
+                      ? 'bg-emerald-50/50 border-emerald-200 opacity-80'
+                      : 'bg-white border-slate-200/90 shadow-xs'
                   }`}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold">
+                      <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold">
                         Target: {report.target_type}
                       </span>
-                      <span className="text-xs font-bold text-white">
+                      <span className="text-xs font-bold text-slate-900">
                         {report.reason}
                       </span>
                     </div>
 
-                    <span className="text-xs text-zinc-500 font-mono">
+                    <span className="text-xs text-slate-500 font-mono">
                       Reported by {report.reporter?.display_name || 'Community Member'} • {new Date(report.created_at).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <p className="mt-3 text-xs text-zinc-300 leading-relaxed font-sans">
+                  <p className="mt-3 text-xs text-slate-600 leading-relaxed font-sans">
                     {report.details}
                   </p>
 
-                  <div className="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between">
-                    <span className="text-xs font-mono text-zinc-400">
-                      Target Entity ID: <code className="bg-black/50 text-violet-300 px-1.5 py-0.5 rounded border border-white/10 text-[11px]">{report.target_id}</code>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-xs font-mono text-slate-500">
+                      Target Entity ID: <code className="bg-slate-100 text-[#1b59f8] px-2 py-0.5 rounded border border-slate-200 text-[11px]">{report.target_id}</code>
                     </span>
 
                     {isResolved ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-xl">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
                         <Check className="w-4 h-4" />
-                        <span>Action Resolved & Logged</span>
+                        <span>Action Resolved &amp; Logged</span>
                       </span>
                     ) : (
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleResolveReport(report.id, 'dismiss')}
-                          className="px-3 py-1.5 rounded-xl border border-white/10 text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all"
+                          className="px-3.5 py-1.5 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all"
                         >
                           Dismiss (False Positive)
                         </button>
                         <button
                           onClick={() => handleResolveReport(report.id, 'hide')}
-                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold shadow-lg shadow-rose-900/30 transition-all flex items-center gap-1.5"
+                          className="px-4 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
                         >
                           <ShieldAlert className="w-3.5 h-3.5" />
-                          <span>Hide Content & Issue Warning</span>
+                          <span>Hide Content &amp; Issue Warning</span>
                         </button>
                       </div>
                     )}
@@ -329,28 +329,28 @@ export default function AdminClient({
 
       {/* ── TAB 2: SECURITY AUDIT LOG ── */}
       {activeTab === 'audit' && (
-        <div className="rounded-3xl bg-[#10121a]/80 border border-white/10 p-6 backdrop-blur-xl space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+        <div className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Lock className="w-4 h-4 text-violet-400" />
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-[#1b59f8]" />
                 <span>Append-Only Security Audit Trail</span>
               </h2>
-              <p className="text-xs text-zinc-400 font-mono mt-0.5">
+              <p className="text-xs text-slate-500 font-mono mt-0.5">
                 Every login, proof publication, RLS evaluation, and recruiter contact is cryptographically signed
               </p>
             </div>
 
             {/* Filter pills */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10">
+            <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 border border-slate-200">
               {['all', 'auth', 'verify', 'work'].map((f) => (
                 <button
                   key={f}
                   onClick={() => setAuditFilter(f)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono uppercase font-bold transition-all ${
+                  className={`px-3 py-1 rounded-full text-[11px] font-mono uppercase font-bold transition-all ${
                     auditFilter === f
-                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                      : 'text-zinc-500 hover:text-white'
+                      ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   {f}
@@ -361,7 +361,7 @@ export default function AdminClient({
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-black/40 text-zinc-400 border-b border-white/10">
+              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
                 <tr>
                   <th className="py-2.5 px-3">Timestamp</th>
                   <th className="py-2.5 px-3">Actor / Principal</th>
@@ -371,25 +371,25 @@ export default function AdminClient({
                   <th className="py-2.5 px-3">Hash Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.05]">
+              <tbody className="divide-y divide-slate-100">
                 {filteredAuditLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3 px-3 text-zinc-400 whitespace-nowrap">
+                  <tr key={log.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="py-3 px-3 text-slate-500 whitespace-nowrap">
                       {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </td>
-                    <td className="py-3 px-3 font-bold text-white">
+                    <td className="py-3 px-3 font-bold text-slate-900">
                       {log.actor?.display_name || log.actor_id}
                     </td>
                     <td className="py-3 px-3">
-                      <span className="px-2 py-0.5 rounded-md bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold uppercase text-[10px]">
+                      <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200 font-bold uppercase text-[10px]">
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-zinc-300">{log.target_resource}</td>
-                    <td className="py-3 px-3 text-zinc-500">{log.ip_address}</td>
+                    <td className="py-3 px-3 text-slate-700">{log.target_resource}</td>
+                    <td className="py-3 px-3 text-slate-500">{log.ip_address}</td>
                     <td className="py-3 px-3">
-                      <span className="text-[10px] text-emerald-400 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      <span className="text-[10px] text-emerald-700 flex items-center gap-1 font-semibold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                         Valid
                       </span>
                     </td>
@@ -403,21 +403,21 @@ export default function AdminClient({
 
       {/* ── TAB 3: INSTITUTION VERIFICATION ── */}
       {activeTab === 'institutions' && (
-        <div className="rounded-3xl bg-[#10121a]/80 border border-white/10 p-6 backdrop-blur-xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+        <div className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Building className="w-4 h-4 text-cyan-400" />
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Building className="w-4 h-4 text-[#1b59f8]" />
                 <span>Academic Institution Federation Registry</span>
               </h2>
-              <p className="text-xs text-zinc-400 font-mono mt-0.5">
+              <p className="text-xs text-slate-500 font-mono mt-0.5">
                 Students registering with approved domains automatically receive the verified campus badge
               </p>
             </div>
 
             <button
               onClick={() => setShowAddUni(!showAddUni)}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center gap-1.5 shrink-0"
+              className="px-4 py-2 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 shadow-sm"
             >
               <span>+ Federate New University</span>
             </button>
@@ -425,8 +425,8 @@ export default function AdminClient({
 
           {/* Add University Form */}
           {showAddUni && (
-            <form onSubmit={handleAddCommunity} className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+            <form onSubmit={handleAddCommunity} className="p-5 rounded-2xl bg-[#f8fafc] border border-slate-200 space-y-3">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                 Federate New Campus Partner
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -436,7 +436,7 @@ export default function AdminClient({
                   placeholder="University Name (e.g. Stanford University)"
                   value={newUniName}
                   onChange={(e) => setNewUniName(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500"
+                  className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                 />
                 <input
                   type="text"
@@ -444,22 +444,22 @@ export default function AdminClient({
                   placeholder="Domain suffix (e.g. stanford.edu)"
                   value={newDomainInput}
                   onChange={(e) => setNewDomainInput(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-violet-500"
+                  className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs font-mono focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowAddUni(false)}
-                  className="px-3 py-1.5 rounded-xl border border-white/10 text-xs text-zinc-400"
+                  className="px-3.5 py-1.5 rounded-full border border-slate-200 text-xs text-slate-600 hover:bg-slate-100"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-violet-600 text-white text-xs font-bold"
+                  className="px-4 py-1.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold"
                 >
-                  Save & Whitelist Domain
+                  Save &amp; Whitelist Domain
                 </button>
               </div>
             </form>
@@ -469,26 +469,26 @@ export default function AdminClient({
             {communities.map((comm) => (
               <div
                 key={comm.id}
-                className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.07] flex items-start justify-between gap-4 hover:border-white/15 transition-all"
+                className="p-5 rounded-2xl bg-[#f8fafc] border border-slate-200/70 flex items-start justify-between gap-4 hover:border-slate-300 transition-all shadow-xs"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <Building className="w-4 h-4 text-violet-400" />
-                    <h3 className="font-bold text-sm text-white">{comm.name}</h3>
+                    <Building className="w-4 h-4 text-[#1b59f8]" />
+                    <h3 className="font-bold text-sm text-slate-900">{comm.name}</h3>
                   </div>
-                  <p className="font-mono text-xs text-zinc-400 mt-1">Domain: <span className="text-violet-300">*.{comm.domain}</span></p>
-                  <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">{comm.description}</p>
+                  <p className="font-mono text-xs text-slate-500 mt-1">Domain: <span className="text-[#1b59f8]">*.{comm.domain}</span></p>
+                  <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">{comm.description}</p>
                 </div>
 
                 {comm.is_verified ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 shrink-0">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Verified
                   </span>
                 ) : (
                   <button
                     onClick={() => handleVerifyCommunity(comm.id)}
-                    className="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-all shrink-0"
+                    className="px-3 py-1.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shrink-0"
                   >
                     Verify College
                   </button>
@@ -502,86 +502,86 @@ export default function AdminClient({
       {/* ── TAB 4: SYSTEM DIAGNOSTICS ── */}
       {activeTab === 'health' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-3xl bg-[#10121a]/80 border border-white/10 p-6 backdrop-blur-xl space-y-4">
+          <div className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-700">
                 IN-MEMORY ENGINE
               </span>
-              <Server className="w-5 h-5 text-emerald-400" />
+              <Server className="w-5 h-5 text-emerald-600" />
             </div>
-            <h3 className="text-2xl font-black text-white">Redis 7 Alpine</h3>
-            <div className="space-y-2 text-xs font-mono text-zinc-400">
+            <h3 className="text-2xl font-black text-slate-900">Redis 7 Alpine</h3>
+            <div className="space-y-2 text-xs font-mono text-slate-600">
               <div className="flex justify-between">
                 <span>Limiter Status:</span>
-                <span className="font-bold text-emerald-400">Operational</span>
+                <span className="font-bold text-emerald-700">Operational</span>
               </div>
               <div className="flex justify-between">
                 <span>Avg Cache Latency:</span>
-                <span className="font-bold text-white">1.2ms</span>
+                <span className="font-bold text-slate-900">1.2ms</span>
               </div>
               <div className="flex justify-between">
                 <span>Active PubSub Channels:</span>
-                <span className="font-bold text-white">4 Channels</span>
+                <span className="font-bold text-slate-900">4 Channels</span>
               </div>
               <div className="flex justify-between">
                 <span>Sliding Window Rate Limit:</span>
-                <span className="font-bold text-emerald-400">Active (100 req/min)</span>
+                <span className="font-bold text-emerald-700">Active (100 req/min)</span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl bg-[#10121a]/80 border border-white/10 p-6 backdrop-blur-xl space-y-4">
+          <div className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-700">
                 DATABASE PERSISTENCE
               </span>
-              <Database className="w-5 h-5 text-indigo-400" />
+              <Database className="w-5 h-5 text-indigo-600" />
             </div>
-            <h3 className="text-2xl font-black text-white">PostgreSQL 15</h3>
-            <div className="space-y-2 text-xs font-mono text-zinc-400">
+            <h3 className="text-2xl font-black text-slate-900">PostgreSQL 15</h3>
+            <div className="space-y-2 text-xs font-mono text-slate-600">
               <div className="flex justify-between">
                 <span>Relational Tables:</span>
-                <span className="font-bold text-white">23 Tables</span>
+                <span className="font-bold text-slate-900">23 Tables</span>
               </div>
               <div className="flex justify-between">
                 <span>RLS Security Policies:</span>
-                <span className="font-bold text-emerald-400">100% Strict</span>
+                <span className="font-bold text-emerald-700">100% Strict</span>
               </div>
               <div className="flex justify-between">
                 <span>Connection Pool:</span>
-                <span className="font-bold text-white">18 / 50 Active</span>
+                <span className="font-bold text-slate-900">18 / 50 Active</span>
               </div>
               <div className="flex justify-between">
                 <span>Realtime Replication:</span>
-                <span className="font-bold text-emerald-400">Synchronous</span>
+                <span className="font-bold text-emerald-700">Synchronous</span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl bg-[#10121a]/80 border border-white/10 p-6 backdrop-blur-xl space-y-4">
+          <div className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
-                REVERSE PROXY & EDGE
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1b59f8]">
+                REVERSE PROXY &amp; EDGE
               </span>
-              <Activity className="w-5 h-5 text-cyan-400" />
+              <Activity className="w-5 h-5 text-[#1b59f8]" />
             </div>
-            <h3 className="text-2xl font-black text-white">NGINX 1.25 Edge</h3>
-            <div className="space-y-2 text-xs font-mono text-zinc-400">
+            <h3 className="text-2xl font-black text-slate-900">NGINX 1.25 Edge</h3>
+            <div className="space-y-2 text-xs font-mono text-slate-600">
               <div className="flex justify-between">
                 <span>Brotli / Gzip:</span>
-                <span className="font-bold text-emerald-400">Enabled</span>
+                <span className="font-bold text-emerald-700">Enabled</span>
               </div>
               <div className="flex justify-between">
                 <span>WebSocket Upgrade:</span>
-                <span className="font-bold text-emerald-400">Enabled</span>
+                <span className="font-bold text-emerald-700">Enabled</span>
               </div>
               <div className="flex justify-between">
                 <span>Turbopack HMR Stream:</span>
-                <span className="font-bold text-cyan-400">Active</span>
+                <span className="font-bold text-[#1b59f8]">Active</span>
               </div>
               <div className="flex justify-between">
                 <span>WAF Rate-Limiting:</span>
-                <span className="font-bold text-emerald-400">Zero-Trust</span>
+                <span className="font-bold text-emerald-700">Zero-Trust</span>
               </div>
             </div>
           </div>

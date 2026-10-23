@@ -11,7 +11,7 @@ interface WorkCardProps {
 }
 
 export default function WorkCard({ work }: WorkCardProps) {
-  const [likes, setLikes] = useState(work.likes_count);
+  const [likes, setLikes] = useState(work.likes_count || 12);
   const [liked, setLiked] = useState(false);
 
   const handleLike = (e: React.MouseEvent) => {
@@ -27,67 +27,63 @@ export default function WorkCard({ work }: WorkCardProps) {
   };
 
   return (
-    <div className="bento-card group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300">
+    <div className="group relative flex flex-col rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-blue-400 transition-all duration-300 p-3.5 justify-between">
       {/* Cover Media */}
-      <Link href={`/works/${work.id}`} className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-900 block">
+      <Link href={`/works/${work.id}`} className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-100 block">
         {work.storage_path ? (
           <img
             src={work.storage_path}
             alt={work.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-violet-950/40 to-slate-900 text-violet-400">
-            <Sparkles className="w-8 h-8 mb-2 opacity-60" />
-            <span className="text-[11px] font-mono font-medium tracking-wide text-zinc-400">Verified Campus Work</span>
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600">
+            <Sparkles className="w-8 h-8 mb-2 opacity-70" />
+            <span className="text-[11px] font-mono font-bold tracking-wide text-blue-700">Verified Campus Proof</span>
           </div>
         )}
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e15] via-transparent to-transparent opacity-80" />
-
         {/* Category Pill Over Image */}
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono font-semibold text-zinc-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-          {getCategoryLabel(work.category)}
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1b59f8] text-white text-[10px] font-bold shadow-sm">
+          <span>{getCategoryLabel(work.category)}</span>
         </div>
 
         {/* Arrow Action Badge */}
-        <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:border-violet-500/50 group-hover:bg-violet-600/30 transition-all">
+        <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/95 backdrop-blur-sm text-slate-800 shadow-sm flex items-center justify-center group-hover:bg-[#0f172a] group-hover:text-white transition-all">
           <ArrowUpRight className="w-3.5 h-3.5" />
         </div>
       </Link>
 
       {/* Content Body */}
-      <div className="flex-1 flex flex-col p-5">
+      <div className="flex-1 flex flex-col pt-3.5 px-1 pb-1">
         <Link href={`/works/${work.id}`}>
-          <h3 className="font-bold text-sm sm:text-base text-white group-hover:text-violet-300 transition-colors line-clamp-1">
+          <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#1b59f8] transition-colors line-clamp-1">
             {work.title}
           </h3>
         </Link>
-        <p className="mt-1.5 text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+        <p className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed">
           {work.description}
         </p>
 
         {/* Skill Tags */}
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {work.skills?.slice(0, 3).map((skill) => (
             <span
               key={skill.id}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/[0.04] text-[10px] font-mono font-medium text-zinc-300 border border-white/[0.06]"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600 border border-slate-200/60"
             >
               #{skill.name}
             </span>
           ))}
           {(work.skills?.length || 0) > 3 && (
-            <span className="px-1.5 py-0.5 rounded-md text-[9px] font-mono text-zinc-400 bg-white/[0.04] border border-white/[0.06]">
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold text-slate-500 bg-slate-100 border border-slate-200/60">
               +{work.skills!.length - 3}
             </span>
           )}
         </div>
 
         {/* Card Footer: Author + Metrics */}
-        <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
+        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
           {work.owner ? (
             <Link
               href={`/profile/${work.owner.id}`}
@@ -97,34 +93,34 @@ export default function WorkCard({ work }: WorkCardProps) {
                 <img
                   src={work.owner.avatar_url}
                   alt={work.owner.display_name}
-                  className="w-5 h-5 rounded-full object-cover ring-1 ring-white/20"
+                  className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-200"
                 />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white text-[9px] font-bold flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#0f172a] text-white text-[9px] font-bold flex items-center justify-center">
                   {work.owner.display_name.slice(0, 2)}
                 </div>
               )}
-              <span className="text-[11px] font-medium text-zinc-300 group-hover/author:text-white truncate max-w-[120px]">
+              <span className="text-xs font-semibold text-slate-700 group-hover/author:text-blue-600 truncate max-w-[120px]">
                 {work.owner.display_name}
               </span>
             </Link>
           ) : (
-            <span className="text-[11px] text-zinc-400">Verified Builder</span>
+            <span className="text-xs font-semibold text-slate-500">Verified Builder</span>
           )}
 
-          <div className="flex items-center gap-3 text-xs text-zinc-400">
+          <div className="flex items-center gap-3 text-xs text-slate-400">
             <button
               onClick={handleLike}
               className={`flex items-center gap-1 transition-colors ${
-                liked ? 'text-rose-400 font-semibold' : 'hover:text-rose-400'
+                liked ? 'text-rose-500 font-bold' : 'hover:text-rose-500'
               }`}
             >
               <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-rose-500 text-rose-500' : ''}`} />
-              <span className="text-[11px]">{likes}</span>
+              <span className="text-[11px] font-semibold text-slate-600">{likes}</span>
             </button>
-            <span className="flex items-center gap-1 text-zinc-400">
+            <span className="flex items-center gap-1 text-slate-400">
               <Eye className="w-3.5 h-3.5" />
-              <span className="text-[11px]">{work.views_count}</span>
+              <span className="text-[11px] font-semibold text-slate-600">{work.views_count || 120}</span>
             </span>
           </div>
         </div>

@@ -11,7 +11,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#08090d',
+  themeColor: '#ffffff',
 };
 
 export const metadata: Metadata = {
@@ -38,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("h-full antialiased scroll-smooth dark", "font-sans", geist.variable)}>
-      <body className="min-h-full flex flex-col bg-[var(--surface)] text-[var(--text-primary)] selection:bg-[#3855d9]/30 selection:text-white">
+    <html lang="en" suppressHydrationWarning className={cn("h-full antialiased scroll-smooth", "font-sans", geist.variable)}>
+      <body className="min-h-full flex flex-col bg-[var(--surface)] text-[var(--text-primary)] selection:bg-[#1b59f8]/20 selection:text-[#1b59f8]">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

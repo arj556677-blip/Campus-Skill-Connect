@@ -486,29 +486,29 @@ export default function CvBuilderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-white py-8">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         {/* Navigation & Header Bar (Hidden on print) */}
-        <div className="no-print flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="no-print flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <Link
               href="/cv"
-              className="p-2.5 rounded-xl bg-[#10121a] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-all shadow-sm"
+              className="p-2.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all shadow-xs"
               title="Back to CV Hub"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-                  Interactive CV Studio & ATS Engine
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                  Interactive CV Studio &amp; ATS Engine
                 </h1>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200">
                   V2.0
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Rule-based ATS section validator, custom field export selector, and 4 high-signal templates.
               </p>
             </div>
@@ -517,15 +517,15 @@ export default function CvBuilderPage() {
           {/* Quick Presets & Print / Download Controls */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Presets */}
-            <div className="flex items-center gap-1 p-1 bg-[#10121a] border border-white/10 rounded-xl">
-              <span className="text-[10px] font-mono text-zinc-500 px-1.5 uppercase font-bold">Samples:</span>
+            <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-full shadow-xs">
+              <span className="text-[10px] font-mono text-slate-400 px-2 uppercase font-bold">Samples:</span>
               <button
                 type="button"
                 onClick={() => setResume(PRESET_ALEX)}
-                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all ${
                   resume.fullName === 'Alex Rivera'
-                    ? 'bg-violet-600 text-white shadow-sm'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-[#0f172a] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Load sample distributed systems resume"
               >
@@ -534,10 +534,10 @@ export default function CvBuilderPage() {
               <button
                 type="button"
                 onClick={() => setResume(PRESET_PRIYA)}
-                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all ${
                   resume.fullName === 'Priya Sharma'
-                    ? 'bg-violet-600 text-white shadow-sm'
-                    : 'text-zinc-400 hover:text-white'
+                    ? 'bg-[#0f172a] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
                 title="Load sample AI/ML researcher resume"
               >
@@ -546,7 +546,7 @@ export default function CvBuilderPage() {
               <button
                 type="button"
                 onClick={() => setResume(EMPTY_RESUME)}
-                className="px-2 py-1 rounded-lg text-[11px] font-bold text-zinc-400 hover:text-rose-400 transition-all"
+                className="px-2.5 py-1 rounded-full text-[11px] font-bold text-slate-400 hover:text-rose-600 transition-all"
                 title="Clear all fields to type your own details"
               >
                 Clear
@@ -554,16 +554,16 @@ export default function CvBuilderPage() {
             </div>
 
             {/* Template Selector */}
-            <div className="flex items-center gap-1 bg-[#10121a] border border-white/10 p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-full shadow-xs">
               {(['technical', 'modern', 'minimal', 'academic'] as CvTemplate[]).map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setTemplate(t)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold capitalize transition-all ${
+                  className={`px-3 py-1 rounded-full text-[11px] font-bold capitalize transition-all ${
                     template === t
-                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-sm'
-                      : 'text-zinc-400 hover:text-white'
+                      ? 'bg-[#1b59f8] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {t}
@@ -575,10 +575,10 @@ export default function CvBuilderPage() {
             <button
               type="button"
               onClick={handleCopyPlainText}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#10121a] border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 text-xs font-semibold transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50 text-xs font-semibold transition-all shadow-xs"
               title="Copy ATS Plain Text for Job Portals"
             >
-              {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copiedText ? 'Copied!' : 'Copy Text'}</span>
             </button>
 
@@ -586,7 +586,7 @@ export default function CvBuilderPage() {
             <button
               type="button"
               onClick={handleExportJson}
-              className="p-2 rounded-xl bg-[#10121a] border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 transition-all"
+              className="p-2 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-all shadow-xs"
               title="Export JSON-Resume"
             >
               <Download className="w-4 h-4" />
@@ -596,9 +596,9 @@ export default function CvBuilderPage() {
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold hover:from-emerald-500 hover:to-teal-500 transition-all shadow-[0_0_20px_rgba(16,185,129,0.35)] active:scale-95"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-sm active:scale-95"
             >
-              <Printer className="w-4 h-4 text-emerald-200" />
+              <Printer className="w-4 h-4" />
               <span>Print to PDF</span>
             </button>
           </div>
@@ -606,15 +606,15 @@ export default function CvBuilderPage() {
 
         {/* Import Banner Notification */}
         {importNotice && (
-          <div className="no-print p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center justify-between gap-3 animate-in fade-in duration-200">
+          <div className="no-print p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between gap-3 animate-in fade-in duration-200">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{importNotice}</span>
             </div>
             <button
               type="button"
               onClick={() => setImportNotice(null)}
-              className="text-emerald-400 hover:text-white text-xs font-bold"
+              className="text-emerald-700 hover:text-emerald-900 text-xs font-bold"
             >
               Dismiss
             </button>
@@ -622,31 +622,31 @@ export default function CvBuilderPage() {
         )}
 
         {/* ATS Score Gauge Strip (Hidden on print) */}
-        <div className="no-print rounded-2xl bg-[#0e1017] border border-white/10 p-4 sm:p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="no-print rounded-3xl bg-white border border-slate-200/90 p-5 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div
               className={`relative w-14 h-14 rounded-full flex items-center justify-center font-black text-sm border-4 ${
                 atsChecklist.passedCount >= 4
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-500'
                   : atsChecklist.passedCount >= 3
-                  ? 'bg-amber-500/10 text-amber-400 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
-                  : 'bg-rose-500/10 text-rose-400 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.25)]'
+                  ? 'bg-amber-50 text-amber-700 border-amber-500'
+                  : 'bg-rose-50 text-rose-700 border-rose-500'
               }`}
             >
               {atsChecklist.passedCount}/{atsChecklist.totalCount}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-sm text-white">
+                <h3 className="font-bold text-sm text-slate-900">
                   ATS Structure Checklist: {atsChecklist.passedCount} of {atsChecklist.totalCount} Rules Met
                 </h3>
                 <span
-                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                  className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
                     atsChecklist.passedCount >= 4
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                       : atsChecklist.passedCount >= 3
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                      : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : 'bg-rose-50 text-rose-700 border-rose-200'
                   }`}
                 >
                   {atsChecklist.passedCount >= 4
@@ -656,7 +656,7 @@ export default function CvBuilderPage() {
                     : 'Missing Core Structural Sections'}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Rule-based rubric: contact completeness, action verbs, quantified metrics, and skills vocabulary.
               </p>
             </div>
@@ -666,22 +666,22 @@ export default function CvBuilderPage() {
             <button
               type="button"
               onClick={handleAutoPopulateCampusWorks}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 text-xs font-bold transition-all shrink-0"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-50 hover:bg-blue-100 text-[#1b59f8] border border-blue-200 text-xs font-bold transition-all shrink-0"
             >
-              <Zap className="w-3.5 h-3.5 text-violet-400 fill-current" />
+              <Zap className="w-3.5 h-3.5 fill-current" />
               <span>Auto-Sync Verified Works</span>
             </button>
           </div>
         </div>
 
-        {/* 2-Column Grid: Left Dark Editor | Right Live Sheet */}
+        {/* 2-Column Grid: Left Editor | Right Live Sheet */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT: Editor Form (Hidden on print) */}
           <div className="no-print lg:col-span-5 space-y-4">
             
             {/* Section Tab Switcher */}
-            <div className="flex items-center gap-1.5 p-1 bg-[#10121a] border border-white/10 rounded-xl overflow-x-auto">
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-full overflow-x-auto">
               {[
                 { id: 'contact', label: 'Contact', icon: FileText },
                 { id: 'education', label: 'Education', icon: GraduationCap },
@@ -696,10 +696,10 @@ export default function CvBuilderPage() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id as SectionTab)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                       isActive
-                        ? 'bg-violet-600 text-white shadow-md'
-                        : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -711,94 +711,94 @@ export default function CvBuilderPage() {
 
             {/* TAB 1: Contact & Identity */}
             {activeTab === 'contact' && (
-              <div className="rounded-2xl bg-[#0e1017] border border-white/10 p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-violet-400" />
-                    <span>Contact & Target Headline</span>
+              <div className="rounded-3xl bg-white border border-slate-200/90 p-6 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-[#1b59f8]" />
+                    <span>Contact &amp; Target Headline</span>
                   </h3>
-                  <span className="text-[10px] font-mono text-zinc-500">ATS Header Zone</span>
+                  <span className="text-[10px] font-mono text-slate-400">ATS Header Zone</span>
                 </div>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">Full Name *</label>
+                    <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">Full Name *</label>
                     <input
                       type="text"
                       value={resume.fullName}
                       onChange={(e) => setResume({ ...resume, fullName: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40"
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">Target Headline / Specialization *</label>
+                    <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">Target Headline / Specialization *</label>
                     <input
                       type="text"
                       value={resume.headline}
                       onChange={(e) => setResume({ ...resume, headline: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40"
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">Email *</label>
+                      <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">Email *</label>
                       <input
                         type="email"
                         value={resume.email}
                         onChange={(e) => setResume({ ...resume, email: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">Phone *</label>
+                      <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">Phone *</label>
                       <input
                         type="text"
                         value={resume.phone}
                         onChange={(e) => setResume({ ...resume, phone: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">Location</label>
+                      <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">Location</label>
                       <input
                         type="text"
                         value={resume.location}
                         onChange={(e) => setResume({ ...resume, location: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">GitHub</label>
+                      <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">GitHub</label>
                       <input
                         type="text"
                         value={resume.github}
                         onChange={(e) => setResume({ ...resume, github: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-mono font-bold text-zinc-400 block mb-1">LinkedIn</label>
+                      <label className="text-[11px] font-mono font-bold text-slate-700 block mb-1">LinkedIn</label>
                       <input
                         type="text"
                         value={resume.linkedin}
                         onChange={(e) => setResume({ ...resume, linkedin: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                       />
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-[11px] font-mono font-bold text-zinc-400">Professional Summary *</label>
-                      <span className="text-[10px] font-mono text-zinc-500">{resume.summary.length} characters</span>
+                      <label className="text-[11px] font-mono font-bold text-slate-700">Professional Summary *</label>
+                      <span className="text-[10px] font-mono text-slate-400">{resume.summary.length} characters</span>
                     </div>
                     <textarea
                       rows={4}
                       value={resume.summary}
                       onChange={(e) => setResume({ ...resume, summary: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs leading-relaxed focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/40"
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs leading-relaxed focus:outline-none focus:border-[#1b59f8]"
                     />
                   </div>
                 </div>
@@ -807,16 +807,16 @@ export default function CvBuilderPage() {
 
             {/* TAB 2: Education */}
             {activeTab === 'education' && (
-              <div className="rounded-2xl bg-[#0e1017] border border-white/10 p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <GraduationCap className="w-4 h-4 text-emerald-400" />
-                    <span>Education & Qualifications ({resume.education.length})</span>
+              <div className="rounded-3xl bg-white border border-slate-200/90 p-6 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <GraduationCap className="w-4 h-4 text-emerald-600" />
+                    <span>Education &amp; Qualifications ({resume.education.length})</span>
                   </h3>
                   <button
                     type="button"
                     onClick={addEducation}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold"
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0f172a] hover:bg-black text-white text-[11px] font-bold shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Degree</span>
@@ -825,13 +825,13 @@ export default function CvBuilderPage() {
 
                 <div className="space-y-3">
                   {resume.education.map((edu, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl bg-[#141722] border border-white/10 space-y-2 relative group">
+                    <div key={idx} className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200/80 space-y-2 relative group shadow-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold text-emerald-400">Degree #{idx + 1}</span>
+                        <span className="text-[10px] font-mono font-bold text-emerald-700">Degree #{idx + 1}</span>
                         <button
                           type="button"
                           onClick={() => removeEducation(idx)}
-                          className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                           title="Remove degree"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -848,7 +848,7 @@ export default function CvBuilderPage() {
                             updated[idx].institution = e.target.value;
                             setResume({ ...resume, education: updated });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-bold focus:outline-none focus:border-emerald-500"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#1b59f8]"
                         />
                         <input
                           type="text"
@@ -859,7 +859,7 @@ export default function CvBuilderPage() {
                             updated[idx].degree = e.target.value;
                             setResume({ ...resume, education: updated });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                         />
                         <div className="grid grid-cols-2 gap-2">
                           <input
@@ -871,7 +871,7 @@ export default function CvBuilderPage() {
                               updated[idx].year = e.target.value;
                               setResume({ ...resume, education: updated });
                             }}
-                            className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-zinc-300 text-xs font-mono focus:outline-none focus:border-emerald-500"
+                            className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-mono focus:outline-none focus:border-[#1b59f8]"
                           />
                           <input
                             type="text"
@@ -882,7 +882,7 @@ export default function CvBuilderPage() {
                               updated[idx].gpa = e.target.value;
                               setResume({ ...resume, education: updated });
                             }}
-                            className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-zinc-300 text-xs font-mono focus:outline-none focus:border-emerald-500"
+                            className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-mono focus:outline-none focus:border-[#1b59f8]"
                           />
                         </div>
                       </div>
@@ -894,16 +894,16 @@ export default function CvBuilderPage() {
 
             {/* TAB 3: Experience */}
             {activeTab === 'experience' && (
-              <div className="rounded-2xl bg-[#0e1017] border border-white/10 p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <Briefcase className="w-4 h-4 text-cyan-400" />
-                    <span>Experience & Internships ({resume.experience.length})</span>
+              <div className="rounded-3xl bg-white border border-slate-200/90 p-6 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <Briefcase className="w-4 h-4 text-[#1b59f8]" />
+                    <span>Experience &amp; Internships ({resume.experience.length})</span>
                   </h3>
                   <button
                     type="button"
                     onClick={addExperience}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-[11px] font-bold"
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0f172a] hover:bg-black text-white text-[11px] font-bold shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Role</span>
@@ -912,13 +912,13 @@ export default function CvBuilderPage() {
 
                 <div className="space-y-3">
                   {resume.experience.map((exp, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl bg-[#141722] border border-white/10 space-y-2 relative group">
+                    <div key={idx} className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200/80 space-y-2 relative group shadow-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold text-cyan-400">Position #{idx + 1}</span>
+                        <span className="text-[10px] font-mono font-bold text-[#1b59f8]">Position #{idx + 1}</span>
                         <button
                           type="button"
                           onClick={() => removeExperience(idx)}
-                          className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                           title="Remove role"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -935,7 +935,7 @@ export default function CvBuilderPage() {
                             updated[idx].company = e.target.value;
                             setResume({ ...resume, experience: updated });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-bold focus:outline-none focus:border-cyan-500"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#1b59f8]"
                         />
                         <input
                           type="text"
@@ -946,7 +946,7 @@ export default function CvBuilderPage() {
                             updated[idx].role = e.target.value;
                             setResume({ ...resume, experience: updated });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-500"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                         />
                       </div>
                       <input
@@ -958,17 +958,17 @@ export default function CvBuilderPage() {
                           updated[idx].duration = e.target.value;
                           setResume({ ...resume, experience: updated });
                         }}
-                        className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-zinc-300 text-xs font-mono focus:outline-none focus:border-cyan-500"
+                        className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-mono focus:outline-none focus:border-[#1b59f8]"
                       />
 
                       {/* Bullets */}
                       <div className="space-y-1.5 pt-1">
-                        <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                        <div className="flex items-center justify-between text-[11px] font-mono text-slate-500">
                           <span>Quantified Achievement Bullets:</span>
                           <button
                             type="button"
                             onClick={() => addExperienceBullet(idx)}
-                            className="text-cyan-400 hover:underline flex items-center gap-1 font-bold"
+                            className="text-[#1b59f8] hover:underline flex items-center gap-1 font-bold"
                           >
                             <Plus className="w-3 h-3" /> Add Bullet
                           </button>
@@ -983,12 +983,12 @@ export default function CvBuilderPage() {
                                 updated[idx].bullets[bIdx] = e.target.value;
                                 setResume({ ...resume, experience: updated });
                               }}
-                              className="w-full px-2.5 py-1.5 rounded-lg bg-black/30 border border-white/10 text-zinc-200 text-xs focus:outline-none focus:border-cyan-500"
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs focus:outline-none focus:border-[#1b59f8]"
                             />
                             <button
                               type="button"
                               onClick={() => removeExperienceBullet(idx, bIdx)}
-                              className="p-1 text-zinc-500 hover:text-rose-400 shrink-0"
+                              className="p-1 text-slate-400 hover:text-rose-600 shrink-0"
                             >
                               <Trash2 className="w-3 h-3" />
                             </button>
@@ -1003,16 +1003,16 @@ export default function CvBuilderPage() {
 
             {/* TAB 4: Verified Campus Projects */}
             {activeTab === 'projects' && (
-              <div className="rounded-2xl bg-[#0e1017] border border-white/10 p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <FolderGit2 className="w-4 h-4 text-violet-400" />
+              <div className="rounded-3xl bg-white border border-slate-200/90 p-6 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <FolderGit2 className="w-4 h-4 text-[#1b59f8]" />
                     <span>Verified Projects ({resume.projects.length})</span>
                   </h3>
                   <button
                     type="button"
                     onClick={addProject}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 text-[11px] font-bold"
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0f172a] hover:bg-black text-white text-[11px] font-bold shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Project</span>
@@ -1021,13 +1021,13 @@ export default function CvBuilderPage() {
 
                 <div className="space-y-3">
                   {resume.projects.map((proj, pIdx) => (
-                    <div key={pIdx} className="p-3.5 rounded-xl bg-[#141722] border border-white/10 space-y-2 relative group">
+                    <div key={pIdx} className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200/80 space-y-2 relative group shadow-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold text-violet-400">Project #{pIdx + 1}</span>
+                        <span className="text-[10px] font-mono font-bold text-[#1b59f8]">Project #{pIdx + 1}</span>
                         <button
                           type="button"
                           onClick={() => removeProject(pIdx)}
-                          className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                          className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                           title="Remove project"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1043,7 +1043,7 @@ export default function CvBuilderPage() {
                           newProjs[pIdx].title = e.target.value;
                           setResume({ ...resume, projects: newProjs });
                         }}
-                        className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-bold focus:outline-none focus:border-violet-500"
+                        className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#1b59f8]"
                       />
                       <div className="grid grid-cols-2 gap-2">
                         <input
@@ -1055,7 +1055,7 @@ export default function CvBuilderPage() {
                             newProjs[pIdx].technologies = e.target.value;
                             setResume({ ...resume, projects: newProjs });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-zinc-300 text-xs font-mono focus:outline-none focus:border-violet-500"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-mono focus:outline-none focus:border-[#1b59f8]"
                         />
                         <input
                           type="text"
@@ -1066,7 +1066,7 @@ export default function CvBuilderPage() {
                             newProjs[pIdx].link = e.target.value;
                             setResume({ ...resume, projects: newProjs });
                           }}
-                          className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-blue-300 text-xs font-mono focus:outline-none focus:border-violet-500"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-[#1b59f8] text-xs font-mono focus:outline-none focus:border-[#1b59f8]"
                         />
                       </div>
                       <textarea
@@ -1078,7 +1078,7 @@ export default function CvBuilderPage() {
                           newProjs[pIdx].description = e.target.value;
                           setResume({ ...resume, projects: newProjs });
                         }}
-                        className="w-full p-2.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs leading-relaxed focus:outline-none focus:border-violet-500"
+                        className="w-full p-2.5 rounded-lg bg-white border border-slate-200 text-slate-900 text-xs leading-relaxed focus:outline-none focus:border-[#1b59f8]"
                       />
                     </div>
                   ))}
@@ -1088,13 +1088,13 @@ export default function CvBuilderPage() {
 
             {/* TAB 5: Technical Competencies */}
             {activeTab === 'skills' && (
-              <div className="rounded-2xl bg-[#0e1017] border border-white/10 p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-purple-400" />
+              <div className="rounded-3xl bg-white border border-slate-200/90 p-6 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-[#1b59f8]" />
                     <span>Technical Skills ({resume.skills.length})</span>
                   </h3>
-                  <span className="text-[10px] font-mono text-zinc-500">ATS Keyword Match</span>
+                  <span className="text-[10px] font-mono text-slate-400">ATS Keyword Match</span>
                 </div>
 
                 {/* Input for new skill */}
@@ -1110,11 +1110,11 @@ export default function CvBuilderPage() {
                     value={newSkillInput}
                     onChange={(e) => setNewSkillInput(e.target.value)}
                     placeholder="Type a skill and press Enter (e.g., Kubernetes, Rust)..."
-                    className="flex-1 px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white text-xs focus:outline-none focus:border-purple-500"
+                    className="flex-1 px-3 py-2 rounded-full bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                   />
                   <button
                     type="submit"
-                    className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all"
+                    className="px-4 py-2 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-xs"
                   >
                     Add
                   </button>
@@ -1125,13 +1125,13 @@ export default function CvBuilderPage() {
                   {resume.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#141722] border border-white/10 text-xs font-mono font-medium text-purple-200"
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-mono font-medium text-[#1b59f8]"
                     >
                       <span>{skill}</span>
                       <button
                         type="button"
                         onClick={() => removeSkill(skill)}
-                        className="text-zinc-500 hover:text-rose-400 font-bold ml-1"
+                        className="text-slate-400 hover:text-rose-600 font-bold ml-1"
                       >
                         ×
                       </button>
@@ -1140,15 +1140,15 @@ export default function CvBuilderPage() {
                 </div>
 
                 {/* Suggested Chips */}
-                <div className="pt-2 border-t border-white/10 space-y-2">
-                  <p className="text-[11px] font-mono text-zinc-400">One-Click Quick Add High-Demand Skills:</p>
+                <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <p className="text-[11px] font-mono text-slate-500">One-Click Quick Add High-Demand Skills:</p>
                   <div className="flex flex-wrap gap-1.5">
                     {SUGGESTED_SKILLS.filter((s) => !resume.skills.includes(s)).map((skill) => (
                       <button
                         key={skill}
                         type="button"
                         onClick={() => addSkill(skill)}
-                        className="px-2 py-0.5 rounded-md bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] text-[11px] font-mono text-zinc-300 hover:text-white transition-all"
+                        className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[11px] font-mono text-slate-700 transition-all"
                       >
                         + {skill}
                       </button>
@@ -1159,24 +1159,24 @@ export default function CvBuilderPage() {
             )}
 
             {/* ATS Diagnostics Checklist */}
-            <div className="rounded-2xl bg-[#0e1017] border border-white/10 p-4 space-y-2.5 text-xs shadow-xl">
-              <div className="flex items-center gap-2 font-bold text-zinc-200">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>ATS Quality Checklist & Rubric</span>
+            <div className="rounded-3xl bg-white border border-slate-200/90 p-5 space-y-2.5 text-xs shadow-xs">
+              <div className="flex items-center gap-2 font-bold text-slate-900">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>ATS Quality Checklist &amp; Rubric</span>
               </div>
               <div className="space-y-1.5">
                 {atsChecklist.rules.map((rule, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-[11.5px]">
                     {rule.passed ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     ) : (
-                      <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                     )}
                     <div className="flex-1">
-                      <span className={`font-semibold ${rule.passed ? 'text-zinc-200' : 'text-amber-300'}`}>
+                      <span className={`font-semibold ${rule.passed ? 'text-slate-900' : 'text-amber-800'}`}>
                         {rule.name}:
                       </span>{' '}
-                      <span className={rule.passed ? 'text-zinc-400' : 'text-amber-300/80'}>
+                      <span className={rule.passed ? 'text-slate-500' : 'text-amber-700'}>
                         {rule.description}
                       </span>
                     </div>

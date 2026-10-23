@@ -49,13 +49,13 @@ function renderInline(text: string): ReactNode[] {
 
     if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
       nodes.push(
-        <strong key={index} className="text-white font-semibold">
+        <strong key={index} className="text-slate-900 font-semibold">
           {part.slice(2, -2)}
         </strong>
       );
     } else if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
       nodes.push(
-        <em key={index} className="text-zinc-300 italic">
+        <em key={index} className="text-slate-600 italic">
           {part.slice(1, -1)}
         </em>
       );
@@ -63,7 +63,7 @@ function renderInline(text: string): ReactNode[] {
       nodes.push(
         <code
           key={index}
-          className="px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-violet-300 font-mono text-[11px]"
+          className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[#1b59f8] font-mono text-[11px]"
         >
           {part.slice(1, -1)}
         </code>
@@ -81,7 +81,7 @@ function MarkdownRenderer({ content }: { content: string }) {
   const lines = content.split('\n');
 
   return (
-    <div className="space-y-2 text-xs sm:text-sm text-zinc-200 leading-relaxed">
+    <div className="space-y-2 text-xs sm:text-sm text-slate-800 leading-relaxed">
       {lines.map((line, idx) => {
         const trimmed = line.trim();
 
@@ -94,9 +94,9 @@ function MarkdownRenderer({ content }: { content: string }) {
           return (
             <h4
               key={idx}
-              className="text-sm sm:text-base font-bold text-white pt-2 pb-1 border-b border-white/10 flex items-center gap-2"
+              className="text-sm sm:text-base font-bold text-slate-900 pt-2 pb-1 border-b border-slate-100 flex items-center gap-2"
             >
-              <span className="w-1.5 h-3.5 bg-violet-500 rounded-full" />
+              <span className="w-1.5 h-3.5 bg-[#1b59f8] rounded-full" />
               {trimmed.replace('### ', '')}
             </h4>
           );
@@ -107,7 +107,7 @@ function MarkdownRenderer({ content }: { content: string }) {
           const raw = trimmed.replace(/^[•\-\*]\s+/, '');
           return (
             <div key={idx} className="flex items-start gap-2 pl-1">
-              <span className="text-violet-400 mt-1 text-xs">•</span>
+              <span className="text-[#1b59f8] mt-1 text-xs">•</span>
               <span>{renderInline(raw)}</span>
             </div>
           );
@@ -118,7 +118,7 @@ function MarkdownRenderer({ content }: { content: string }) {
         if (numMatch) {
           return (
             <div key={idx} className="flex items-start gap-2.5 pl-1">
-              <span className="font-mono text-xs font-bold text-violet-400 mt-0.5 shrink-0">
+              <span className="font-mono text-xs font-bold text-[#1b59f8] mt-0.5 shrink-0">
                 {numMatch[1]}.
               </span>
               <span>{renderInline(numMatch[2])}</span>
@@ -139,7 +139,7 @@ export default function CopilotPage() {
       id: 'init-1',
       role: 'assistant',
       content:
-        '👋 Welcome to the **Campus Career & Engineering Copilot**! I can help you prepare for technical interviews, review project architecture, and refine your resume evidence.\n\nWhat would you like to prepare for today?',
+        '👋 Welcome to **Campus AI Copilot**! I can help you validate engineering project architecture, prep for technical recruiter screens, or review your ATS resume checklist. What are you working on today?',
     },
   ]);
   const [inputVal, setInputVal] = useState('');
@@ -152,47 +152,51 @@ export default function CopilotPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const handleSend = async (textToSend?: string) => {
-    const text = textToSend || inputVal.trim();
-    if (!text || isLoading) return;
+  const handleSend = async (contentToSend?: string) => {
+    const text = contentToSend || inputVal;
+    if (!text.trim() || isLoading) return;
 
     const userMsgId = createMessageId('user');
-    const userMsg: ChatMessage = {
-      id: userMsgId,
-      role: 'user',
-      content: text,
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+    const newMessages: ChatMessage[] = [
+      ...messages,
+      { id: userMsgId, role: 'user', content: text },
+    ];
+    setMessages(newMessages);
     setInputVal('');
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/copilot', {
+      const res = await fetch('/api/copilot/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMsg],
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
-      const data = await response.json();
-      const botMsgId = createMessageId('bot');
-      const botMsg: ChatMessage = {
-        id: botMsgId,
-        role: 'assistant',
-        content: data.reply || 'Let me help you optimize that work.',
-      };
-      setMessages((prev) => [...prev, botMsg]);
-    } catch {
-      const errBotId = createMessageId('err');
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate copilot critique');
+      }
+
+      const botMsgId = createMessageId('assistant');
       setMessages((prev) => [
         ...prev,
         {
-          id: errBotId,
+          id: botMsgId,
           role: 'assistant',
-          content:
-            '### Technical Assessment & Review:\n1. **Systems Evidence**: Clearly document your cache invalidation strategies and database constraints.\n2. **Security Focus**: Highlight row-level security and verified session tokens over client-side filters.\n3. **Measurable Outcomes**: Benchmark your latency, throughput, and error rates with reproducible data.',
+          content: data.reply || "I've reviewed your request. Let's dig deeper into the technical architecture.",
+        },
+      ]);
+    } catch (err: unknown) {
+      const errorReply = err instanceof Error ? err.message : 'Error reaching copilot service';
+      const botMsgId = createMessageId('error');
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: botMsgId,
+          role: 'assistant',
+          content: `⚠️ ${errorReply}. Please verify your network connection or try again.`,
         },
       ]);
     } finally {
@@ -218,46 +222,42 @@ export default function CopilotPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-[#08090d] text-white py-8 relative">
-      {/* Background Glows */}
-      <div className="absolute top-10 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-[calc(100vh-65px)] bg-[#f8fafc] text-slate-900 py-8 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
         {/* Navigation & Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="p-2.5 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-zinc-300 hover:text-white transition-all shadow-sm"
+              className="p-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 transition-all shadow-xs"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                   Campus AI Career Copilot
                 </h1>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold uppercase">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200 font-bold uppercase">
                   Context-Aware
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Engineering interview simulator, portfolio review assistant, and ATS checklist advisor.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-              <ShieldCheck className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Rate Limiter: Active</span>
             </div>
 
             <button
               onClick={clearChat}
               title="Reset Chat"
-              className="p-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-zinc-400 hover:text-rose-400 transition-colors"
+              className="p-2.5 rounded-full bg-white hover:bg-rose-50 border border-slate-200 text-slate-500 hover:text-rose-600 transition-colors shadow-xs"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -265,9 +265,9 @@ export default function CopilotPage() {
         </div>
 
         {/* Chat Container */}
-        <div className="rounded-3xl bg-[#0f111a] border border-white/10 shadow-2xl flex flex-col h-[640px] overflow-hidden">
+        <div className="rounded-3xl bg-white border border-slate-200 shadow-xs flex flex-col h-[640px] overflow-hidden">
           {/* Messages Stream */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-[#0c0d14]/60">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-[#f8fafc]">
             {messages.map((msg) => {
               const isBot = msg.role === 'assistant';
 
@@ -278,10 +278,10 @@ export default function CopilotPage() {
                 >
                   {/* Avatar Icon */}
                   <div
-                    className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 ${
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
                       isBot
-                        ? 'bg-gradient-to-tr from-purple-600 via-violet-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.35)]'
-                        : 'bg-zinc-800 text-zinc-200 border border-white/10'
+                        ? 'bg-[#1b59f8] text-white shadow-xs'
+                        : 'bg-[#0f172a] text-white'
                     }`}
                   >
                     {isBot ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4" />}
@@ -289,10 +289,10 @@ export default function CopilotPage() {
 
                   {/* Message Bubble */}
                   <div
-                    className={`max-w-2xl rounded-2xl p-4 sm:p-5 relative group transition-all ${
+                    className={`max-w-2xl rounded-2xl p-4 sm:p-5 relative group transition-all shadow-xs ${
                       isBot
-                        ? 'bg-[#131625] border border-white/10 text-zinc-100 shadow-lg'
-                        : 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-[0_4px_20px_rgba(139,92,246,0.25)] border border-violet-400/20'
+                        ? 'bg-white border border-slate-200 text-slate-800'
+                        : 'bg-[#0f172a] text-white'
                     }`}
                   >
                     {isBot ? (
@@ -307,11 +307,11 @@ export default function CopilotPage() {
                     {isBot && (
                       <button
                         onClick={() => handleCopy(msg.id, msg.content)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-3 right-3 p-1.5 rounded-lg bg-black/40 hover:bg-black/60 text-zinc-400 hover:text-white"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800"
                         title="Copy message"
                       >
                         {copiedId === msg.id ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}
@@ -323,8 +323,8 @@ export default function CopilotPage() {
             })}
 
             {isLoading && (
-              <div className="flex items-center gap-3 text-xs text-zinc-400 font-mono">
-                <div className="w-9 h-9 rounded-2xl bg-violet-500/10 border border-violet-500/30 text-violet-400 flex items-center justify-center">
+              <div className="flex items-center gap-3 text-xs text-slate-500">
+                <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 text-[#1b59f8] flex items-center justify-center">
                   <RefreshCw className="w-4 h-4 animate-spin" />
                 </div>
                 <span className="animate-pulse">
@@ -337,16 +337,16 @@ export default function CopilotPage() {
           </div>
 
           {/* Quick Presets */}
-          <div className="px-4 sm:px-6 py-2.5 bg-[#0f111a] border-t border-white/[0.08] flex items-center gap-2 overflow-x-auto scrollbar-none">
-            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-              <Lightbulb className="w-3 h-3 text-amber-400" />
+          <div className="px-4 sm:px-6 py-2.5 bg-white border-t border-slate-100 flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
               Prompt:
             </span>
             {PRESETS.map((preset) => (
               <button
                 key={preset}
                 onClick={() => handleSend(preset)}
-                className="px-3 py-1 rounded-xl text-xs font-medium text-zinc-300 bg-white/[0.05] hover:bg-white/[0.12] hover:text-white border border-white/10 whitespace-nowrap transition-all"
+                className="px-3.5 py-1 rounded-full text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 whitespace-nowrap transition-all shadow-xs"
               >
                 {preset}
               </button>
@@ -359,19 +359,19 @@ export default function CopilotPage() {
               e.preventDefault();
               handleSend();
             }}
-            className="p-3 sm:p-4 bg-[#0a0c12] border-t border-white/10 flex items-center gap-3"
+            className="p-3 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-3"
           >
             <input
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               placeholder="Ask Copilot for interview prep, architecture critique, or ATS review..."
-              className="flex-1 px-4 py-3 rounded-2xl bg-[#12141f] border border-white/10 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
+              className="flex-1 px-5 py-3 rounded-full bg-[#f8fafc] border border-slate-200 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1b59f8] transition-all"
             />
             <button
               type="submit"
               disabled={!inputVal.trim() || isLoading}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold shadow-soft hover:from-violet-500 hover:to-indigo-500 active:scale-95 transition-all disabled:opacity-40 flex items-center gap-1.5 shrink-0"
+              className="px-6 py-3 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold shadow-xs active:scale-95 transition-all disabled:opacity-40 flex items-center gap-1.5 shrink-0"
             >
               <span>Ask</span>
               <Send className="w-3.5 h-3.5" />

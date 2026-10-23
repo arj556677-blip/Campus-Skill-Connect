@@ -13,7 +13,7 @@ export default async function CollaboratePage() {
   const rooms = await getCollabRooms();
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] py-10">
+    <div className="min-h-screen bg-[#f8fafc] py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <CollaborateClient initialRooms={rooms} />
       </div>

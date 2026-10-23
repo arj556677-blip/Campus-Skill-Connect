@@ -69,7 +69,7 @@ export default function ProfileActions({
           <button
             onClick={() => performAction('request')}
             disabled={loadingAction !== null}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[var(--radius-sm)] text-xs font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-sm transition-all focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-bold bg-[#0f172a] hover:bg-black text-white shadow-xs transition-all active:scale-95"
           >
             {loadingAction === 'request' ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
@@ -80,13 +80,13 @@ export default function ProfileActions({
           </button>
         ) : status === 'pending' && !isIncoming ? (
           <div className="inline-flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium bg-[var(--surface-sunken)] border border-[var(--border)] text-[var(--text-secondary)]">
+            <span className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200 text-slate-700">
               Pending
             </span>
             <button
               onClick={() => performAction('withdraw')}
               disabled={loadingAction !== null}
-              className="px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium text-[var(--danger)] hover:bg-[var(--danger-bg)] border border-[var(--danger)]/30 transition-colors"
+              className="px-3 py-2 rounded-full text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors"
             >
               Withdraw
             </button>
@@ -96,7 +96,7 @@ export default function ProfileActions({
             <button
               onClick={() => performAction('accept')}
               disabled={loadingAction !== null}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white"
+              className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold bg-[#1b59f8] hover:bg-[#174ed8] text-white shadow-xs"
             >
               <UserCheck className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Accept</span>
@@ -104,26 +104,26 @@ export default function ProfileActions({
             <button
               onClick={() => performAction('decline')}
               disabled={loadingAction !== null}
-              className="px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium text-[var(--danger)] hover:bg-[var(--danger-bg)] border border-[var(--border)]"
+              className="px-3.5 py-2 rounded-full text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200"
             >
               Decline
             </button>
           </div>
         ) : status === 'accepted' ? (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-semibold bg-[var(--success-bg)] text-[var(--success)] border border-[var(--success)]/40">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
             <UserCheck className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Connected</span>
           </span>
         ) : status === 'blocked' ? (
           <div className="inline-flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium bg-[var(--danger-bg)] text-[var(--danger)]">
+            <span className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
               <Ban className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Blocked</span>
             </span>
             <button
               onClick={() => performAction('unblock')}
               disabled={loadingAction !== null}
-              className="text-xs text-[var(--text-muted)] hover:text-white underline ml-1"
+              className="text-xs text-slate-500 hover:text-slate-900 underline ml-1"
             >
               Unblock
             </button>
@@ -134,9 +134,9 @@ export default function ProfileActions({
         {status === 'accepted' && (
           <Link
             href={`/messages?recipientId=${profileId}`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs font-semibold hover:bg-[var(--surface-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 text-xs font-semibold transition-colors shadow-xs"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-[var(--text-secondary)]" aria-hidden="true" />
+            <MessageSquare className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
             <span>Message</span>
           </Link>
         )}
@@ -144,17 +144,17 @@ export default function ProfileActions({
         {/* Share Button */}
         <button
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-sm)] text-xs font-medium bg-[var(--surface-sunken)] text-[var(--text-secondary)] border border-[var(--border)] hover:text-white hover:border-[var(--border-hover)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-xs transition-colors"
           title="Share profile link"
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-[var(--success)]" aria-hidden="true" />
-              <span className="text-[var(--success)] font-medium">Copied</span>
+              <Check className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+              <span className="text-emerald-700 font-semibold">Copied</span>
             </>
           ) : (
             <>
-              <Share2 className="w-3.5 h-3.5" aria-hidden="true" />
+              <Share2 className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
               <span>Share</span>
             </>
           )}
@@ -166,7 +166,7 @@ export default function ProfileActions({
             onClick={() => performAction('block')}
             disabled={loadingAction !== null}
             title="Block this user"
-            className="p-2 rounded-[var(--radius-sm)] text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-bg)] transition-colors"
+            className="p-2 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
           >
             <UserX className="w-3.5 h-3.5" aria-hidden="true" />
             <span className="sr-only">Block user</span>
@@ -176,7 +176,7 @@ export default function ProfileActions({
 
       {/* Inline Rollback Error Message */}
       {errorMessage && (
-        <div role="alert" className="text-xs text-[var(--danger)] flex items-center gap-1.5">
+        <div role="alert" className="text-xs text-rose-600 flex items-center gap-1.5">
           <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>

@@ -158,24 +158,24 @@ export default function NewWorkPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--surface)] text-[var(--text-primary)] py-10">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Navigation Breadcrumb */}
         <Link
           href="/showcase"
-          className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[var(--text-secondary)] hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           <span>Back to Showcase Feed</span>
         </Link>
 
-        <div className="bento-card p-6 sm:p-10 space-y-8">
+        <div className="rounded-3xl bg-white border border-slate-200/90 shadow-xs p-6 sm:p-10 space-y-8">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Publish Evidence of Work
             </h1>
-            <p className="text-xs text-[var(--text-secondary)]">
+            <p className="text-xs text-slate-500">
               Link-first portfolio submission. Back your self-declared skills with peer-reviewable artifacts.
             </p>
           </div>
@@ -183,7 +183,7 @@ export default function NewWorkPage() {
           {errorMessage && (
             <div
               role="alert"
-              className="p-3.5 rounded-[var(--radius-sm)] bg-[var(--danger-bg)] border border-[var(--danger)] text-[var(--danger)] text-xs flex items-center gap-2.5"
+              className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5"
             >
               <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
               <span>{errorMessage}</span>
@@ -195,7 +195,7 @@ export default function NewWorkPage() {
             {/* Title & Category */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                   Work Title *
                 </label>
                 <input
@@ -204,18 +204,18 @@ export default function NewWorkPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Distributed Consensus Engine in Rust"
-                  className="w-full px-3.5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--focus)]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                   Disciplinary Category *
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as WorkCategory)}
-                  className="w-full px-3.5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs focus:outline-none focus:border-[var(--focus)]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8]"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -228,7 +228,7 @@ export default function NewWorkPage() {
 
             {/* External URL (Link-First with Safe-Link Validation) */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                 External Artifact / Demonstration URL (HTTPS only)
               </label>
               <div className="relative">
@@ -237,28 +237,28 @@ export default function NewWorkPage() {
                   value={externalUrl}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   placeholder="https://github.com/org/repo or https://doi.org/..."
-                  className={`w-full px-3.5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border text-white text-xs placeholder-[var(--text-muted)] focus:outline-none font-mono ${
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-[#f8fafc] border text-slate-900 text-xs placeholder-slate-400 focus:outline-none font-mono ${
                     urlSafe === true
-                      ? 'border-[var(--success)] focus:border-[var(--success)]'
+                      ? 'border-emerald-500 focus:border-emerald-500'
                       : urlSafe === false
-                      ? 'border-[var(--danger)] focus:border-[var(--danger)]'
-                      : 'border-[var(--border)] focus:border-[var(--focus)]'
+                      ? 'border-rose-400 focus:border-rose-500'
+                      : 'border-slate-200 focus:border-[#1b59f8]'
                   }`}
                 />
               </div>
 
-              {/* Safe-Link Preview (No Arbitrary Server-side SSRF Fetch) */}
+              {/* Safe-Link Preview */}
               {urlSafe === true && urlHostname && (
-                <div className="mt-2 p-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-[var(--success)]">
-                    <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>Safe HTTPS origin verified: <strong className="font-mono text-white">{urlHostname}</strong></span>
+                <div className="mt-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-emerald-800">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                    <span>Safe HTTPS origin verified: <strong className="font-mono text-slate-900">{urlHostname}</strong></span>
                   </div>
-                  <span className="text-[10px] text-[var(--text-muted)] font-mono">Zero SSRF sandbox</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Zero SSRF sandbox</span>
                 </div>
               )}
               {urlSafe === false && (
-                <p className="mt-1 text-[11px] text-[var(--danger)]">
+                <p className="mt-1 text-[11px] text-rose-600">
                   Must be a secure address starting with https://
                 </p>
               )}
@@ -266,8 +266,8 @@ export default function NewWorkPage() {
 
             {/* Description */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
-                Description & Engineering Evidence
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+                Description &amp; Engineering Evidence
               </label>
               <textarea
                 rows={4}
@@ -275,39 +275,39 @@ export default function NewWorkPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Explain the problem solved, architectural decisions, benchmarks, and how this demonstrates your proficiency..."
-                className="w-full px-3.5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--focus)] resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#1b59f8] resize-none"
               />
             </div>
 
             {/* Collaborators and Completion Date */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                   Collaborators (Text format)
                 </label>
                 <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
                   <input
                     type="text"
                     value={collaborators}
                     onChange={(e) => setCollaborators(e.target.value)}
                     placeholder="e.g. Maya Chen, Dr. A. Raman (Faculty Advisor)"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--focus)]"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                   Completion / Presentation Date
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
                   <input
                     type="date"
                     value={completionDate}
                     onChange={(e) => setCompletionDate(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs focus:outline-none focus:border-[var(--focus)]"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-700 text-xs focus:outline-none focus:border-[#1b59f8]"
                   />
                 </div>
               </div>
@@ -315,7 +315,7 @@ export default function NewWorkPage() {
 
             {/* Controlled Skills Vocabulary Search */}
             <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                 Demonstrated Skills (Controlled Vocabulary)
               </label>
 
@@ -325,13 +325,13 @@ export default function NewWorkPage() {
                   {selectedSkills.map((s) => (
                     <span
                       key={s.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-white text-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#1b59f8] text-xs font-medium"
                     >
                       <span>{s.name}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveSkill(s.id)}
-                        className="text-[var(--text-secondary)] hover:text-white"
+                        className="text-slate-400 hover:text-slate-800"
                         aria-label={`Remove skill ${s.name}`}
                       >
                         <X className="w-3 h-3" aria-hidden="true" />
@@ -343,28 +343,28 @@ export default function NewWorkPage() {
 
               {/* Search box */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
                 <input
                   type="text"
                   value={skillSearchQuery}
                   onChange={(e) => setSkillSearchQuery(e.target.value)}
                   placeholder="Search skills (e.g. React, PostgreSQL, Docker, Academic Writing)..."
-                  className="w-full pl-9 pr-3.5 py-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-white text-xs placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--focus)]"
+                  className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>
 
               {/* Autocomplete Suggestions */}
               {skillSearchQuery && availableSkills.length > 0 && (
-                <div className="p-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] max-h-40 overflow-y-auto space-y-1">
+                <div className="p-2 rounded-2xl bg-white border border-slate-200 shadow-sm max-h-40 overflow-y-auto space-y-1">
                   {availableSkills.map((sk) => (
                     <button
                       key={sk.id}
                       type="button"
                       onClick={() => handleAddSkill(sk)}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--surface-hover)] text-xs text-left text-[var(--text-primary)]"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl hover:bg-slate-50 text-xs text-left text-slate-800"
                     >
                       <span className="font-semibold">{sk.name}</span>
-                      <span className="text-[10px] text-[var(--text-muted)] uppercase font-mono">
+                      <span className="text-[10px] text-slate-400 uppercase font-mono">
                         {sk.category}
                       </span>
                     </button>
@@ -375,7 +375,7 @@ export default function NewWorkPage() {
 
             {/* Visibility Selector explicitly shown before publishing */}
             <div className="space-y-2 pt-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
                 Visibility Model (Strict Server Enforcement)
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -409,10 +409,10 @@ export default function NewWorkPage() {
                   return (
                     <label
                       key={opt.id}
-                      className={`flex items-start gap-3 p-3 rounded-[var(--radius-sm)] border cursor-pointer transition-colors ${
+                      className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-colors ${
                         visibility === opt.id
-                          ? 'border-[var(--accent)] bg-[var(--accent)]/10'
-                          : 'border-[var(--border)] bg-[var(--surface-sunken)] hover:bg-[var(--surface-hover)]'
+                          ? 'border-[#1b59f8] bg-blue-50/50'
+                          : 'border-slate-200 bg-[#f8fafc] hover:bg-slate-100'
                       }`}
                     >
                       <input
@@ -421,16 +421,16 @@ export default function NewWorkPage() {
                         value={opt.id}
                         checked={visibility === opt.id}
                         onChange={() => setVisibility(opt.id as Visibility)}
-                        className="mt-0.5 text-[var(--accent)] focus:ring-[var(--focus)]"
+                        className="mt-0.5 text-[#1b59f8] focus:ring-[#1b59f8]"
                       />
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <Icon className="w-3.5 h-3.5 text-[var(--accent)]" aria-hidden="true" />
-                          <span className="text-xs font-semibold text-[var(--text-primary)]">
+                          <Icon className="w-3.5 h-3.5 text-[#1b59f8]" aria-hidden="true" />
+                          <span className="text-xs font-semibold text-slate-900">
                             {opt.title}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">{opt.desc}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{opt.desc}</p>
                       </div>
                     </label>
                   );
@@ -440,20 +440,20 @@ export default function NewWorkPage() {
 
             {/* Live Preview Card */}
             {title && (
-              <div className="p-4 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] space-y-2">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-bold">
+              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200 space-y-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
                   Publication Preview
                 </span>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-[var(--accent)] uppercase font-mono">
+                    <span className="text-xs font-semibold text-[#1b59f8] uppercase font-mono">
                       {category}
                     </span>
-                    <span className="text-xs text-[var(--text-muted)]">•</span>
-                    <span className="text-xs text-[var(--text-muted)] font-mono">Visibility: {visibility}</span>
+                    <span className="text-xs text-slate-400">•</span>
+                    <span className="text-xs text-slate-500 font-mono">Visibility: {visibility}</span>
                   </div>
-                  <h3 className="text-base font-bold text-white">{title}</h3>
-                  <p className="text-xs text-[var(--text-secondary)] line-clamp-2">
+                  <h3 className="text-base font-bold text-slate-900">{title}</h3>
+                  <p className="text-xs text-slate-600 line-clamp-2">
                     {description || 'No description entered yet.'}
                   </p>
                 </div>
@@ -461,17 +461,17 @@ export default function NewWorkPage() {
             )}
 
             {/* Actions */}
-            <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-end gap-3">
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
               <Link
                 href="/showcase"
-                className="px-4 py-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition-colors"
+                className="px-5 py-2.5 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </Link>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius-sm)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shadow-sm active:scale-95"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />

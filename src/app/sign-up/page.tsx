@@ -6,6 +6,38 @@ import { createClient } from '@/lib/supabase/client';
 import { useRole } from '@/lib/auth/role-context';
 import { ArrowLeft, Mail, Lock, User, Building, ArrowRight, GraduationCap, Briefcase, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { MOCK_COMMUNITIES } from '@/lib/data/mock-data';
+import { signInWithFirebaseGoogle, signInWithFirebaseGithub } from '@/lib/firebase/config';
+
+function GoogleIcon() {
+  return (
+    <svg className="w-4 h-4" viewBox="0 0 24 24">
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+      />
+    </svg>
+  );
+}
+
+function GithubIcon() {
+  return (
+    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+    </svg>
+  );
+}
 
 export default function SignUpPage() {
   const { login } = useRole();
@@ -18,6 +50,7 @@ export default function SignUpPage() {
   const [companyName, setCompanyName] = useState('Stripe');
   const [consentGiven, setConsentGiven] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'github' | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -48,7 +81,6 @@ export default function SignUpPage() {
       });
 
       if (error) {
-        // Fallback only if local offline placeholder environment
         const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
         if (isPlaceholder) {
           login(accountType);
@@ -72,35 +104,85 @@ export default function SignUpPage() {
     }
   };
 
-  return (
-    <div className="min-h-[92vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-[#08090d]">
-      {/* Background ambient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gradient-to-tr from-violet-600/15 via-indigo-600/10 to-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
+  const handleSocialRegister = async (provider: 'google' | 'github') => {
+    setSocialLoading(provider);
+    setErrorMsg(null);
+    try {
+      const res = provider === 'google' ? await signInWithFirebaseGoogle() : await signInWithFirebaseGithub();
+      if (res.error) {
+        setErrorMsg(res.error);
+        return;
+      }
+      login(accountType);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : `${provider} registration failed`;
+      setErrorMsg(msg);
+    } finally {
+      setSocialLoading(null);
+    }
+  };
 
+  return (
+    <div className="min-h-[92vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-[#f8fafc] text-slate-900">
       <div className="max-w-md w-full space-y-6 relative z-10">
         <Link
           href="/sign-in"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Already have an account? Sign In</span>
         </Link>
 
-        <div className="rounded-3xl bg-[#10121a]/90 border border-white/10 p-6 sm:p-10 shadow-[0_24px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl space-y-6">
+        <div className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-10 shadow-xs space-y-6">
           <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xl mx-auto shadow-[0_0_25px_rgba(139,92,246,0.5)]">
+            <div className="w-12 h-12 rounded-2xl bg-[#0f172a] text-white flex items-center justify-center font-bold text-xl mx-auto shadow-xs">
               CS
             </div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               Create Campus Account
             </h1>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-slate-500">
               Join the high-trust proof-of-skill network to showcase work and discover verified talent.
             </p>
           </div>
 
+          {/* Social One-Click Registration */}
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              onClick={() => handleSocialRegister('google')}
+              disabled={socialLoading !== null || loading}
+              className="w-full py-2.5 px-4 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+            >
+              <GoogleIcon />
+              <span>
+                {socialLoading === 'google' ? 'Connecting to Google...' : 'Sign up with Google'}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSocialRegister('github')}
+              disabled={socialLoading !== null || loading}
+              className="w-full py-2.5 px-4 rounded-full bg-[#24292f] hover:bg-[#1b1f23] text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+            >
+              <GithubIcon />
+              <span>
+                {socialLoading === 'github' ? 'Connecting to GitHub...' : 'Sign up with GitHub'}
+              </span>
+            </button>
+          </div>
+
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-slate-200 w-full" />
+            <span className="bg-white px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+              or register with credentials
+            </span>
+            <div className="border-t border-slate-200 w-full" />
+          </div>
+
           {/* Account Type Toggle */}
-          <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-black/40 border border-white/[0.08]">
+          <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200">
             <button
               type="button"
               onClick={() => {
@@ -109,11 +191,11 @@ export default function SignUpPage() {
               }}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
                 accountType === 'student'
-                  ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40 shadow-[0_0_15px_rgba(139,92,246,0.3)]'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-white text-slate-900 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              <GraduationCap className="w-4 h-4 text-violet-400" />
+              <GraduationCap className="w-4 h-4 text-[#1b59f8]" />
               <span>Student Builder</span>
             </button>
             <button
@@ -124,55 +206,55 @@ export default function SignUpPage() {
               }}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
                 accountType === 'recruiter'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-white text-slate-900 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              <Briefcase className="w-4 h-4 text-emerald-400" />
+              <Briefcase className="w-4 h-4 text-emerald-600" />
               <span>Tech Recruiter</span>
             </button>
           </div>
 
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
 
           <form onSubmit={handleSignUp} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Full Legal Name
               </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Alex Rivera"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-sans"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-sans"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 {accountType === 'student'
                   ? 'Institutional Email (.edu or .ac.in)'
                   : 'Company Work Email'}
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="email"
                   required
@@ -183,25 +265,25 @@ export default function SignUpPage() {
                       ? 'student@campus.edu'
                       : 'recruiter@company.com'
                   }
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-mono"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-mono"
                 />
               </div>
             </div>
 
             {accountType === 'student' ? (
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Campus Institution
                 </label>
                 <div className="relative">
-                  <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <select
                     value={communityId}
                     onChange={(e) => setCommunityId(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#141724] border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-sans"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-sans"
                   >
                     {MOCK_COMMUNITIES.map((c) => (
-                      <option key={c.id} value={c.id} className="bg-[#141724] text-white">
+                      <option key={c.id} value={c.id}>
                         {c.name} ({c.domain})
                       </option>
                     ))}
@@ -210,51 +292,51 @@ export default function SignUpPage() {
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                   Company / Agency Name
                 </label>
                 <div className="relative">
-                  <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
                     required
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="e.g. Stripe, Google, Datadog"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-sans"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-sans"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Choose a strong passkey"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-mono"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f8fafc] border border-slate-200 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-[#1b59f8] transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* DPDP Act 2023 Consent Notice */}
-            <div className="rounded-xl p-3 bg-white/[0.03] border border-white/[0.08] space-y-2">
-              <label className="flex items-start gap-2.5 cursor-pointer text-xs text-zinc-300 select-none">
+            <div className="rounded-xl p-3 bg-slate-50 border border-slate-200 space-y-2">
+              <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600 select-none">
                 <input
                   type="checkbox"
                   required
                   checked={consentGiven}
                   onChange={(e) => setConsentGiven(e.target.checked)}
-                  className="mt-0.5 rounded border-white/20 bg-black/40 text-violet-600 focus:ring-violet-500"
+                  className="mt-0.5 rounded border-slate-300 text-[#1b59f8] focus:ring-[#1b59f8]"
                 />
-                <span className="leading-tight text-[11px] text-zinc-400">
+                <span className="leading-tight text-[11px] text-slate-500">
                   I consent to the collection and processing of my name, institutional email, and portfolio evidence for the sole purpose of campus discovery and talent verification in compliance with the Digital Personal Data Protection Act, 2023 (India).
                 </span>
               </label>
@@ -262,22 +344,18 @@ export default function SignUpPage() {
 
             <button
               type="submit"
-              disabled={loading}
-              className={`w-full py-3 rounded-xl text-white text-xs font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
-                accountType === 'student'
-                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-violet-900/40'
-                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-900/40'
-              }`}
+              disabled={loading || socialLoading !== null}
+              className="w-full py-3 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold shadow-xs active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <span>{loading ? 'Creating Account...' : `Register as ${accountType === 'student' ? 'Student' : 'Recruiter'}`}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          <div className="pt-4 border-t border-white/[0.08] text-center">
-            <p className="text-xs text-zinc-400">
+          <div className="pt-4 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-500">
               Already verified?{' '}
-              <Link href="/sign-in" className="font-bold text-violet-400 hover:underline">
+              <Link href="/sign-in" className="font-bold text-[#1b59f8] hover:underline">
                 Sign In
               </Link>
             </p>

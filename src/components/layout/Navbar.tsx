@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRole, UserRoleType } from '@/lib/auth/role-context';
@@ -15,13 +15,11 @@ import {
   MessageSquare,
   Menu,
   X,
-  ShieldAlert,
   ChevronDown,
   User,
   LogOut,
   CircleHelp as HelpCircle,
   LayoutDashboard,
-  GraduationCap,
   ArrowRight,
   LogIn,
 } from 'lucide-react';
@@ -29,351 +27,528 @@ import {
 export default function Navbar() {
   const pathname = usePathname();
   const { isLoggedIn, isMounted, currentRole, currentUser, switchRole, signOut } = useRole();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [unreadCount] = useState(3);
+  const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const toolsRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
+
+  // Unread message indicator
+  const unreadCount = 3;
+
+  // Scroll detection for dynamic elevation
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 15);
+      setIsScrolled(window.scrollY > 12);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, badge: 'Hub', badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/30' },
-    { label: 'Showcase', href: '/showcase', icon: Compass },
-    { label: 'Talent Directory', href: '/people', icon: Users },
-    { label: 'Collab Rooms', href: '/collaborate', icon: Video, badge: 'Live', badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
-    { label: 'CV Studio', href: '/cv', icon: FileText, badge: 'ATS', badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' },
-    { label: 'AI Copilot', href: '/copilot', icon: Sparkles, badge: 'AI', badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30' },
-    { label: 'Recruiter Hub', href: '/recruiter/search', icon: Briefcase },
+  // Close menus on route navigation
+  useEffect(() => {
+    setToolsDropdownOpen(false);
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Click outside and escape key handling
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+      if (toolsRef.current && !toolsRef.current.contains(target)) {
+        setToolsDropdownOpen(false);
+      }
+      if (userRef.current && !userRef.current.contains(target)) {
+        setUserDropdownOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setToolsDropdownOpen(false);
+        setUserDropdownOpen(false);
+        setMobileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Primary navigation links (clean, essential, uncluttered)
+  const primaryLinks = [
+    { label: 'Showcase', href: '/showcase' },
+    { label: 'Talent', href: '/people' },
+    { label: 'Recruiters', href: '/recruiter/search' },
   ];
 
+  // Secondary suite/tools grouped into an elegant popover dropdown
+  const toolsItems = [
+    {
+      label: 'Collab Rooms',
+      desc: 'Live video & real-time pair programming',
+      href: '/collaborate',
+      icon: Video,
+      accent: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+      badge: 'Live',
+    },
+    {
+      label: 'CV Studio',
+      desc: 'ATS-optimized resume builder from verified work',
+      href: '/cv',
+      icon: FileText,
+      accent: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
+      badge: 'ATS',
+    },
+    {
+      label: 'AI Copilot',
+      desc: 'Skill analysis & portfolio matchmaking assistant',
+      href: '/copilot',
+      icon: Sparkles,
+      accent: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
+      badge: 'AI',
+    },
+  ];
+
+  const isToolsActive = toolsItems.some((item) => pathname.startsWith(item.href));
+
   return (
-    <header className="sticky top-0 z-50 w-full px-3 sm:px-6 pt-3 pb-2 transition-all">
-      <div
-        className={`max-w-7xl mx-auto rounded-2xl transition-all duration-300 ${
-          isScrolled
-            ? 'bg-[#0d0f17]/90 backdrop-blur-xl border border-white/10 shadow-[0_12px_36px_0_rgba(0,0,0,0.6)] py-2.5 px-4 sm:px-6'
-            : 'bg-[#0d0f17]/70 backdrop-blur-md border border-white/[0.07] shadow-lg py-3 px-4 sm:px-6'
-        }`}
-      >
-        <div className="flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-[0_0_20px_rgba(139,92,246,0.5)] transition-transform duration-200 group-hover:scale-105">
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+          : 'bg-white/85 backdrop-blur-md border-b border-slate-200/60'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        {/* Brand Section */}
+        <div className="flex items-center gap-8">
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 group shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl py-1"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-sm group-hover:bg-[#1b59f8] transition-all duration-200">
               CS
             </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-white flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-sm tracking-tight text-slate-900 group-hover:text-[#1b59f8] transition-colors">
                 Campus Skill Connect
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold uppercase tracking-wider">
-                  V2.0
-                </span>
-              </span>
-              <span className="text-[11px] text-zinc-400 font-medium -mt-0.5 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Proof-of-Skill Campus Network
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
+          <nav className="hidden md:flex items-center gap-1">
+            {/* Direct primary links */}
+            {primaryLinks.map((item) => {
               const isActive = pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-white border border-white/15 shadow-sm font-semibold'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
+                      ? 'text-[#1b59f8] bg-blue-50 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-violet-400' : 'text-zinc-400'}`} />
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span
-                      className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border ${item.badgeColor}`}
+                  {item.label}
+                </Link>
+              );
+            })}
+
+            {/* Tools Dropdown (Consolidates Collab, CV, and AI Copilot without clutter) */}
+            <div className="relative" ref={toolsRef}>
+              <button
+                type="button"
+                onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  isToolsActive || toolsDropdownOpen
+                    ? 'text-[#1b59f8] bg-blue-50 font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+                aria-expanded={toolsDropdownOpen}
+                aria-haspopup="true"
+              >
+                <span>Tools</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${
+                    toolsDropdownOpen ? 'rotate-180 text-blue-600' : ''
+                  }`}
+                />
+              </button>
+
+              {toolsDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white border border-slate-200 shadow-[0_16px_40px_rgba(0,0,0,0.08)] p-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="px-2.5 py-1.5 mb-1 border-b border-slate-100">
+                    <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+                      Student & Creator Suite
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    {toolsItems.map((tool) => {
+                      const Icon = tool.icon;
+                      const isActive = pathname.startsWith(tool.href);
+                      return (
+                        <Link
+                          key={tool.href}
+                          href={tool.href}
+                          className={`flex items-start gap-3 p-2.5 rounded-xl transition-colors group ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-900'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          <div className={`p-2 rounded-xl border shrink-0 mt-0.5 ${tool.accent}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                {tool.label}
+                              </span>
+                              {tool.badge && (
+                                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border border-white/10 bg-white/[0.04] text-zinc-400">
+                                  {tool.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-zinc-400 leading-snug line-clamp-1 mt-0.5">
+                              {tool.desc}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Dashboard Shortcut (if logged in) */}
+            {isMounted && isLoggedIn && (
+              <Link
+                href="/dashboard"
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  pathname.startsWith('/dashboard')
+                    ? 'text-[#1b59f8] bg-blue-50 font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                Dashboard
+              </Link>
+            )}
+          </nav>
+        </div>
+
+        {/* Action Center (Right Side) */}
+        <div className="flex items-center gap-2.5">
+          {/* Primary CTA: Share Work */}
+          <Link
+            href="/works/new"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Share Work</span>
+          </Link>
+
+          {/* Messages Notification Button */}
+          {isMounted && isLoggedIn && (
+            <Link
+              href="/messages"
+              title="Direct Messages"
+              className="relative p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            >
+              <MessageSquare className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
+              )}
+            </Link>
+          )}
+
+          {/* User Profile or Auth Trigger */}
+          {isMounted && isLoggedIn && currentUser ? (
+            /* Logged-In User Profile Menu */
+            <div className="relative" ref={userRef}>
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-expanded={userDropdownOpen}
+                aria-haspopup="true"
+              >
+                <div
+                  className={`w-6 h-6 rounded-full text-white flex items-center justify-center font-bold text-[10px] shadow-sm ${
+                    currentRole === 'admin'
+                      ? 'bg-gradient-to-tr from-rose-600 to-orange-500'
+                      : currentRole === 'student'
+                      ? 'bg-gradient-to-tr from-blue-600 to-indigo-600'
+                      : 'bg-gradient-to-tr from-emerald-600 to-teal-500'
+                  }`}
+                >
+                  {currentUser.initials}
+                </div>
+                <span className="hidden md:inline text-xs font-semibold text-slate-800 max-w-[100px] truncate">
+                  {currentUser.name.split(' ')[0]}
+                </span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${
+                    userDropdownOpen ? 'rotate-180 text-blue-600' : ''
+                  }`}
+                />
+              </button>
+
+              {userDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-slate-200 shadow-[0_20px_48px_rgba(0,0,0,0.12)] p-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {/* User Profile Info Card */}
+                  <div className="px-3 py-2.5 border-b border-slate-100">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
+                      <span
+                        className={`text-[9px] font-mono px-2 py-0.5 rounded-full uppercase border font-bold ${
+                          currentRole === 'admin'
+                            ? 'bg-rose-50 text-rose-600 border-rose-200'
+                            : currentRole === 'student'
+                            ? 'bg-blue-50 text-blue-600 border-blue-200'
+                            : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                        }`}
+                      >
+                        {currentRole === 'admin' ? 'Admin' : currentRole === 'student' ? 'Student' : 'Recruiter'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{currentUser.title}</p>
+                    <p className="text-[10px] font-mono text-slate-400 truncate mt-0.5">{currentUser.email}</p>
+                  </div>
+
+                  {/* Persona Switcher Quick Control */}
+                  <div className="p-2 border-b border-slate-100 bg-slate-50 rounded-xl my-1.5">
+                    <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block mb-1.5 font-bold">
+                      Switch Role:
+                    </span>
+                    <div className="grid grid-cols-3 gap-1">
+                      {(['student', 'recruiter', 'admin'] as UserRoleType[]).map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => {
+                            switchRole(r, true);
+                            setUserDropdownOpen(false);
+                          }}
+                          className={`py-1 px-1.5 rounded-lg text-[10px] font-semibold capitalize transition-colors text-center ${
+                            currentRole === r
+                              ? 'bg-[#0f172a] text-white shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                          }`}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Navigation Links */}
+                  <div className="py-1 space-y-0.5">
+                    <Link
+                      href={currentUser.dashboardUrl}
+                      className="flex items-center justify-between px-2.5 py-2 text-xs font-semibold text-slate-800 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors"
                     >
-                      {item.badge}
+                      <div className="flex items-center gap-2">
+                        <LayoutDashboard className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Go to Dashboard</span>
+                      </div>
+                      <ArrowRight className="w-3 h-3 text-slate-400" />
+                    </Link>
+
+                    {currentRole === 'student' && (
+                      <Link
+                        href="/profile/me"
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                      >
+                        <User className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Public Portfolio</span>
+                      </Link>
+                    )}
+
+                    {currentRole === 'recruiter' && (
+                      <Link
+                        href="/recruiter/search"
+                        className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                      >
+                        <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Candidate Radar</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      href="/connections"
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                    >
+                      <Users className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Connections</span>
+                    </Link>
+
+                    <Link
+                      href="/support"
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Support Desk</span>
+                    </Link>
+                  </div>
+
+                  {/* Sign Out */}
+                  <div className="pt-1 mt-1 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        signOut();
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors text-left"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Logged-Out Actions: Black pill button Login matching reference design */
+            <div className="flex items-center gap-2">
+              <Link
+                href="/sign-in"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+              >
+                <span>Login</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                href="/sign-up"
+                className="hidden sm:inline-flex items-center gap-1 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+              >
+                <span>Join</span>
+              </Link>
+            </div>
+          )}
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+            aria-label="Toggle mobile menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-slate-200 bg-white/98 backdrop-blur-2xl px-4 py-4 space-y-4 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150">
+          {/* Main Links */}
+          <div className="space-y-1">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold px-2 mb-1">
+              Explore
+            </p>
+            {primaryLinks.map((item) => {
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                    isActive ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+            {isMounted && isLoggedIn && (
+              <Link
+                href="/dashboard"
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  pathname.startsWith('/dashboard')
+                    ? 'bg-blue-50 text-blue-600 font-bold'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>Dashboard</span>
+              </Link>
+            )}
+          </div>
+
+          {/* Tools Suite */}
+          <div className="space-y-1 pt-2 border-t border-slate-100">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold px-2 mb-1">
+              Creator Suite
+            </p>
+            {toolsItems.map((tool) => {
+              const Icon = tool.icon;
+              const isActive = pathname.startsWith(tool.href);
+              return (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                    isActive ? 'bg-blue-50 text-blue-600' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4 text-slate-500" />
+                    <span>{tool.label}</span>
+                  </div>
+                  {tool.badge && (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border border-slate-200 bg-slate-50 text-slate-500">
+                      {tool.badge}
                     </span>
                   )}
                 </Link>
               );
             })}
-          </nav>
+          </div>
 
-          {/* Action Center */}
-          <div className="flex items-center gap-2.5">
-            {/* Post Work CTA */}
+          {/* Quick Actions in Mobile Drawer */}
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             <Link
               href="/works/new"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-semibold hover:from-violet-500 hover:to-indigo-500 transition-all shadow-[0_0_20px_rgba(139,92,246,0.35)] active:scale-95"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors"
             >
-              <Plus className="w-3.5 h-3.5 text-white" />
-              <span>Share Work</span>
+              <Plus className="w-4 h-4" />
+              <span>Share New Work</span>
             </Link>
 
-            {/* Direct Messages Shortcut (only if logged in) */}
-            {isMounted && isLoggedIn && (
-              <Link
-                href="/messages"
-                title="In-App Real-time Messages"
-                className="relative p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
-              >
-                <MessageSquare className="w-4 h-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-[#0d0f17]">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
-            )}
-
-            {/* Conditional Auth State: User Profile vs Log In */}
-            {isMounted && isLoggedIn && currentUser ? (
-              /* User Profile & Dropdown (When Logged In) */
-              <div className="relative">
-                <button
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 pl-2 pr-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/[0.04] hover:bg-white/[0.08] transition-all"
-                >
-                  <div
-                    className={`w-6 h-6 rounded-lg text-white flex items-center justify-center font-bold text-[10px] shadow-sm ${
-                      currentRole === 'admin'
-                        ? 'bg-gradient-to-tr from-rose-600 to-orange-500'
-                        : currentRole === 'student'
-                        ? 'bg-gradient-to-tr from-violet-600 to-cyan-500'
-                        : 'bg-gradient-to-tr from-emerald-600 to-teal-500'
-                    }`}
-                  >
-                    {currentUser.initials}
-                  </div>
-                  <div className="hidden sm:flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-zinc-200">
-                      {currentUser.name}
-                    </span>
-                    <span
-                      className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full uppercase border font-bold ${
-                        currentRole === 'admin'
-                          ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
-                          : currentRole === 'student'
-                          ? 'bg-violet-500/20 text-violet-300 border-violet-500/30'
-                          : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                      }`}
-                    >
-                      {currentRole === 'admin' ? 'Admin' : currentRole === 'student' ? 'Student' : 'Recruiter'}
-                    </span>
-                  </div>
-                  <ChevronDown className="w-3 h-3 text-zinc-400" />
-                </button>
-
-                {userDropdownOpen && (
-                  <div
-                    onMouseLeave={() => setUserDropdownOpen(false)}
-                    className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#12141f] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150 backdrop-blur-2xl"
-                  >
-                    <div className="px-3 py-2.5 border-b border-white/[0.08]">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold text-white">{currentUser.name}</p>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          Online
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-zinc-400 truncate mt-0.5">
-                        {currentUser.title}
-                      </p>
-                      <p className="text-[10px] font-mono text-zinc-500 truncate">
-                        {currentUser.email}
-                      </p>
-                    </div>
-
-                    {/* Switch Role Quick Bar */}
-                    <div className="p-2 border-b border-white/[0.08] bg-black/20 rounded-xl my-1.5">
-                      <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block mb-1 font-semibold">
-                        Switch Active Persona:
-                      </span>
-                      <div className="grid grid-cols-3 gap-1">
-                        {(['admin', 'student', 'recruiter'] as UserRoleType[]).map((r) => (
-                          <button
-                            key={r}
-                            onClick={() => {
-                              switchRole(r, true);
-                              setUserDropdownOpen(false);
-                            }}
-                            className={`py-1 px-1.5 rounded-lg text-[10px] font-bold capitalize transition-all ${
-                              currentRole === r
-                                ? r === 'admin'
-                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm'
-                                  : r === 'student'
-                                  ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40 shadow-sm'
-                                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                                : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
-                            }`}
-                          >
-                            {r === 'admin' ? 'Admin' : r}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="py-1">
-                      <Link
-                        href={currentUser.dashboardUrl}
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-white bg-white/[0.06] hover:bg-white/[0.1] rounded-xl transition-colors mb-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <LayoutDashboard className="w-3.5 h-3.5 text-violet-400" />
-                          <span>Go to {currentRole === 'admin' ? 'Admin' : currentRole === 'student' ? 'Student' : 'Recruiter'} Dashboard</span>
-                        </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
-                      </Link>
-
-                      {currentRole === 'student' && (
-                        <Link
-                          href="/profile/me"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors"
-                        >
-                          <User className="w-3.5 h-3.5 text-zinc-400" />
-                          View Public Portfolio
-                        </Link>
-                      )}
-
-                      {currentRole === 'recruiter' && (
-                        <Link
-                          href="/recruiter/search"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors"
-                        >
-                          <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
-                          Candidate Search Radar
-                        </Link>
-                      )}
-
-                      <Link
-                        href="/connections"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors"
-                      >
-                        <Users className="w-3.5 h-3.5 text-zinc-400" />
-                        Campus Network & Connections
-                      </Link>
-
-                      <Link
-                        href="/support"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5 text-zinc-400" />
-                        Help & Support Desk
-                      </Link>
-                    </div>
-
-                    <div className="pt-1 border-t border-white/[0.08]">
-                      <button
-                        onClick={() => {
-                          signOut();
-                          setUserDropdownOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors text-left"
-                      >
-                        <LogOut className="w-3.5 h-3.5" />
-                        Sign Out
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* When NOT Logged In: Show Log In & Sign Up buttons ONLY */
-              <div className="flex items-center gap-2">
+            {(!isMounted || !isLoggedIn) && (
+              <div className="grid grid-cols-2 gap-2 pt-1">
                 <Link
                   href="/sign-in"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold hover:from-violet-500 hover:to-indigo-500 shadow-md active:scale-95 transition-all"
+                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-colors"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>Log In</span>
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all"
+                  className="flex items-center justify-center py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
                 >
                   <span>Sign Up</span>
                 </Link>
               </div>
             )}
-
-            {/* Mobile Hamburger Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06]"
-              aria-label="Toggle mobile menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Menu Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden mt-3 pt-3 border-t border-white/10 space-y-1">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium ${
-                    isActive
-                      ? 'bg-white/10 text-white font-semibold'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/[0.05]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 text-zinc-400" />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border ${item.badgeColor}`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-            <div className="pt-2 border-t border-white/[0.08] flex flex-col gap-2">
-              <Link
-                href="/works/new"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-semibold shadow-glow-primary"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Share New Work</span>
-              </Link>
-              <Link
-                href="/sign-in"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold"
-              >
-                <LogIn className="w-4 h-4 text-violet-400" />
-                <span>Log In (Customized Views)</span>
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </header>
   );
 }

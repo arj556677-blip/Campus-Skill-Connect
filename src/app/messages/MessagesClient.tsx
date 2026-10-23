@@ -331,40 +331,40 @@ export default function MessagesClient() {
   const activeConv = conversations.find((c) => c.id === activeConvId);
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-white py-6">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-6">
       {/* Screen Reader Accessible Live Region for New Messages */}
       <div aria-live="polite" aria-atomic="false" className="sr-only">
         {liveAnnouncement}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-[#0e1017] border border-white/10 overflow-hidden shadow-2xl h-[calc(100vh-8rem)] flex flex-col md:flex-row">
+        <div className="rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-xs h-[calc(100vh-8rem)] flex flex-col md:flex-row">
           
           {/* ── LEFT SIDEBAR: CONVERSATION LIST ── */}
-          <div className="w-full md:w-80 lg:w-96 border-r border-white/10 flex flex-col shrink-0 bg-[#0b0c12]">
+          <div className="w-full md:w-80 lg:w-96 border-r border-slate-200 flex flex-col shrink-0 bg-[#f8fafc]">
             {/* Sidebar Header */}
-            <div className="p-4 border-b border-white/10 space-y-3">
+            <div className="p-4 border-b border-slate-200 space-y-3 bg-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-violet-400" />
-                  <h1 className="text-sm font-extrabold uppercase tracking-wider text-white">
+                  <MessageSquare className="w-4 h-4 text-[#1b59f8]" />
+                  <h1 className="text-sm font-extrabold uppercase tracking-wider text-slate-900">
                     Direct Messages
                   </h1>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 font-bold">
+                <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200">
                   Connections Only
                 </span>
               </div>
 
               {/* Search Bar */}
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Filter connections..."
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                  className="w-full pl-8 pr-3 py-1.5 rounded-full bg-[#f8fafc] border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                 />
               </div>
             </div>
@@ -374,21 +374,21 @@ export default function MessagesClient() {
               ref={convListRef}
               role="listbox"
               aria-label="Active conversations"
-              className="flex-1 overflow-y-auto divide-y divide-white/[0.04]"
+              className="flex-1 overflow-y-auto divide-y divide-slate-100"
             >
               {isLoadingConvs ? (
-                <div className="p-8 text-center text-zinc-500 text-xs font-mono">
-                  <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2 text-violet-400" />
+                <div className="p-8 text-center text-slate-400 text-xs">
+                  <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2 text-[#1b59f8]" />
                   <span>Loading connections...</span>
                 </div>
               ) : filteredConversations.length === 0 ? (
                 <div className="p-8 text-center space-y-3">
-                  <p className="text-xs text-zinc-400 leading-relaxed">
+                  <p className="text-xs text-slate-500 leading-relaxed">
                     No active direct conversations. Messaging is permitted between accepted, unblocked connections.
                   </p>
                   <Link
                     href="/showcase"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-600/20 text-violet-300 border border-violet-500/30 text-xs font-bold hover:bg-violet-600/30 transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200 text-xs font-bold hover:bg-blue-100 transition-all"
                   >
                     <span>Discover Peers</span>
                   </Link>
@@ -406,11 +406,11 @@ export default function MessagesClient() {
                       onKeyDown={(e) => handleKeyDownList(e, idx)}
                       className={`w-full text-left p-3.5 flex items-start gap-3 transition-colors ${
                         isActive
-                          ? 'bg-violet-600/15 border-l-4 border-l-violet-500'
-                          : 'hover:bg-white/[0.02]'
+                          ? 'bg-white border-l-4 border-l-[#1b59f8] shadow-xs'
+                          : 'hover:bg-slate-100/70'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0 text-violet-300 font-bold text-xs">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0 text-[#1b59f8] font-bold text-xs">
                         {c.otherUser.avatar_url ? (
                           <img
                             src={c.otherUser.avatar_url}
@@ -424,23 +424,23 @@ export default function MessagesClient() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
-                          <h2 className="text-xs font-bold text-white truncate">
+                          <h2 className="text-xs font-bold text-slate-900 truncate">
                             {c.otherUser.display_name}
                           </h2>
-                          <span className="text-[10px] font-mono text-zinc-500">
+                          <span className="text-[10px] text-slate-400">
                             {new Date(c.lastMessageAt).toLocaleDateString([], {
                               month: 'short',
                               day: 'numeric',
                             })}
                           </span>
                         </div>
-                        <p className="text-[11px] text-zinc-400 truncate">
+                        <p className="text-[11px] text-slate-500 truncate">
                           {c.lastMessage}
                         </p>
                       </div>
 
                       {c.unreadCount > 0 && (
-                        <span className="px-1.5 py-0.5 rounded-full bg-violet-600 text-[10px] font-bold text-white font-mono">
+                        <span className="px-2 py-0.5 rounded-full bg-[#1b59f8] text-[10px] font-bold text-white">
                           {c.unreadCount}
                         </span>
                       )}
@@ -452,13 +452,13 @@ export default function MessagesClient() {
           </div>
 
           {/* ── RIGHT MAIN PANEL: ACTIVE THREAD ── */}
-          <div className="flex-1 flex flex-col bg-[#0e1017] min-w-0">
+          <div className="flex-1 flex flex-col bg-white min-w-0">
             {activeConv ? (
               <>
                 {/* Thread Header */}
-                <div className="p-4 border-b border-white/10 flex items-center justify-between gap-4">
+                <div className="p-4 border-b border-slate-200 flex items-center justify-between gap-4 bg-white">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0 text-violet-300 font-bold text-xs">
+                    <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0 text-[#1b59f8] font-bold text-xs">
                       {activeConv.otherUser.avatar_url ? (
                         <img
                           src={activeConv.otherUser.avatar_url}
@@ -473,17 +473,17 @@ export default function MessagesClient() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/profile/${activeConv.otherUser.id}`}
-                          className="text-sm font-bold text-white hover:underline truncate"
+                          className="text-sm font-bold text-slate-900 hover:text-[#1b59f8] truncate"
                         >
                           {activeConv.otherUser.display_name}
                         </Link>
                         {activeConv.otherUser.username && (
-                          <span className="text-[10px] font-mono text-zinc-500">
+                          <span className="text-[10px] text-slate-400">
                             @{activeConv.otherUser.username}
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-zinc-400 truncate">
+                      <p className="text-[11px] text-slate-500 truncate">
                         {activeConv.otherUser.headline || 'Verified Campus Connection'}
                       </p>
                     </div>
@@ -494,7 +494,7 @@ export default function MessagesClient() {
                     <button
                       type="button"
                       onClick={() => setShowReportModal(true)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-rose-500/10 text-zinc-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/20 text-xs font-mono transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs font-semibold transition-all"
                       title="Report thread to moderation"
                     >
                       <ShieldAlert className="w-3.5 h-3.5" />
@@ -504,7 +504,7 @@ export default function MessagesClient() {
                     <button
                       type="button"
                       onClick={handleBlockUser}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-rose-500/15 text-zinc-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/30 text-xs font-mono transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs font-semibold transition-all"
                       title="Block user symmetrically"
                     >
                       <Ban className="w-3.5 h-3.5" />
@@ -514,14 +514,14 @@ export default function MessagesClient() {
                 </div>
 
                 {/* Message Stream */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-[#f8fafc]">
                   {isLoadingMessages ? (
-                    <div className="p-8 text-center text-zinc-500 text-xs font-mono">
-                      <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2 text-violet-400" />
+                    <div className="p-8 text-center text-slate-400 text-xs">
+                      <RefreshCw className="w-4 h-4 animate-spin mx-auto mb-2 text-[#1b59f8]" />
                       <span>Loading messages...</span>
                     </div>
                   ) : messages.length === 0 ? (
-                    <div className="p-12 text-center text-zinc-500 text-xs font-mono">
+                    <div className="p-12 text-center text-slate-400 text-xs">
                       <span>No messages yet. Send a note to start the conversation!</span>
                     </div>
                   ) : (
@@ -533,16 +533,16 @@ export default function MessagesClient() {
                           className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
-                            className={`max-w-[75%] rounded-2xl p-3.5 text-xs leading-relaxed space-y-1 shadow-md ${
+                            className={`max-w-[75%] rounded-2xl p-3.5 text-xs leading-relaxed space-y-1 shadow-xs ${
                               isMe
-                                ? 'bg-violet-600 text-white rounded-br-none'
-                                : 'bg-[#141722] text-zinc-200 border border-white/10 rounded-bl-none'
+                                ? 'bg-[#0f172a] text-white rounded-br-none'
+                                : 'bg-white text-slate-900 border border-slate-200 rounded-bl-none'
                             }`}
                           >
                             <p className="whitespace-pre-wrap break-words">{m.content}</p>
                             <div
-                              className={`flex items-center justify-end gap-1 text-[9px] font-mono ${
-                                isMe ? 'text-violet-200' : 'text-zinc-500'
+                              className={`flex items-center justify-end gap-1 text-[9px] ${
+                                isMe ? 'text-slate-400' : 'text-slate-400'
                               }`}
                             >
                               <span>
@@ -553,9 +553,9 @@ export default function MessagesClient() {
                               </span>
                               {isMe && (
                                 m.is_read ? (
-                                  <CheckCheck className="w-3 h-3 text-emerald-300" />
+                                  <CheckCheck className="w-3 h-3 text-emerald-400" />
                                 ) : (
-                                  <Check className="w-3 h-3 text-violet-300" />
+                                  <Check className="w-3 h-3 text-slate-400" />
                                 )
                               )}
                             </div>
@@ -569,15 +569,15 @@ export default function MessagesClient() {
 
                 {/* Error Banner */}
                 {errorMsg && (
-                  <div className="px-4 py-2 bg-rose-500/10 border-t border-rose-500/20 text-rose-300 text-xs font-mono flex items-center justify-between">
+                  <div className="px-4 py-2 bg-rose-50 border-t border-rose-200 text-rose-700 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
                       <span>{errorMsg}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setErrorMsg(null)}
-                      className="text-rose-400 hover:text-white"
+                      className="text-rose-600 hover:text-rose-900"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -587,7 +587,7 @@ export default function MessagesClient() {
                 {/* Message Input & Character Counter */}
                 <form
                   onSubmit={handleSendMessage}
-                  className="p-3 sm:p-4 border-t border-white/10 bg-[#0b0c12] space-y-2"
+                  className="p-3 sm:p-4 border-t border-slate-200 bg-white space-y-2"
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -596,31 +596,31 @@ export default function MessagesClient() {
                       placeholder="Type a direct message to your connection (Enter to send)..."
                       value={inputVal}
                       onChange={(e) => setInputVal(e.target.value)}
-                      className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                      className="flex-1 px-4 py-2.5 rounded-full bg-[#f8fafc] border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1b59f8]"
                     />
                     <button
                       type="submit"
                       disabled={isSending || !inputVal.trim()}
-                      className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white transition-all shadow-md active:scale-95 shrink-0"
+                      className="p-2.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] disabled:opacity-40 text-white transition-all shadow-xs active:scale-95 shrink-0"
                       aria-label="Send message"
                     >
                       <Send className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                  <div className="flex items-center justify-between text-[10px] text-slate-400">
                     <span>Direct Message Encrypted Session • Realtime Sync</span>
-                    <span className={inputVal.length > 1800 ? 'text-amber-400 font-bold' : ''}>
+                    <span className={inputVal.length > 1800 ? 'text-amber-600 font-bold' : ''}>
                       {inputVal.length} / {MAX_MESSAGE_LENGTH} characters
                     </span>
                   </div>
                 </form>
               </>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-zinc-500">
-                <MessageSquare className="w-10 h-10 text-zinc-600 mb-3" />
-                <h2 className="text-sm font-bold text-zinc-300">No Conversation Selected</h2>
-                <p className="text-xs text-zinc-500 max-w-sm mt-1">
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                <MessageSquare className="w-10 h-10 text-slate-300 mb-3" />
+                <h2 className="text-sm font-bold text-slate-800">No Conversation Selected</h2>
+                <p className="text-xs text-slate-500 max-w-sm mt-1">
                   Choose a peer connection from the sidebar to inspect verified messages or discuss project sprints.
                 </p>
               </div>
@@ -631,17 +631,17 @@ export default function MessagesClient() {
 
       {/* ── REPORT MODAL ── */}
       {showReportModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0e1017] border border-white/10 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase font-mono">
+              <div className="flex items-center gap-2 text-rose-600 font-bold text-xs uppercase">
                 <ShieldAlert className="w-4 h-4" />
                 <span>Report Communication</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowReportModal(false)}
-                className="text-zinc-400 hover:text-white"
+                className="text-slate-400 hover:text-slate-700"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -649,11 +649,11 @@ export default function MessagesClient() {
 
             <form onSubmit={handleReportSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="block text-zinc-300 font-bold mb-1">Reason for report</label>
+                <label className="block text-slate-700 font-bold mb-1">Reason for report</label>
                 <select
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
-                  className="w-full bg-[#141722] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-rose-500"
+                  className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-rose-500"
                 >
                   <option value="Harassment or Spam">Harassment or Spam</option>
                   <option value="Inappropriate Content">Inappropriate Content</option>
@@ -663,14 +663,14 @@ export default function MessagesClient() {
               </div>
 
               <div>
-                <label className="block text-zinc-300 font-bold mb-1">Details / Specific Context</label>
+                <label className="block text-slate-700 font-bold mb-1">Details / Specific Context</label>
                 <textarea
                   rows={3}
                   required
                   value={reportDetails}
                   onChange={(e) => setReportDetails(e.target.value)}
                   placeholder="Explain why this message thread requires moderation review..."
-                  className="w-full bg-[#141722] border border-white/10 rounded-xl p-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-rose-500"
+                  className="w-full bg-[#f8fafc] border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-rose-500"
                 />
               </div>
 
@@ -678,14 +678,14 @@ export default function MessagesClient() {
                 <button
                   type="button"
                   onClick={() => setShowReportModal(false)}
-                  className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white"
+                  className="px-4 py-2 rounded-full text-slate-600 hover:text-slate-900 font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={reportSubmitting}
-                  className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all disabled:opacity-50"
+                  className="px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold transition-all disabled:opacity-50"
                 >
                   {reportSubmitting ? 'Submitting...' : 'Send to Moderation'}
                 </button>

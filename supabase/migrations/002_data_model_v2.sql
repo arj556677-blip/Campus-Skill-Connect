@@ -482,7 +482,8 @@ SELECT USING (
 );
 
 -- Drop legacy works policy to reinstall hardened policy
-DROP POLICY IF EXISTS "Works: viewable based on visibility" ON works FOR
+DROP POLICY IF EXISTS "Works: viewable based on visibility" ON works;
+CREATE POLICY "Works: viewable based on visibility" ON works FOR
 SELECT USING (
   -- Owner can always view own works
   owner_id = auth.uid()

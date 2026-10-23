@@ -5,13 +5,8 @@ import Link from 'next/link';
 import {
   Users,
   Check,
-  X,
   MessageSquare,
-  ShieldCheck,
-  Building,
   UserCheck,
-  ArrowRight,
-  Clock,
 } from 'lucide-react';
 import { MOCK_PROFILES } from '@/lib/data/mock-data';
 
@@ -143,7 +138,7 @@ export default function ConnectionsPage() {
 
                   {req.note && (
                     <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs text-[var(--color-ink-muted)] leading-relaxed italic">
-                      "{req.note}"
+                      &ldquo;{req.note}&rdquo;
                     </div>
                   )}
 

@@ -12,6 +12,9 @@ import {
   Download,
   ShieldCheck,
   ExternalLink,
+  SlidersHorizontal,
+  X,
+  Users,
 } from 'lucide-react';
 import { Profile, Community, Zone } from '@/lib/types';
 
@@ -26,13 +29,22 @@ export default function RecruiterClient({
   communities,
   zones,
 }: RecruiterClientProps) {
-  const [jobQuery, setJobQuery] = useState('Redis, Next.js, Distributed Systems');
+  const [skillFilter, setSkillFilter] = useState('');
   const [selectedCommunity, setSelectedCommunity] = useState('all');
-  const [selectedZone, setSelectedZone] = useState('all');
-  const [shortlist, setShortlist] = useState<string[]>(['user-1']);
+  const [selectedField, setSelectedField] = useState('all');
+  const [shortlist, setShortlist] = useState<string[]>([]);
 
-  const rankedCandidates = useMemo(() => {
-    const requiredSkills = jobQuery
+  // Unique fields for filter dropdown
+  const uniqueFields = useMemo(() => {
+    const fields = new Set<string>();
+    profiles.forEach((p) => {
+      if (p.field) fields.add(p.field);
+    });
+    return Array.from(fields);
+  }, [profiles]);
+
+  const filteredCandidates = useMemo(() => {
+    const searchTerms = skillFilter
       .toLowerCase()
       .split(/[,+\s]+/)
       .map((s) => s.trim())
@@ -40,38 +52,36 @@ export default function RecruiterClient({
 
     return profiles
       .filter((p) => p.role === 'student')
-      .map((profile) => {
-        let matchCount = 0;
-        const profileCorpus = (
-          profile.display_name +
-          ' ' +
-          (profile.headline || '') +
-          ' ' +
-          (profile.bio || '') +
-          ' ' +
-          (profile.field || '')
-        ).toLowerCase();
-
-        requiredSkills.forEach((skill) => {
-          if (profileCorpus.includes(skill)) matchCount++;
-        });
-
-        const baseScore = requiredSkills.length > 0 ? (matchCount / requiredSkills.length) * 100 : 70;
-        const matchScore = Math.min(Math.round(baseScore * 0.4 + 60), 98);
-
-        return {
-          ...profile,
-          matchScore,
-        };
-      })
       .filter((p) => {
-        const matchesCommunity =
-          selectedCommunity === 'all' || p.institution_id === selectedCommunity;
-        const matchesZone = selectedZone === 'all' || p.zone_id === selectedZone;
-        return matchesCommunity && matchesZone;
-      })
-      .sort((a, b) => b.matchScore - a.matchScore);
-  }, [profiles, jobQuery, selectedCommunity, selectedZone]);
+        // Community filter
+        if (selectedCommunity !== 'all' && p.institution_id !== selectedCommunity) {
+          return false;
+        }
+
+        // Field filter
+        if (selectedField !== 'all' && p.field !== selectedField) {
+          return false;
+        }
+
+        // Skills & text filter
+        if (searchTerms.length > 0) {
+          const profileCorpus = (
+            p.display_name +
+            ' ' +
+            (p.headline || '') +
+            ' ' +
+            (p.bio || '') +
+            ' ' +
+            (p.field || '')
+          ).toLowerCase();
+
+          const allMatched = searchTerms.every((term) => profileCorpus.includes(term));
+          if (!allMatched) return false;
+        }
+
+        return true;
+      });
+  }, [profiles, skillFilter, selectedCommunity, selectedField]);
 
   const toggleBookmark = (id: string) => {
     if (shortlist.includes(id)) {
@@ -82,21 +92,24 @@ export default function RecruiterClient({
   };
 
   const handleExportShortlist = () => {
-    const candidateData = rankedCandidates
+    const candidateData = filteredCandidates
       .filter((c) => shortlist.includes(c.id))
       .map((c) => ({
         name: c.display_name,
-        role: c.headline,
-        matchScore: `${c.matchScore}%`,
-        campus: c.institution?.name || 'IISc',
-        email: 'via campus-skill-connect',
+        username: c.username || c.id,
+        headline: c.headline || 'Scholar',
+        campus: c.institution?.name || 'Verified University',
+        field: c.field || 'General',
+        profile_url: `/u/${c.username || c.id}`,
       }));
 
-    const blob = new Blob([JSON.stringify(candidateData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(candidateData, null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Candidate_Shortlist_CampusSkillConnect.json';
+    a.download = 'Candidate_Shortlist.json';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -104,195 +117,205 @@ export default function RecruiterClient({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/[0.08]">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-violet-400 font-bold mb-1.5">
-            <Briefcase className="w-4 h-4" />
-            <span>Recruiter Candidate Match Engine</span>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[var(--border)]">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[var(--accent)] font-semibold">
+            <Briefcase className="w-4 h-4" aria-hidden="true" />
+            <span>Verified Talent Directory</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            High-Signal Student Engineering Search
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] tracking-tight">
+            Corporate Candidate Search
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-xl">
-            Rank student candidates based on verified repositories and technical achievements rather than self-reported resume claims.
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl">
+            Compare student engineers and scholars directly on verifiable production work, academic discipline, and institutional membership.
           </p>
         </div>
 
-        <button
-          onClick={handleExportShortlist}
-          disabled={shortlist.length === 0}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold hover:from-violet-500 hover:to-indigo-500 transition-all shadow-[0_0_20px_rgba(139,92,246,0.35)] disabled:opacity-50 self-start md:self-end"
-        >
-          <Download className="w-4 h-4 text-emerald-300" />
-          <span>Export Shortlist ({shortlist.length})</span>
-        </button>
+        {shortlist.length > 0 && (
+          <button
+            onClick={handleExportShortlist}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] hover:bg-[var(--surface-hover)] text-xs font-semibold text-[var(--text-primary)] transition-colors"
+          >
+            <Download className="w-4 h-4" aria-hidden="true" />
+            <span>Export Shortlist ({shortlist.length})</span>
+          </button>
+        )}
       </div>
 
-      {/* Target Job Skill Input Bar */}
-      <div className="rounded-2xl bento-card p-6 space-y-4">
+      {/* Filters & Search */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Skill Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+          <input
+            type="text"
+            value={skillFilter}
+            onChange={(e) => setSkillFilter(e.target.value)}
+            placeholder="Filter by skills or keyword..."
+            className="w-full pl-9 pr-8 py-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--focus)]"
+          />
+          {skillFilter && (
+            <button
+              onClick={() => setSkillFilter('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white"
+            >
+              <X className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+
+        {/* Campus Filter */}
         <div>
-          <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-            Target Job Skills / Technical Stack
-          </label>
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-            <input
-              type="text"
-              value={jobQuery}
-              onChange={(e) => setJobQuery(e.target.value)}
-              placeholder="e.g. Next.js, Redis, PyTorch, Distributed Systems, WebRTC..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#090b10] border border-white/10 text-sm font-semibold text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 font-mono"
-            />
-          </div>
-          <p className="mt-1.5 text-[11px] text-zinc-400 font-mono">
-            Our match engine computes weighted alignment across verified works, GitHub tags, and peer endorsements.
-          </p>
+          <select
+            value={selectedCommunity}
+            onChange={(e) => setSelectedCommunity(e.target.value)}
+            className="w-full px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--focus)]"
+          >
+            <option value="all">All Campuses &amp; Universities</option>
+            {communities.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Institution & Zone Filters */}
-        <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-white/[0.06] font-mono text-xs">
-          <div className="flex items-center gap-2">
-            <Building className="w-4 h-4 text-zinc-500" />
-            <select
-              value={selectedCommunity}
-              onChange={(e) => setSelectedCommunity(e.target.value)}
-              className="bg-[#090b10] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-zinc-200 focus:outline-none"
-            >
-              <option value="all">All Campuses</option>
-              {communities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-zinc-500" />
-            <select
-              value={selectedZone}
-              onChange={(e) => setSelectedZone(e.target.value)}
-              className="bg-[#090b10] border border-white/10 rounded-xl px-3 py-1.5 text-xs text-zinc-200 focus:outline-none"
-            >
-              <option value="all">All City Zones</option>
-              {zones.map((z) => (
-                <option key={z.id} value={z.id}>
-                  {z.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Discipline / Field Filter */}
+        <div>
+          <select
+            value={selectedField}
+            onChange={(e) => setSelectedField(e.target.value)}
+            className="w-full px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--focus)]"
+          >
+            <option value="all">All Disciplinary Fields</option>
+            {uniqueFields.map((field) => (
+              <option key={field} value={field}>
+                {field}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* Candidate Ranking List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
-          <span>
-            Ranked <strong className="text-white">{rankedCandidates.length}</strong> qualified student builder{rankedCandidates.length === 1 ? '' : 's'}
-          </span>
-          <span className="text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Recruiter Safe-Contact Protocol Active
-          </span>
-        </div>
+      {/* Candidate Count */}
+      <div className="flex items-center justify-between text-xs text-[var(--text-secondary)] font-mono">
+        <span>
+          Showing <strong className="text-[var(--text-primary)]">{filteredCandidates.length}</strong> verified student candidates
+        </span>
+        {shortlist.length > 0 && (
+          <span>{shortlist.length} candidate(s) bookmarked</span>
+        )}
+      </div>
 
-        <div className="space-y-3">
-          {rankedCandidates.map((candidate, idx) => {
+      {/* Candidates List / Grid */}
+      {filteredCandidates.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredCandidates.map((candidate) => {
             const isBookmarked = shortlist.includes(candidate.id);
+            const targetUrl = candidate.username ? `/u/${candidate.username}` : `/u/${candidate.id}`;
+
             return (
               <div
                 key={candidate.id}
-                className="rounded-2xl bento-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="bento-card p-5 space-y-4 flex flex-col justify-between"
               >
-                {/* Left Profile Info */}
-                <div className="flex items-start gap-4">
-                  <div className="relative shrink-0">
-                    <img
-                      src={candidate.avatar_url!}
-                      alt={candidate.display_name}
-                      className="w-14 h-14 rounded-2xl object-cover ring-1 ring-white/10"
-                    />
-                    <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-violet-600 text-white text-[10px] font-mono font-bold flex items-center justify-center shadow-md">
-                      #{idx + 1}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/profile/${candidate.id}`}
-                        className="font-bold text-base text-white hover:text-violet-300 transition-colors"
-                      >
-                        {candidate.display_name}
-                      </Link>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-violet-300 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded-full">
-                        <ShieldCheck className="w-3 h-3 text-violet-400" />
-                        Verified
-                      </span>
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      {candidate.avatar_url || candidate.avatar_path ? (
+                        <img
+                          src={candidate.avatar_url || candidate.avatar_path || undefined}
+                          alt={candidate.display_name}
+                          className="w-11 h-11 rounded-[var(--radius-sm)] object-cover border border-[var(--border)]"
+                        />
+                      ) : (
+                        <div className="w-11 h-11 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] border border-[var(--border)] text-[var(--accent)] font-bold text-sm flex items-center justify-center">
+                          {candidate.display_name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <Link
+                            href={targetUrl}
+                            className="font-bold text-sm text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
+                          >
+                            {candidate.display_name}
+                          </Link>
+                          {candidate.is_verified && (
+                            <span title="Verified Scholar">
+                              <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)]" aria-hidden="true" />
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] line-clamp-1">
+                          {candidate.headline || candidate.field || 'Student Scholar'}
+                        </p>
+                      </div>
                     </div>
 
-                    <p className="text-xs text-zinc-400 font-medium">
-                      {candidate.headline}
+                    <button
+                      onClick={() => toggleBookmark(candidate.id)}
+                      title={isBookmarked ? 'Remove from shortlist' : 'Add to shortlist'}
+                      className="p-1.5 rounded-[var(--radius-sm)] text-[var(--text-muted)] hover:text-white transition-colors"
+                    >
+                      {isBookmarked ? (
+                        <BookmarkCheck className="w-4 h-4 text-[var(--accent)] fill-current" aria-hidden="true" />
+                      ) : (
+                        <Bookmark className="w-4 h-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+
+                  {candidate.institution && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
+                      <Building className="w-3 h-3 shrink-0" aria-hidden="true" />
+                      <span className="truncate">{candidate.institution.name}</span>
+                    </div>
+                  )}
+
+                  {candidate.bio && (
+                    <p className="text-xs text-[var(--text-secondary)] line-clamp-2">
+                      {candidate.bio}
                     </p>
-
-                    <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-zinc-400 font-mono">
-                      {candidate.institution && (
-                        <span className="flex items-center gap-1">
-                          <Building className="w-3.5 h-3.5 text-zinc-400" />
-                          {candidate.institution.name}
-                        </span>
-                      )}
-                      {candidate.zone && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 text-zinc-400" />
-                          {candidate.zone.city}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* Right Match Gauge & Actions */}
-                <div className="flex items-center gap-4 self-end md:self-center">
-                  <div className="text-right">
-                    <span className="text-2xl font-black text-emerald-400 font-mono">
-                      {candidate.matchScore}%
-                    </span>
-                    <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider font-semibold">
-                      Skill Alignment
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => toggleBookmark(candidate.id)}
-                    className={`p-2.5 rounded-xl border transition-all ${
-                      isBookmarked
-                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                        : 'bg-white/[0.04] text-zinc-400 border-white/10 hover:border-white/20 hover:text-white'
-                    }`}
-                    title={isBookmarked ? 'Remove from shortlist' : 'Add to shortlist'}
-                  >
-                    {isBookmarked ? (
-                      <BookmarkCheck className="w-5 h-5 fill-amber-400 text-amber-400" />
-                    ) : (
-                      <Bookmark className="w-5 h-5" />
-                    )}
-                  </button>
+                <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                    {candidate.field || 'General Studies'}
+                  </span>
 
                   <Link
-                    href={`/profile/${candidate.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-white text-xs font-bold transition-all"
+                    href={targetUrl}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)] hover:underline"
                   >
                     <span>View Evidence</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
+                    <ExternalLink className="w-3 h-3" aria-hidden="true" />
                   </Link>
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
+      ) : (
+        <div className="bento-card p-12 text-center space-y-3">
+          <p className="text-sm text-[var(--text-secondary)]">
+            No candidates matched the current skill, campus, or field filters.
+          </p>
+          {(skillFilter || selectedCommunity !== 'all' || selectedField !== 'all') && (
+            <button
+              onClick={() => {
+                setSkillFilter('');
+                setSelectedCommunity('all');
+                setSelectedField('all');
+              }}
+              className="text-xs text-[var(--accent)] hover:underline"
+            >
+              Reset All Filters
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

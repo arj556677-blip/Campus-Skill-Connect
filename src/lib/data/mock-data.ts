@@ -1,4 +1,4 @@
-import { Profile, Work, Community, Campus, Zone, Skill, CollaborationRoom, SupportTicket, AuditLog } from '../types';
+import { Profile, Work, Community, Campus, Zone, Skill, CollaborationRoom, SupportTicket, AuditLog, Report } from '../types';
 
 export const MOCK_COMMUNITIES: Community[] = [
   {
@@ -368,7 +368,7 @@ export const MOCK_COLLAB_ROOMS: CollaborationRoom[] = [
   },
 ];
 
-export const MOCK_REPORTS: any[] = [
+export const MOCK_REPORTS: Report[] = [
   {
     id: 'rep-1',
     reporter_id: 'user-3',

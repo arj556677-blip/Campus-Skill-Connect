@@ -23,9 +23,25 @@ export async function generateMetadata({ params }: WorkPageProps) {
   const { id } = await params;
   const work = await getWorkById(id);
   if (!work) return { title: 'Work Item Not Found' };
+
+  // Tier 2 Requirement: Private items never generate public previews
+  if (work.visibility === 'only_me' || work.visibility === 'connections') {
+    return {
+      title: 'Restricted Item — Campus Skill Connect',
+      description: 'This work item is restricted to authorized connections.',
+      robots: { index: false, follow: false },
+    };
+  }
+
   return {
     title: `${work.title} — Campus Skill Connect`,
     description: work.description,
+    openGraph: {
+      title: work.title,
+      description: work.description || 'Verified Campus Proof-of-Work',
+      type: 'article',
+      images: work.storage_path ? [{ url: work.storage_path }] : [],
+    },
   };
 }
 

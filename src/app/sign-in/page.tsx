@@ -22,44 +22,68 @@ import {
   Terminal,
 } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/client';
+
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useRole();
 
-  const initialRoleParam = searchParams.get('role') as UserRoleType;
-  const [selectedRole, setSelectedRole] = useState<UserRoleType>(
-    initialRoleParam && ROLE_PERSONAS[initialRoleParam] ? initialRoleParam : 'student'
-  );
-  const [email, setEmail] = useState(
-    initialRoleParam && ROLE_PERSONAS[initialRoleParam]
-      ? ROLE_PERSONAS[initialRoleParam].email
-      : ROLE_PERSONAS.student.email
-  );
+  const roleParam = searchParams.get('role') as UserRoleType;
+  const initialRole: UserRoleType = roleParam && ROLE_PERSONAS[roleParam] ? roleParam : 'student';
+
+  const [selectedRole, setSelectedRole] = useState<UserRoleType>(initialRole);
+  const [email, setEmail] = useState(ROLE_PERSONAS[initialRole].email);
   const [password, setPassword] = useState('••••••••••••');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [magicSent, setMagicSent] = useState(false);
-
-  useEffect(() => {
-    const roleParam = searchParams.get('role') as UserRoleType;
-    if (roleParam && ROLE_PERSONAS[roleParam]) {
-      setSelectedRole(roleParam);
-      setEmail(ROLE_PERSONAS[roleParam].email);
-    }
-  }, [searchParams]);
 
   // Sync role defaults when tab switches
   const handleRoleSelect = (role: UserRoleType) => {
     setSelectedRole(role);
     setEmail(ROLE_PERSONAS[role].email);
     setPassword('••••••••••••');
+    setErrorMsg(null);
   };
 
   const handleSignIn = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
+
     const redirectParam = searchParams.get('redirect') || undefined;
-    login(selectedRole, redirectParam);
+
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password === '••••••••••••' ? 'Campus@2026' : password,
+      });
+
+      if (error) {
+        // If live Supabase returns error, display clean error message
+        console.warn('[SignIn] Supabase auth error:', error.message);
+        // If in local mock preview mode with demo credentials, log them in via role context
+        const isPlaceholderMode = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+        if (isPlaceholderMode) {
+          login(selectedRole, redirectParam);
+          return;
+        }
+        setErrorMsg(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data?.user) {
+        login(selectedRole, redirectParam);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Authentication service temporarily unavailable.';
+      setErrorMsg(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMagicLink = () => {
@@ -238,7 +262,7 @@ function SignInContent() {
               {selectedRole === 'admin'
                 ? 'Authenticates root access to PostgreSQL RLS policies, moderation queue, and system telemetry.'
                 : selectedRole === 'student'
-                ? 'Access your proof of work repositories, 98% ATS resume studio, and real-time sprint rooms.'
+                ? 'Access your proof of work repositories, rule-based ATS resume studio, and real-time sprint rooms.'
                 : 'Source pre-verified students, inspect authenticated GitHub commits, and manage candidate shortlists.'}
             </p>
           </div>
@@ -307,7 +331,7 @@ function SignInContent() {
               <>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                  <span>98% ATS Single-Column Resume Tuner</span>
+                  <span>Rule-Based Single-Column Resume Tuner</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 shrink-0" />
@@ -404,13 +428,14 @@ function SignInContent() {
                     ? 'Root Passkey / Security Key'
                     : 'Password / Passkey'}
                 </label>
-                <button
-                  type="button"
-                  onClick={handleMagicLink}
-                  className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
-                >
-                  Use Magic Link
-                </button>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/auth/reset-password"
+                    className="text-xs text-[var(--accent)] hover:underline transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
@@ -425,10 +450,10 @@ function SignInContent() {
               </div>
             </div>
 
-            {magicSent && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400" />
-                <span>One-time Magic Link dispatched to {email}!</span>
+            {errorMsg && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{errorMsg}</span>
               </div>
             )}
 

@@ -2,14 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useRole } from '@/lib/auth/role-context';
-import { ArrowLeft, Mail, Lock, User, Building, ArrowRight, Sparkles, GraduationCap, Briefcase } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, User, Building, ArrowRight, GraduationCap, Briefcase, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { MOCK_COMMUNITIES } from '@/lib/data/mock-data';
 
 export default function SignUpPage() {
-  const router = useRouter();
   const { login } = useRole();
 
   const [accountType, setAccountType] = useState<'student' | 'recruiter'>('student');
@@ -18,31 +16,60 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [communityId, setCommunityId] = useState(MOCK_COMMUNITIES[0].id);
   const [companyName, setCompanyName] = useState('Stripe');
+  const [consentGiven, setConsentGiven] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!consentGiven) {
+      setErrorMsg('You must review and consent to data processing under the DPDP Act 2023 to proceed.');
+      return;
+    }
+
     setLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
 
     try {
       const supabase = createClient();
-      await supabase.auth.signUp({
-        email,
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
         password,
         options: {
           data: {
             display_name: name,
             institution_id: accountType === 'student' ? communityId : null,
+            company_name: accountType === 'recruiter' ? companyName : null,
             role: accountType,
           },
         },
       });
-    } catch {
-      // Offline fallback
-    }
 
-    // Persist role & authenticate
-    login(accountType);
+      if (error) {
+        // Fallback only if local offline placeholder environment
+        const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+        if (isPlaceholder) {
+          login(accountType);
+          return;
+        }
+        setErrorMsg(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data?.session) {
+        login(accountType);
+      } else {
+        setSuccessMsg('Account registered successfully! A verification email has been sent. Please confirm your email before signing in.');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      setErrorMsg(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,7 +95,7 @@ export default function SignUpPage() {
               Create Campus Account
             </h1>
             <p className="text-xs text-zinc-400">
-              Join the high-trust proof-of-skill network to showcase work and hire verified talent.
+              Join the high-trust proof-of-skill network to showcase work and discover verified talent.
             </p>
           </div>
 
@@ -76,7 +103,10 @@ export default function SignUpPage() {
           <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-black/40 border border-white/[0.08]">
             <button
               type="button"
-              onClick={() => setAccountType('student')}
+              onClick={() => {
+                setAccountType('student');
+                setErrorMsg(null);
+              }}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
                 accountType === 'student'
                   ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40 shadow-[0_0_15px_rgba(139,92,246,0.3)]'
@@ -88,7 +118,10 @@ export default function SignUpPage() {
             </button>
             <button
               type="button"
-              onClick={() => setAccountType('recruiter')}
+              onClick={() => {
+                setAccountType('recruiter');
+                setErrorMsg(null);
+              }}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
                 accountType === 'recruiter'
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
@@ -99,6 +132,20 @@ export default function SignUpPage() {
               <span>Tech Recruiter</span>
             </button>
           </div>
+
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSignUp} className="space-y-4">
             <div>
@@ -133,8 +180,8 @@ export default function SignUpPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={
                     accountType === 'student'
-                      ? 'alex.rivera@iisc.ac.in'
-                      : 'marcus.chen@stripe.com'
+                      ? 'student@campus.edu'
+                      : 'recruiter@company.com'
                   }
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-mono"
                 />
@@ -195,6 +242,22 @@ export default function SignUpPage() {
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-violet-500/80 focus:ring-1 focus:ring-violet-500/50 transition-all font-mono"
                 />
               </div>
+            </div>
+
+            {/* DPDP Act 2023 Consent Notice */}
+            <div className="rounded-xl p-3 bg-white/[0.03] border border-white/[0.08] space-y-2">
+              <label className="flex items-start gap-2.5 cursor-pointer text-xs text-zinc-300 select-none">
+                <input
+                  type="checkbox"
+                  required
+                  checked={consentGiven}
+                  onChange={(e) => setConsentGiven(e.target.checked)}
+                  className="mt-0.5 rounded border-white/20 bg-black/40 text-violet-600 focus:ring-violet-500"
+                />
+                <span className="leading-tight text-[11px] text-zinc-400">
+                  I consent to the collection and processing of my name, institutional email, and portfolio evidence for the sole purpose of campus discovery and talent verification in compliance with the Digital Personal Data Protection Act, 2023 (India).
+                </span>
+              </label>
             </div>
 
             <button

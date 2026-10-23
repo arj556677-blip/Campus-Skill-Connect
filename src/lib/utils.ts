@@ -16,9 +16,11 @@ export const WORK_CATEGORIES: Record<WorkCategory, string> = {
   dance: 'Dance & Performing Arts',
   video: 'Video & Media Production',
   writing: 'Technical & Creative Writing',
+  other: 'Interdisciplinary & Other',
 };
 
 export const VISIBILITY_OPTIONS: Record<Visibility, string> = {
+  public: 'Public (All Signed-in Users)',
   worldwide: 'Public (Worldwide)',
   campus: 'Campus Only (Institutional Domain)',
   connections: 'Connections Only',

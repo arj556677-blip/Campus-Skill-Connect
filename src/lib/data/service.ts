@@ -1,28 +1,37 @@
 /* ─────────────────────────────────────────────────────
- * Data Service — Transparent Redis Cache + Supabase + Fallback
- * Implements the Cache-Aside architecture specified in Plan
+ * Data Service — Transparent Redis Cache + Supabase Data Access
+ * Implements the Cache-Aside architecture.
+ * Strictly returns genuine PostgreSQL records. Never masks database
+ * queries or empty query results with mock data (DATA-002).
  * ───────────────────────────────────────────────────── */
 
 import { cacheGet, CacheKeys, CacheTTL } from '../redis/cache';
 import { createServerSupabaseClient } from '../supabase/server';
 import {
-  MOCK_PROFILES,
-  MOCK_WORKS,
-  MOCK_SKILLS,
-  MOCK_COMMUNITIES,
-  MOCK_CAMPUSES,
-  MOCK_ZONES,
-  MOCK_COLLAB_ROOMS,
-  MOCK_AUDIT_LOGS,
-  MOCK_SUPPORT_TICKETS,
-} from './mock-data';
-import { Profile, Work, Skill, Community, Campus, Zone, CollaborationRoom, AuditLog, SupportTicket } from '../types';
+  Profile,
+  Work,
+  Skill,
+  Community,
+  Zone,
+  CollaborationRoom,
+  AuditLog,
+  SupportTicket,
+} from '../types';
+
+function isPlaceholderConfig(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return !url || url.includes('placeholder');
+}
 
 export async function getWorks(filters?: { category?: string; query?: string }): Promise<Work[]> {
   const filterKey = JSON.stringify(filters || {});
   return cacheGet<Work[]>(
     CacheKeys.showcaseFeed(Buffer.from(filterKey).toString('base64')),
     async () => {
+      if (isPlaceholderConfig()) {
+        return [];
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         let query = supabase
@@ -34,29 +43,22 @@ export async function getWorks(filters?: { category?: string; query?: string }):
           query = query.eq('category', filters.category);
         }
 
-        const { data, error } = await query;
-        if (data && data.length > 0 && !error) {
-          return data as Work[];
+        if (filters?.query && filters.query.trim().length > 0) {
+          const q = filters.query.trim();
+          query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
         }
-      } catch (err) {
-        // Fallback to mock
-      }
 
-      // Filter mock works
-      let results = [...MOCK_WORKS];
-      if (filters?.category && filters.category !== 'all') {
-        results = results.filter((w) => w.category === filters.category);
+        const { data, error } = await query;
+        if (error) {
+          console.error('[getWorks] Query error:', error.message);
+          return [];
+        }
+
+        return (data || []) as Work[];
+      } catch (err) {
+        console.error('[getWorks] Service failure:', err);
+        return [];
       }
-      if (filters?.query) {
-        const q = filters.query.toLowerCase();
-        results = results.filter(
-          (w) =>
-            w.title.toLowerCase().includes(q) ||
-            (w.description ?? '').toLowerCase().includes(q) ||
-            w.skills?.some((s) => s.name.toLowerCase().includes(q))
-        );
-      }
-      return results;
     },
     CacheTTL.DISCOVER_FEED
   );
@@ -66,6 +68,10 @@ export async function getWorkById(id: string): Promise<Work | null> {
   return cacheGet<Work | null>(
     CacheKeys.work(id),
     async () => {
+      if (isPlaceholderConfig()) {
+        return null;
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase
@@ -74,12 +80,15 @@ export async function getWorkById(id: string): Promise<Work | null> {
           .eq('id', id)
           .single();
 
-        if (data && !error) return data as Work;
-      } catch (err) {
-        // Fallback to mock
-      }
+        if (error || !data) {
+          return null;
+        }
 
-      return MOCK_WORKS.find((w) => w.id === id) || null;
+        return data as Work;
+      } catch (err) {
+        console.error('[getWorkById] Service failure:', err);
+        return null;
+      }
     },
     CacheTTL.WORK
   );
@@ -89,6 +98,10 @@ export async function getProfiles(filters?: { role?: string; query?: string; cam
   return cacheGet<Profile[]>(
     `profiles:all:${JSON.stringify(filters || {})}`,
     async () => {
+      if (isPlaceholderConfig()) {
+        return [];
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         let query = supabase
@@ -96,26 +109,26 @@ export async function getProfiles(filters?: { role?: string; query?: string; cam
           .select('*, institution:communities(*), campus:campuses(*), zone:zones(*)')
           .order('created_at', { ascending: false });
 
-        if (filters?.role) query = query.eq('role', filters.role);
-        const { data, error } = await query;
-        if (data && data.length > 0 && !error) return data as Profile[];
-      } catch (err) {
-        // Fallback
-      }
+        if (filters?.role) {
+          query = query.eq('role', filters.role);
+        }
 
-      let results = [...MOCK_PROFILES];
-      if (filters?.role) results = results.filter((p) => p.role === filters.role);
-      if (filters?.query) {
-        const q = filters.query.toLowerCase();
-        results = results.filter(
-          (p) =>
-            p.display_name.toLowerCase().includes(q) ||
-            p.headline?.toLowerCase().includes(q) ||
-            p.bio?.toLowerCase().includes(q) ||
-            p.field?.toLowerCase().includes(q)
-        );
+        if (filters?.query && filters.query.trim().length > 0) {
+          const q = filters.query.trim();
+          query = query.or(`display_name.ilike.%${q}%,headline.ilike.%${q}%,bio.ilike.%${q}%,field.ilike.%${q}%`);
+        }
+
+        const { data, error } = await query;
+        if (error) {
+          console.error('[getProfiles] Query error:', error.message);
+          return [];
+        }
+
+        return (data || []) as Profile[];
+      } catch (err) {
+        console.error('[getProfiles] Service failure:', err);
+        return [];
       }
-      return results;
     },
     CacheTTL.PROFILE
   );
@@ -125,6 +138,10 @@ export async function getProfileById(id: string): Promise<Profile | null> {
   return cacheGet<Profile | null>(
     CacheKeys.profile(id),
     async () => {
+      if (isPlaceholderConfig()) {
+        return null;
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase
@@ -133,12 +150,15 @@ export async function getProfileById(id: string): Promise<Profile | null> {
           .eq('id', id)
           .single();
 
-        if (data && !error) return data as Profile;
-      } catch (err) {
-        // Fallback
-      }
+        if (error || !data) {
+          return null;
+        }
 
-      return MOCK_PROFILES.find((p) => p.id === id) || MOCK_PROFILES[0];
+        return data as Profile;
+      } catch (err) {
+        console.error('[getProfileById] Service failure:', err);
+        return null;
+      }
     },
     CacheTTL.PROFILE
   );
@@ -148,14 +168,22 @@ export async function getSkills(): Promise<Skill[]> {
   return cacheGet<Skill[]>(
     CacheKeys.skillsAll(),
     async () => {
+      if (isPlaceholderConfig()) {
+        return [];
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase.from('skills').select('*').order('name');
-        if (data && data.length > 0 && !error) return data as Skill[];
+        if (error) {
+          console.error('[getSkills] Query error:', error.message);
+          return [];
+        }
+        return (data || []) as Skill[];
       } catch (err) {
-        // Fallback
+        console.error('[getSkills] Service failure:', err);
+        return [];
       }
-      return MOCK_SKILLS;
     },
     CacheTTL.SKILLS_ALL
   );
@@ -165,14 +193,22 @@ export async function getCommunities(): Promise<Community[]> {
   return cacheGet<Community[]>(
     CacheKeys.communities(),
     async () => {
+      if (isPlaceholderConfig()) {
+        return [];
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase.from('communities').select('*');
-        if (data && data.length > 0 && !error) return data as Community[];
+        if (error) {
+          console.error('[getCommunities] Query error:', error.message);
+          return [];
+        }
+        return (data || []) as Community[];
       } catch (err) {
-        // Fallback
+        console.error('[getCommunities] Service failure:', err);
+        return [];
       }
-      return MOCK_COMMUNITIES;
     },
     CacheTTL.COMMUNITIES
   );
@@ -182,14 +218,22 @@ export async function getZones(): Promise<Zone[]> {
   return cacheGet<Zone[]>(
     CacheKeys.zones(),
     async () => {
+      if (isPlaceholderConfig()) {
+        return [];
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase.from('zones').select('*');
-        if (data && data.length > 0 && !error) return data as Zone[];
+        if (error) {
+          console.error('[getZones] Query error:', error.message);
+          return [];
+        }
+        return (data || []) as Zone[];
       } catch (err) {
-        // Fallback
+        console.error('[getZones] Service failure:', err);
+        return [];
       }
-      return MOCK_ZONES;
     },
     CacheTTL.ZONES
   );
@@ -199,6 +243,10 @@ export async function getCollabRooms(): Promise<CollaborationRoom[]> {
   return cacheGet<CollaborationRoom[]>(
     'rooms:active',
     async () => {
+      if (isPlaceholderConfig()) {
+        return [];
+      }
+
       try {
         const supabase = await createServerSupabaseClient();
         const { data, error } = await supabase
@@ -207,17 +255,25 @@ export async function getCollabRooms(): Promise<CollaborationRoom[]> {
           .eq('is_active', true)
           .order('created_at', { ascending: false });
 
-        if (data && data.length > 0 && !error) return data as CollaborationRoom[];
+        if (error) {
+          console.error('[getCollabRooms] Query error:', error.message);
+          return [];
+        }
+        return (data || []) as CollaborationRoom[];
       } catch (err) {
-        // Fallback
+        console.error('[getCollabRooms] Service failure:', err);
+        return [];
       }
-      return MOCK_COLLAB_ROOMS;
     },
     60 // 1 minute
   );
 }
 
 export async function getAuditLogs(): Promise<AuditLog[]> {
+  if (isPlaceholderConfig()) {
+    return [];
+  }
+
   try {
     const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
@@ -225,23 +281,37 @@ export async function getAuditLogs(): Promise<AuditLog[]> {
       .select('*, actor:profiles(*)')
       .order('created_at', { ascending: false })
       .limit(50);
-    if (data && data.length > 0 && !error) return data as AuditLog[];
+
+    if (error) {
+      console.error('[getAuditLogs] Query error:', error.message);
+      return [];
+    }
+    return (data || []) as AuditLog[];
   } catch (err) {
-    // Fallback
+    console.error('[getAuditLogs] Service failure:', err);
+    return [];
   }
-  return MOCK_AUDIT_LOGS;
 }
 
 export async function getSupportTickets(): Promise<SupportTicket[]> {
+  if (isPlaceholderConfig()) {
+    return [];
+  }
+
   try {
     const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from('support_tickets')
       .select('*, user:profiles(*)')
       .order('created_at', { ascending: false });
-    if (data && data.length > 0 && !error) return data as SupportTicket[];
+
+    if (error) {
+      console.error('[getSupportTickets] Query error:', error.message);
+      return [];
+    }
+    return (data || []) as SupportTicket[];
   } catch (err) {
-    // Fallback
+    console.error('[getSupportTickets] Service failure:', err);
+    return [];
   }
-  return MOCK_SUPPORT_TICKETS;
 }

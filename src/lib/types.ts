@@ -7,7 +7,7 @@
 
 export type UserRole = 'student' | 'faculty' | 'recruiter' | 'admin';
 
-export type Visibility = 'worldwide' | 'campus' | 'connections' | 'selected_users' | 'only_me';
+export type Visibility = 'public' | 'worldwide' | 'campus' | 'connections' | 'selected_users' | 'only_me';
 
 export type WorkCategory =
   | 'software'
@@ -18,7 +18,8 @@ export type WorkCategory =
   | 'music'
   | 'dance'
   | 'video'
-  | 'writing';
+  | 'writing'
+  | 'other';
 
 export type SkillCategory =
   | 'software'
@@ -30,7 +31,7 @@ export type SkillCategory =
 
 export type Proficiency = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 
-export type ConnectionStatus = 'pending' | 'accepted' | 'rejected';
+export type ConnectionStatus = 'pending' | 'accepted' | 'declined' | 'withdrawn' | 'blocked' | 'rejected';
 
 export type ReportTargetType = 'profile' | 'work' | 'message';
 export type ReportStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed';
@@ -62,6 +63,7 @@ export type MessagePrivacy = 'connections_only' | 'all';
 
 export interface Profile {
   id: string;
+  username?: string | null;
   display_name: string;
   headline: string | null;
   bio: string | null;
@@ -71,8 +73,10 @@ export interface Profile {
   zone_id: string | null;
   field: string | null;
   avatar_url: string | null;
+  avatar_path?: string | null;
   profile_visibility: Visibility;
   is_verified: boolean;
+  is_campus_verified?: boolean;
   github_username: string | null;
   linkedin_url: string | null;
   website_url: string | null;

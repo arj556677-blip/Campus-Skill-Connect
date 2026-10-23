@@ -28,6 +28,7 @@ export const RateLimits = {
   CHAT: { maxRequests: 120, windowSeconds: 60 } as RateLimitConfig,
   AUTH: { maxRequests: 5, windowSeconds: 300 } as RateLimitConfig,
   UPLOAD: { maxRequests: 10, windowSeconds: 60 } as RateLimitConfig,
+  REPORT: { maxRequests: 10, windowSeconds: 60 } as RateLimitConfig,
   GENERAL: { maxRequests: 100, windowSeconds: 60 } as RateLimitConfig,
 } as const;
 
@@ -41,7 +42,8 @@ export const RateLimits = {
  */
 export async function checkRateLimit(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
+  options?: { failClosed?: boolean }
 ): Promise<RateLimitResult> {
   const redis = getRedisClient();
   const key = `${PREFIX}${identifier}`;
@@ -86,12 +88,20 @@ export async function checkRateLimit(
 
     return {
       allowed: true,
-      remaining: config.maxRequests - currentCount - 1,
+      remaining: Math.max(config.maxRequests - currentCount - 1, 0),
       resetInSeconds: config.windowSeconds,
     };
   } catch (err) {
-    console.warn('[RateLimit] Error, allowing request:', err);
-    // Fail open — don't block users if Redis is down
+    console.warn('[RateLimit] Storage unavailable:', err);
+    // Per specification: Fail closed for sensitive (auth, AI) endpoints, fail open for read routes
+    if (options?.failClosed) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetInSeconds: config.windowSeconds,
+      };
+    }
+
     return {
       allowed: true,
       remaining: config.maxRequests,

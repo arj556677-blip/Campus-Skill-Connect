@@ -1,6 +1,8 @@
 /* ─────────────────────────────────────────────────────
- * Supabase — Middleware Client
- * Refreshes auth tokens on each request
+ * Supabase — Middleware / Proxy Client
+ * Refreshes auth tokens on each request using verified SSR cookies.
+ * Strictly derives session identity from supabase.auth.getUser().
+ * Never trusts client-supplied demo cookies or localStorage.
  * ───────────────────────────────────────────────────── */
 
 import { createServerClient } from '@supabase/ssr';
@@ -13,7 +15,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
-    // In local dev without live Supabase configured, pass through request smoothly
+    // In local dev without live Supabase configured, pass through request
     return supabaseResponse;
   }
 
@@ -39,22 +41,20 @@ export async function updateSession(request: NextRequest) {
       }
     );
 
-    // Refresh the session — this is critical for SSR auth
+    // Refresh the session — cryptographically verified SSR auth token check
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Check for client-side demo role authentication cookies
-    const isDemoLoggedIn = request.cookies.get('csc_is_logged_in')?.value === 'true';
-    const demoRole = request.cookies.get('csc_active_role')?.value;
-    const isAuthenticated = !!user || isDemoLoggedIn;
+    const isAuthenticated = !!user;
 
-    // Protected routes — only genuinely private operations require authentication
+    // Protected member routes
     const protectedRoutes = [
-      '/profile/edit',
       '/works/new',
       '/messages',
-      '/settings',
+      '/dashboard/student',
+      '/dashboard/recruiter',
+      '/profile/edit',
     ];
 
     const isProtectedRoute = protectedRoutes.some((route) =>
@@ -68,9 +68,9 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Admin routes — verify admin role (either from Supabase profile or active role session)
+    // Admin routes — strictly enforced by verified database role check
     if (request.nextUrl.pathname.startsWith('/admin')) {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !user) {
         const url = request.nextUrl.clone();
         url.pathname = '/sign-in';
         url.searchParams.set('role', 'admin');
@@ -78,28 +78,21 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
       }
 
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+      // Check verified role from user_roles or profiles table in Postgres
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-        if (profile?.role !== 'admin' && demoRole !== 'admin') {
-          return NextResponse.redirect(new URL('/dashboard', request.url));
-        }
-      } else if (demoRole !== 'admin') {
-        const url = request.nextUrl.clone();
-        url.pathname = '/sign-in';
-        url.searchParams.set('role', 'admin');
-        url.searchParams.set('redirect', '/admin');
-        return NextResponse.redirect(url);
+      if (profile?.role !== 'admin') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
       }
     }
 
     return supabaseResponse;
   } catch (error) {
-    console.warn('[Supabase Middleware] Session check failed:', error);
+    console.warn('[Supabase Middleware] Session verification error:', error);
     return supabaseResponse;
   }
 }

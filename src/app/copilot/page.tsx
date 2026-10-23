@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
@@ -9,9 +9,7 @@ import {
   User,
   Lightbulb,
   RefreshCw,
-  Cpu,
   ShieldCheck,
-  Code2,
   Trash2,
   Check,
   Copy,
@@ -24,13 +22,61 @@ interface ChatMessage {
 }
 
 const PRESETS = [
-  'Critique my verified works for FAANG backend roles',
-  'Mock interview questions on Redis caching & rate limiting',
-  'Brainstorm cross-campus project combining YOLOv9 & WebRTC',
-  'Review my ATS score and suggest missing keywords',
+  'Critique my verified works for backend engineering roles',
+  'Mock interview questions on caching & sliding window rate limiting',
+  'Brainstorm cross-campus project combining Computer Vision & WebRTC',
+  'Review my resume checklist and suggest missing keywords',
 ];
 
-// Helper to render rich markdown in chat responses
+let messageSequence = 0;
+function createMessageId(prefix: string): string {
+  messageSequence += 1;
+  return `${prefix}-${messageSequence}`;
+}
+
+/**
+ * Safe inline markdown tokenizer that renders pure React nodes.
+ * Eliminates dangerouslySetInnerHTML entirely, neutralizing any XSS attack payload (SEC-004).
+ */
+function renderInline(text: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  // Tokenize bold (**text**), italic (*text*), and code (`text`)
+  const regex = /(\*\*.*?\*\*|\*.*?\*|`.*?`)/g;
+  const parts = text.split(regex);
+
+  parts.forEach((part, index) => {
+    if (!part) return;
+
+    if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+      nodes.push(
+        <strong key={index} className="text-white font-semibold">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    } else if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+      nodes.push(
+        <em key={index} className="text-zinc-300 italic">
+          {part.slice(1, -1)}
+        </em>
+      );
+    } else if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
+      nodes.push(
+        <code
+          key={index}
+          className="px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-violet-300 font-mono text-[11px]"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    } else {
+      nodes.push(part);
+    }
+  });
+
+  return nodes;
+}
+
+/** Helper to render structured markdown safely in chat responses */
 function MarkdownRenderer({ content }: { content: string }) {
   const lines = content.split('\n');
 
@@ -46,7 +92,10 @@ function MarkdownRenderer({ content }: { content: string }) {
         // Heading 3
         if (trimmed.startsWith('### ')) {
           return (
-            <h4 key={idx} className="text-sm sm:text-base font-bold text-white pt-2 pb-1 border-b border-white/10 flex items-center gap-2">
+            <h4
+              key={idx}
+              className="text-sm sm:text-base font-bold text-white pt-2 pb-1 border-b border-white/10 flex items-center gap-2"
+            >
               <span className="w-1.5 h-3.5 bg-violet-500 rounded-full" />
               {trimmed.replace('### ', '')}
             </h4>
@@ -59,7 +108,7 @@ function MarkdownRenderer({ content }: { content: string }) {
           return (
             <div key={idx} className="flex items-start gap-2 pl-1">
               <span className="text-violet-400 mt-1 text-xs">•</span>
-              <span dangerouslySetInnerHTML={{ __html: formatInline(raw) }} />
+              <span>{renderInline(raw)}</span>
             </div>
           );
         }
@@ -72,28 +121,16 @@ function MarkdownRenderer({ content }: { content: string }) {
               <span className="font-mono text-xs font-bold text-violet-400 mt-0.5 shrink-0">
                 {numMatch[1]}.
               </span>
-              <span dangerouslySetInnerHTML={{ __html: formatInline(numMatch[2]) }} />
+              <span>{renderInline(numMatch[2])}</span>
             </div>
           );
         }
 
         // Normal text
-        return (
-          <p key={idx} dangerouslySetInnerHTML={{ __html: formatInline(trimmed) }} />
-        );
+        return <p key={idx}>{renderInline(trimmed)}</p>;
       })}
     </div>
   );
-}
-
-function formatInline(text: string): string {
-  // Convert **bold** to <strong>
-  let html = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
-  // Convert *italic* to <em>
-  html = html.replace(/\*(.*?)\*/g, '<em class="text-zinc-300 italic">$1</em>');
-  // Convert `code` to <code>
-  html = html.replace(/`(.*?)`/g, '<code class="px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-violet-300 font-mono text-[11px]">$1</code>');
-  return html;
 }
 
 export default function CopilotPage() {
@@ -102,7 +139,7 @@ export default function CopilotPage() {
       id: 'init-1',
       role: 'assistant',
       content:
-        '👋 Welcome to the **Campus Career & Engineering Copilot**! I have direct context on your verified proof-of-work, including **HyperCache** (Redis 7) and **Campus Peer Mesh** (WebRTC).\n\nWhat would you like to prepare for today?',
+        '👋 Welcome to the **Campus Career & Engineering Copilot**! I can help you prepare for technical interviews, review project architecture, and refine your resume evidence.\n\nWhat would you like to prepare for today?',
     },
   ]);
   const [inputVal, setInputVal] = useState('');
@@ -119,8 +156,9 @@ export default function CopilotPage() {
     const text = textToSend || inputVal.trim();
     if (!text || isLoading) return;
 
+    const userMsgId = createMessageId('user');
     const userMsg: ChatMessage = {
-      id: 'u-' + Date.now(),
+      id: userMsgId,
       role: 'user',
       content: text,
     };
@@ -139,19 +177,22 @@ export default function CopilotPage() {
       });
 
       const data = await response.json();
+      const botMsgId = createMessageId('bot');
       const botMsg: ChatMessage = {
-        id: 'bot-' + Date.now(),
+        id: botMsgId,
         role: 'assistant',
         content: data.reply || 'Let me help you optimize that work.',
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch {
+      const errBotId = createMessageId('err');
       setMessages((prev) => [
         ...prev,
         {
-          id: 'bot-err-' + Date.now(),
+          id: errBotId,
           role: 'assistant',
-          content: '### Technical Assessment for FAANG / Top-Tier Backend Roles:\n1. **Highlight Your Redis Work**: Your *HyperCache* project demonstrating 99.4% hit rates with cache-aside and sliding window rate limiting is a huge differentiator.\n2. **PostgreSQL RLS as Security Proof**: Most student resumes mention generic MongoDB. Emphasize row-level multi-tenant policies and schema isolation.\n3. **Recommended Next Challenge**: Implement a distributed consensus demo using Redis Redlock or Raft.',
+          content:
+            '### Technical Assessment & Review:\n1. **Systems Evidence**: Clearly document your cache invalidation strategies and database constraints.\n2. **Security Focus**: Highlight row-level security and verified session tokens over client-side filters.\n3. **Measurable Outcomes**: Benchmark your latency, throughput, and error rates with reproducible data.',
         },
       ]);
     } finally {
@@ -166,9 +207,10 @@ export default function CopilotPage() {
   };
 
   const clearChat = () => {
+    const clearId = createMessageId('reset');
     setMessages([
       {
-        id: 'init-' + Date.now(),
+        id: clearId,
         role: 'assistant',
         content: '👋 Copilot memory cleared. Ready for your next portfolio review or technical interview prep.',
       },
@@ -201,7 +243,7 @@ export default function CopilotPage() {
                 </span>
               </div>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Intelligent engineering interview simulator, portfolio critic, and ATS advisor.
+                Engineering interview simulator, portfolio review assistant, and ATS checklist advisor.
               </p>
             </div>
           </div>
@@ -209,7 +251,7 @@ export default function CopilotPage() {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Redis Rate Limiter: Active</span>
+              <span>Rate Limiter: Active</span>
             </div>
 
             <button
@@ -286,7 +328,7 @@ export default function CopilotPage() {
                   <RefreshCw className="w-4 h-4 animate-spin" />
                 </div>
                 <span className="animate-pulse">
-                  Analyzing portfolio proof-of-work &amp; synthesizing engineering critique...
+                  Analyzing portfolio evidence &amp; synthesizing engineering critique...
                 </span>
               </div>
             )}

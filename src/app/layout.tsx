@@ -39,10 +39,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={cn("h-full antialiased scroll-smooth dark", "font-sans", geist.variable)}>
-      <body className="min-h-full flex flex-col bg-[#08090d] text-white selection:bg-violet-500/30 selection:text-violet-200">
+      <body className="min-h-full flex flex-col bg-[var(--surface)] text-[var(--text-primary)] selection:bg-[#3855d9]/30 selection:text-white">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <RoleProvider>
           <Navbar />
-          <main className="flex-1 flex flex-col w-full">{children}</main>
+          <main id="main-content" className="flex-1 flex flex-col w-full" tabIndex={-1}>
+            {children}
+          </main>
           <Footer />
         </RoleProvider>
       </body>

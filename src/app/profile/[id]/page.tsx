@@ -176,14 +176,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <span>Verified Technical Competencies</span>
               </h3>
               <div className="flex flex-wrap gap-2">
-                {profile.skills.map((skill) => (
-                  <span
-                    key={skill.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/[0.04] text-xs font-mono font-medium text-zinc-200 border border-white/[0.08]"
-                  >
-                    #{(skill as any).skill?.name || (skill as any).name || 'Skill'}
-                  </span>
-                ))}
+                {profile.skills.map((skill) => {
+                  const name = 'skill' in skill && skill.skill ? skill.skill.name : (skill as { name?: string }).name || 'Skill';
+                  return (
+                    <span
+                      key={skill.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/[0.04] text-xs font-mono font-medium text-zinc-200 border border-white/[0.08]"
+                    >
+                      #{name}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           )}

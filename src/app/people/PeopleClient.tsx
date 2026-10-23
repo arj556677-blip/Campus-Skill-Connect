@@ -9,34 +9,132 @@ interface PeopleClientProps {
   initialProfiles: Profile[];
   communities: Community[];
   zones: Zone[];
+  initialZone?: string;
+  initialCommunity?: string;
+  initialRole?: string;
 }
+
+// Known regional mapping between university campuses and innovation hubs
+const COMMUNITY_ZONE_MAP: Record<string, string> = {
+  'a1111111-1111-1111-1111-111111111111': 'c1111111-1111-1111-1111-111111111111', // IIT Bombay -> Mumbai Tech Hub
+  'a2222222-2222-2222-2222-222222222222': 'c1111111-1111-1111-1111-111111111111', // NID -> Western/Mumbai
+  'a3333333-3333-3333-3333-333333333333': 'c3333333-3333-3333-3333-333333333333', // JNU -> Delhi NCR
+  'a4444444-4444-4444-4444-444444444444': 'c2222222-2222-2222-2222-222222222222', // IIMB -> Bangalore Silicon Valley
+  'a5555555-5555-5555-5555-555555555555': 'c2222222-2222-2222-2222-222222222222', // IISc -> Bangalore Silicon Valley
+  'a6666666-6666-6666-6666-666666666666': 'c4444444-4444-4444-4444-444444444444', // BITS -> Hyderabad Tech City
+  'comm-1': 'zone-1',
+  'comm-2': 'zone-2',
+  'comm-3': 'zone-1',
+  'comm-4': 'zone-3',
+};
 
 export default function PeopleClient({
   initialProfiles,
   communities,
   zones,
+  initialZone,
+  initialCommunity,
+  initialRole,
 }: PeopleClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRole, setSelectedRole] = useState<string>('all');
-  const [selectedCommunity, setSelectedCommunity] = useState<string>('all');
-  const [selectedZone, setSelectedZone] = useState<string>('all');
+  const [selectedRole, setSelectedRole] = useState<string>(initialRole || 'all');
+  const [selectedCommunity, setSelectedCommunity] = useState<string>(initialCommunity || 'all');
+  const [selectedZone, setSelectedZone] = useState<string>(initialZone || 'all');
+
+  // Filter out any system administration accounts - talent directory is exclusively for builders, mentors, & recruiters
+  const talentProfiles = useMemo(() => {
+    return initialProfiles.filter((p) => p.role !== 'admin');
+  }, [initialProfiles]);
+
+  // Handle changing institution with smart zone coordination
+  const handleCommunityChange = (communityId: string) => {
+    setSelectedCommunity(communityId);
+    if (communityId !== 'all') {
+      const associatedZone = COMMUNITY_ZONE_MAP[communityId];
+      // If a zone is selected and it conflicts with the institution's actual zone, reset or sync it
+      if (selectedZone !== 'all' && associatedZone && selectedZone !== associatedZone) {
+        setSelectedZone('all');
+      }
+    }
+  };
+
+  // Handle changing zone with smart institution coordination
+  const handleZoneChange = (zoneId: string) => {
+    setSelectedZone(zoneId);
+    if (zoneId !== 'all' && selectedCommunity !== 'all') {
+      const associatedZone = COMMUNITY_ZONE_MAP[selectedCommunity];
+      if (associatedZone && associatedZone !== zoneId) {
+        setSelectedCommunity('all');
+      }
+    }
+  };
+
+  // Selected Zone object
+  const selectedZoneObj = useMemo(() => {
+    return zones.find((z) => z.id === selectedZone);
+  }, [zones, selectedZone]);
 
   const filteredProfiles = useMemo(() => {
-    return initialProfiles.filter((profile) => {
+    return talentProfiles.filter((profile) => {
+      // 1. Role filter
       const matchesRole = selectedRole === 'all' || profile.role === selectedRole;
+
+      // 2. Institution / Community filter
       const matchesCommunity =
-        selectedCommunity === 'all' || profile.institution_id === selectedCommunity;
-      const matchesZone = selectedZone === 'all' || profile.zone_id === selectedZone;
+        selectedCommunity === 'all' ||
+        profile.institution_id === selectedCommunity ||
+        profile.institution?.id === selectedCommunity;
+
+      // 3. Zone filter with multi-level fallback
+      const matchesZone =
+        selectedZone === 'all' ||
+        profile.zone_id === selectedZone ||
+        profile.zone?.id === selectedZone ||
+        (profile.institution_id && COMMUNITY_ZONE_MAP[profile.institution_id] === selectedZone) ||
+        Boolean(
+          selectedZoneObj &&
+            ((profile.campus?.location &&
+              profile.campus.location.toLowerCase().includes(selectedZoneObj.city.toLowerCase())) ||
+              (profile.institution?.description &&
+                profile.institution.description.toLowerCase().includes(selectedZoneObj.city.toLowerCase())) ||
+              (profile.institution?.name &&
+                profile.institution.name.toLowerCase().includes(selectedZoneObj.city.toLowerCase())))
+        );
+
+      // 4. Query filter
       const matchesQuery =
         !searchQuery ||
         profile.display_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         profile.headline?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         profile.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        profile.field?.toLowerCase().includes(searchQuery.toLowerCase());
+        profile.field?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        profile.institution?.name?.toLowerCase().includes(searchQuery.toLowerCase());
 
       return matchesRole && matchesCommunity && matchesZone && matchesQuery;
     });
-  }, [initialProfiles, selectedRole, selectedCommunity, selectedZone, searchQuery]);
+  }, [talentProfiles, selectedRole, selectedCommunity, selectedZone, searchQuery, selectedZoneObj]);
+
+  // Precompute builder counts per community and per zone for clear UX
+  const communityCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const p of talentProfiles) {
+      if (p.institution_id) {
+        map[p.institution_id] = (map[p.institution_id] || 0) + 1;
+      }
+    }
+    return map;
+  }, [talentProfiles]);
+
+  const zoneCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const p of talentProfiles) {
+      const zId = p.zone_id || (p.institution_id ? COMMUNITY_ZONE_MAP[p.institution_id] : null);
+      if (zId) {
+        map[zId] = (map[zId] || 0) + 1;
+      }
+    }
+    return map;
+  }, [talentProfiles]);
 
   return (
     <div className="space-y-8">
@@ -51,8 +149,7 @@ export default function PeopleClient({
             Campus Talent Directory
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-slate-500 max-w-xl">
-            Discover student developers, ML researchers, product designers, and faculty mentors.
-            Protected by consent-based networking.
+            Discover student developers, ML researchers, product designers, and faculty mentors across verified campuses and innovation zones.
           </p>
         </div>
 
@@ -79,6 +176,7 @@ export default function PeopleClient({
               <button
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                title="Clear search"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -105,38 +203,47 @@ export default function PeopleClient({
 
         {/* Community & Zone Selectors */}
         <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 text-xs">
+          {/* Institution Selector */}
           <div className="flex items-center gap-2">
             <Building className="w-3.5 h-3.5 text-slate-400" />
             <select
               value={selectedCommunity}
-              onChange={(e) => setSelectedCommunity(e.target.value)}
-              className="bg-[#f8fafc] border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#1b59f8]"
+              onChange={(e) => handleCommunityChange(e.target.value)}
+              className="bg-[#f8fafc] border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#1b59f8] max-w-xs truncate"
             >
               <option value="all">All Institutions &amp; Campuses</option>
-              {communities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              {communities.map((c) => {
+                const count = communityCounts[c.id];
+                return (
+                  <option key={c.id} value={c.id}>
+                    {c.name} {count ? `(${count})` : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
+          {/* Zone Selector */}
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-slate-400" />
             <select
               value={selectedZone}
-              onChange={(e) => setSelectedZone(e.target.value)}
+              onChange={(e) => handleZoneChange(e.target.value)}
               className="bg-[#f8fafc] border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#1b59f8]"
             >
               <option value="all">All Innovation Zones</option>
-              {zones.map((z) => (
-                <option key={z.id} value={z.id}>
-                  {z.name} ({z.city})
-                </option>
-              ))}
+              {zones.map((z) => {
+                const count = zoneCounts[z.id];
+                return (
+                  <option key={z.id} value={z.id}>
+                    {z.name} ({z.city}) {count ? `(${count})` : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
+          {/* Reset Filters & Active Filter Badges */}
           {(selectedRole !== 'all' || selectedCommunity !== 'all' || selectedZone !== 'all' || searchQuery) && (
             <button
               onClick={() => {
@@ -145,12 +252,43 @@ export default function PeopleClient({
                 setSelectedZone('all');
                 setSearchQuery('');
               }}
-              className="text-xs text-[#1b59f8] hover:underline font-bold ml-auto transition-colors"
+              className="text-xs text-[#1b59f8] hover:underline font-bold ml-auto transition-colors flex items-center gap-1"
             >
-              Reset Filters
+              <span>Reset Filters</span>
             </button>
           )}
         </div>
+
+        {/* Active Filter Chips */}
+        {(selectedRole !== 'all' || selectedCommunity !== 'all' || selectedZone !== 'all') && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-[11px]">
+            <span className="text-slate-400 font-medium">Active:</span>
+            {selectedRole !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium border border-blue-200">
+                Role: {selectedRole}
+                <button onClick={() => setSelectedRole('all')} className="hover:text-blue-900">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {selectedCommunity !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">
+                {communities.find((c) => c.id === selectedCommunity)?.name || 'Institution'}
+                <button onClick={() => setSelectedCommunity('all')} className="hover:text-emerald-900">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {selectedZone !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 font-medium border border-purple-200">
+                {zones.find((z) => z.id === selectedZone)?.name || 'Innovation Zone'}
+                <button onClick={() => setSelectedZone('all')} className="hover:text-purple-900">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Results Count & Grid */}
@@ -166,8 +304,19 @@ export default function PeopleClient({
             <Sparkles className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <h3 className="text-base font-bold text-slate-900">No builders found</h3>
             <p className="mt-1 text-xs text-slate-500">
-              Try adjusting your search criteria or role filters.
+              Try adjusting your search criteria, switching innovation zones, or clicking &quot;Reset Filters&quot;.
             </p>
+            <button
+              onClick={() => {
+                setSelectedRole('all');
+                setSelectedCommunity('all');
+                setSelectedZone('all');
+                setSearchQuery('');
+              }}
+              className="mt-4 px-4 py-2 rounded-full bg-[#1b59f8] text-white text-xs font-bold hover:bg-blue-600 transition-colors"
+            >
+              Reset Filters
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

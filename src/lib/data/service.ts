@@ -106,7 +106,9 @@ export async function getProfiles(filters?: { role?: string; query?: string; cam
     `profiles:all:${JSON.stringify(filters || {})}`,
     async () => {
       if (isPlaceholderConfig()) {
-        return MOCK_PROFILES;
+        return filters?.role
+          ? MOCK_PROFILES.filter((p) => p.role === filters.role)
+          : MOCK_PROFILES.filter((p) => p.role !== 'admin');
       }
 
       try {
@@ -118,6 +120,9 @@ export async function getProfiles(filters?: { role?: string; query?: string; cam
 
         if (filters?.role) {
           query = query.eq('role', filters.role);
+        } else {
+          // Never expose platform admin as a campus talent builder
+          query = query.neq('role', 'admin');
         }
 
         if (filters?.query && filters.query.trim().length > 0) {
@@ -127,13 +132,17 @@ export async function getProfiles(filters?: { role?: string; query?: string; cam
 
         const { data, error } = await query;
         if (error || !data || data.length === 0) {
-          return MOCK_PROFILES;
+          return filters?.role
+            ? MOCK_PROFILES.filter((p) => p.role === filters.role)
+            : MOCK_PROFILES.filter((p) => p.role !== 'admin');
         }
 
         return data as Profile[];
       } catch (err) {
         console.warn('[getProfiles] Service notice, serving mock profiles:', err);
-        return MOCK_PROFILES;
+        return filters?.role
+          ? MOCK_PROFILES.filter((p) => p.role === filters.role)
+          : MOCK_PROFILES.filter((p) => p.role !== 'admin');
       }
     },
     CacheTTL.PROFILE
@@ -200,20 +209,19 @@ export async function getCommunities(): Promise<Community[]> {
     CacheKeys.communities(),
     async () => {
       if (isPlaceholderConfig()) {
-        return [];
+        return MOCK_COMMUNITIES;
       }
 
       try {
         const supabase = await createServerSupabaseClient();
-        const { data, error } = await supabase.from('communities').select('*');
-        if (error) {
-          console.error('[getCommunities] Query error:', error.message);
-          return [];
+        const { data, error } = await supabase.from('communities').select('*').order('name');
+        if (error || !data || data.length === 0) {
+          return MOCK_COMMUNITIES;
         }
-        return (data || []) as Community[];
+        return data as Community[];
       } catch (err) {
-        console.error('[getCommunities] Service failure:', err);
-        return [];
+        console.error('[getCommunities] Service failure, serving verified fallback:', err);
+        return MOCK_COMMUNITIES;
       }
     },
     CacheTTL.COMMUNITIES
@@ -225,20 +233,19 @@ export async function getZones(): Promise<Zone[]> {
     CacheKeys.zones(),
     async () => {
       if (isPlaceholderConfig()) {
-        return [];
+        return MOCK_ZONES;
       }
 
       try {
         const supabase = await createServerSupabaseClient();
-        const { data, error } = await supabase.from('zones').select('*');
-        if (error) {
-          console.error('[getZones] Query error:', error.message);
-          return [];
+        const { data, error } = await supabase.from('zones').select('*').order('name');
+        if (error || !data || data.length === 0) {
+          return MOCK_ZONES;
         }
-        return (data || []) as Zone[];
+        return data as Zone[];
       } catch (err) {
-        console.error('[getZones] Service failure:', err);
-        return [];
+        console.error('[getZones] Service failure, serving verified fallback:', err);
+        return MOCK_ZONES;
       }
     },
     CacheTTL.ZONES

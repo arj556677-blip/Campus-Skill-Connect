@@ -107,10 +107,10 @@ export default function ProfileCard({ profile, matchScore }: ProfileCardProps) {
             <span className="truncate">{profile.institution.name}</span>
           </div>
         )}
-        {profile.zone && (
+        {(profile.zone || profile.campus?.location) && (
           <div className="flex items-center gap-1.5 truncate">
             <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="truncate">{profile.zone.name}</span>
+            <span className="truncate">{profile.zone?.name || profile.campus?.location}</span>
           </div>
         )}
       </div>

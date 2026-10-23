@@ -9,7 +9,12 @@ export const metadata = {
   description: 'Discover verified student engineers, researchers, and creators across colleges and regional innovation zones.',
 };
 
-export default async function PeoplePage() {
+export default async function PeoplePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ zone?: string; community?: string; role?: string }>;
+}) {
+  const params = await searchParams;
   const profiles = await getProfiles();
   const communities = await getCommunities();
   const zones = await getZones();
@@ -21,6 +26,9 @@ export default async function PeoplePage() {
           initialProfiles={profiles}
           communities={communities}
           zones={zones}
+          initialZone={params?.zone}
+          initialCommunity={params?.community}
+          initialRole={params?.role}
         />
       </div>
     </div>

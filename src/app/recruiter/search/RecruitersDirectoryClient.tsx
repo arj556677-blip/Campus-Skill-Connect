@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Profile, Zone } from '@/lib/types';
 import {
@@ -10,12 +10,22 @@ import {
   MapPin,
   ShieldCheck,
   UserPlus,
+  UserCheck,
   Check,
   MessageSquare,
   Sparkles,
   ExternalLink,
   Lock,
+  Clock,
+  Loader2,
 } from 'lucide-react';
+import {
+  getConnection,
+  sendConnectionRequest,
+  unfollowConnection,
+  CONNECTIONS_EVENT,
+  ConnectionStatus,
+} from '@/lib/connections/connection-store';
 
 interface RecruitersDirectoryClientProps {
   recruiters: Profile[];
@@ -56,17 +66,76 @@ export default function RecruitersDirectoryClient({
 }: RecruitersDirectoryClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('all');
-  const [connectingMap, setConnectingMap] = useState<Record<string, boolean>>({});
-  const [connectedMap, setConnectedMap] = useState<Record<string, boolean>>({});
+  const [connectionsMap, setConnectionsMap] = useState<
+    Record<string, { status: ConnectionStatus; isIncoming: boolean }>
+  >({});
+  const [actionLoadingMap, setActionLoadingMap] = useState<Record<string, boolean>>({});
 
-  const handleConnect = (recruiterId: string, e: React.MouseEvent) => {
+  // Synchronize connection states from central connection-store for uniform integration
+  useEffect(() => {
+    const syncAll = () => {
+      const map: Record<string, { status: ConnectionStatus; isIncoming: boolean }> = {};
+      for (const r of recruiters) {
+        const item = getConnection(r.id);
+        if (item) {
+          map[r.id] = { status: item.status, isIncoming: item.isIncoming };
+        } else {
+          map[r.id] = { status: 'none', isIncoming: false };
+        }
+      }
+      setConnectionsMap(map);
+    };
+
+    syncAll();
+    window.addEventListener(CONNECTIONS_EVENT, syncAll);
+    window.addEventListener('storage', syncAll);
+    return () => {
+      window.removeEventListener(CONNECTIONS_EVENT, syncAll);
+      window.removeEventListener('storage', syncAll);
+    };
+  }, [recruiters]);
+
+  const handleConnect = async (recruiter: Profile, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setConnectingMap((prev) => ({ ...prev, [recruiterId]: true }));
-    setTimeout(() => {
-      setConnectingMap((prev) => ({ ...prev, [recruiterId]: false }));
-      setConnectedMap((prev) => ({ ...prev, [recruiterId]: true }));
-    }, 500);
+    if (actionLoadingMap[recruiter.id]) return;
+
+    setActionLoadingMap((prev) => ({ ...prev, [recruiter.id]: true }));
+    try {
+      await sendConnectionRequest({
+        id: recruiter.id,
+        name: recruiter.display_name,
+        headline: recruiter.headline || 'Technical Recruiter',
+        avatar: recruiter.avatar_url || undefined,
+        role: recruiter.role,
+        institution: recruiter.zone?.name || 'Corporate Partner',
+      });
+
+      setConnectionsMap((prev) => ({
+        ...prev,
+        [recruiter.id]: { status: 'pending', isIncoming: false },
+      }));
+    } finally {
+      setActionLoadingMap((prev) => ({ ...prev, [recruiter.id]: false }));
+    }
+  };
+
+  const handleUnfollow = async (recruiter: Profile, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (actionLoadingMap[recruiter.id]) return;
+
+    setActionLoadingMap((prev) => ({ ...prev, [recruiter.id]: true }));
+    try {
+      await unfollowConnection(recruiter.id);
+
+      setConnectionsMap((prev) => ({
+        ...prev,
+        [recruiter.id]: { status: 'none', isIncoming: false },
+      }));
+    } finally {
+      setActionLoadingMap((prev) => ({ ...prev, [recruiter.id]: false }));
+    }
   };
 
   const filteredRecruiters = useMemo(() => {
@@ -116,7 +185,6 @@ export default function RecruitersDirectoryClient({
         </div>
       </div>
 
-
       {/* Search & Filter Toolbar */}
       <div className="rounded-3xl bg-white border border-slate-200 p-5 space-y-4 shadow-xs">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -149,7 +217,7 @@ export default function RecruitersDirectoryClient({
         </div>
       </div>
 
-      {/* Recruiter Cards Grid (with Limited Details) */}
+      {/* Recruiter Cards Grid */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs text-slate-500">
@@ -169,8 +237,8 @@ export default function RecruitersDirectoryClient({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRecruiters.map((recruiter) => {
               const compInfo = extractCompany(recruiter);
-              const isConnecting = connectingMap[recruiter.id];
-              const isConnected = connectedMap[recruiter.id];
+              const connInfo = connectionsMap[recruiter.id] || { status: 'none', isIncoming: false };
+              const isLoading = actionLoadingMap[recruiter.id];
 
               return (
                 <div
@@ -178,16 +246,11 @@ export default function RecruitersDirectoryClient({
                   className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs hover:shadow-md hover:border-blue-400 transition-all duration-300 flex flex-col justify-between space-y-5"
                 >
                   <div className="space-y-4">
-                    {/* Header: Company Badge & Active Status */}
+                    {/* Header: Company Badge (Hiring Active removed per user request) */}
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-bold text-blue-700">
                         <Building2 className="w-3.5 h-3.5 text-blue-600" />
                         <span>{compInfo.company}</span>
-                      </span>
-
-                      <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1.5 font-mono">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        Hiring Active
                       </span>
                     </div>
 
@@ -227,7 +290,7 @@ export default function RecruitersDirectoryClient({
                       </div>
                     </div>
 
-                    {/* Limited Details: Sourcing Focus & Bio */}
+                    {/* Sourcing Focus & Bio */}
                     <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
                       {recruiter.field && (
                         <div>
@@ -255,36 +318,61 @@ export default function RecruitersDirectoryClient({
                     </div>
                   </div>
 
-                  {/* Actions (Limited details & consent-based networking) */}
+                  {/* Actions: Uniform Connection & Chat Integration */}
                   <div className="pt-4 border-t border-slate-100 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => handleConnect(recruiter.id, e)}
-                        disabled={isConnecting || isConnected}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full text-xs font-bold transition-all shadow-xs ${
-                          isConnected
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-[#0f172a] hover:bg-black text-white'
-                        }`}
-                      >
-                        {isConnected ? (
-                          <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Request Sent</span>
-                          </>
-                        ) : isConnecting ? (
-                          <span>Connecting...</span>
-                        ) : (
-                          <>
-                            <UserPlus className="w-3.5 h-3.5" />
-                            <span>Connect</span>
-                          </>
-                        )}
-                      </button>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {connInfo.status === 'accepted' ? (
+                        /* Accepted Collab: Unfollow and Chat side by side (Chat strictly with connected people) */
+                        <>
+                          <button
+                            onClick={(e) => handleUnfollow(recruiter, e)}
+                            disabled={isLoading}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-all active:scale-95 shadow-xs"
+                            title="Unfollow and disconnect collaborator"
+                          >
+                            <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Unfollow</span>
+                          </button>
+
+                          <Link
+                            href={`/messages?recipientId=${encodeURIComponent(recruiter.id)}`}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-xs font-bold bg-[#1b59f8] hover:bg-blue-600 text-white transition-all shadow-xs active:scale-95"
+                            title={`Chat with ${recruiter.display_name}`}
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            <span>Chat</span>
+                          </Link>
+                        </>
+                      ) : connInfo.status === 'pending' && !connInfo.isIncoming ? (
+                        /* Request Sent: Immutable until acted upon by either user */
+                        <span className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs">
+                          <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                          <span>Request Sent</span>
+                        </span>
+                      ) : (
+                        /* Not connected: Connect button (NO chat button until connected) */
+                        <button
+                          onClick={(e) => handleConnect(recruiter, e)}
+                          disabled={isLoading}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full text-xs font-bold bg-[#0f172a] hover:bg-[#1b59f8] text-white transition-all shadow-xs active:scale-95 disabled:opacity-50"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Sending...</span>
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="w-3.5 h-3.5" />
+                              <span>Connect</span>
+                            </>
+                          )}
+                        </button>
+                      )}
 
                       <Link
                         href={`/profile/${recruiter.id}`}
-                        className="px-3.5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+                        className="p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all shrink-0"
                         title="View Public Profile"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />

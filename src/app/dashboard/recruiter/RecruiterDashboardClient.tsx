@@ -14,9 +14,12 @@ import {
   CheckCircle2,
   ArrowRight,
   Video,
+  Users,
   UserCog,
 } from 'lucide-react';
 import { Profile, Community, Zone } from '@/lib/types';
+import DashboardSessionGuard from '@/components/auth/DashboardSessionGuard';
+import CollabRequestsSection from '@/components/dashboard/CollabRequestsSection';
 
 interface RecruiterDashboardClientProps {
   profiles: Profile[];
@@ -60,6 +63,9 @@ export default function RecruiterDashboardClient({
 
   return (
     <div className="space-y-8">
+      {/* Session Security Guard: Disables browser back/previous button on authenticated dashboard */}
+      <DashboardSessionGuard />
+
       {/* ── TOP HERO BANNER ── */}
       <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs relative overflow-hidden">
         {/* Soft subtle glow wash */}
@@ -433,6 +439,22 @@ export default function RecruiterDashboardClient({
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* ── BENTO TILES ROW 3: CONNECTION & COLLABORATION REQUESTS ── */}
+      <div className="rounded-3xl bg-white border border-slate-200/90 p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-600" />
+              <span>Candidate Connection &amp; Collaboration Requests</span>
+            </h2>
+            <p className="text-xs text-slate-500 font-mono mt-0.5">
+              Review received connection requests from students or inspect pending sent outreach invitations
+            </p>
+          </div>
+        </div>
+        <CollabRequestsSection />
       </div>
     </div>
   );

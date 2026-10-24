@@ -9,6 +9,7 @@ import { Profile } from '@/lib/types';
 import WorkCard from '@/components/cards/WorkCard';
 import ProfileActions from '@/app/profile/[id]/ProfileActions';
 import SkillEvidenceBadge from './SkillEvidenceBadge';
+import ProfileExperienceTabs from '@/components/profile/ProfileExperienceTabs';
 import {
   ShieldCheck,
   Building,
@@ -288,7 +289,13 @@ export default async function PublicProfilePage({ params, searchParams }: Public
                   )}
 
                   <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] text-[var(--text-secondary)] border border-[var(--border)]">
-                    {targetProfile.role}
+                    {targetProfile.role === 'faculty'
+                      ? 'Faculty Mentor'
+                      : targetProfile.role === 'recruiter'
+                      ? 'Tech Recruiter'
+                      : targetProfile.role === 'admin'
+                      ? 'Admin'
+                      : 'Student Builder'}
                   </span>
                 </div>
 
@@ -369,28 +376,12 @@ export default async function PublicProfilePage({ params, searchParams }: Public
           </div>
         </div>
 
-        {/* Works Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
-              Published Evidence of Work ({visibleWorks.length})
-            </h2>
-          </div>
-
-          {visibleWorks.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleWorks.map((work) => (
-                <WorkCard key={work.id} work={work} />
-              ))}
-            </div>
-          ) : (
-            <div className="bento-card p-12 text-center space-y-3">
-              <p className="text-sm text-[var(--text-secondary)]">
-                No visible works under current viewing permissions.
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Works, Certificates & Badges, and Achievements Feed */}
+        <ProfileExperienceTabs
+          profile={targetProfile}
+          works={visibleWorks}
+          isOwner={isOwner}
+        />
       </div>
     </div>
   );

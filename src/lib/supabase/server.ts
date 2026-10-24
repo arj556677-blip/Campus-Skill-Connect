@@ -52,7 +52,7 @@ export async function getUser(): Promise<User | null> {
   try {
     const cookieStore = await cookies();
     const cscSession = cookieStore.get('csc_session')?.value;
-    const cscRole = cookieStore.get('csc_role')?.value as 'admin' | 'student' | 'recruiter' | undefined;
+    const cscRole = cookieStore.get('csc_role')?.value as 'admin' | 'student' | 'faculty' | 'recruiter' | undefined;
     const rawEmail = cookieStore.get('csc_user_email')?.value;
     const rawName = cookieStore.get('csc_user_name')?.value;
     const rawAvatar = cookieStore.get('csc_user_avatar')?.value;
@@ -63,6 +63,8 @@ export async function getUser(): Promise<User | null> {
         ? decodeURIComponent(rawEmail)
         : role === 'student'
         ? 'student@campus.edu'
+        : role === 'faculty'
+        ? 'faculty@campus.edu'
         : role === 'admin'
         ? 'admin@campus-skill-connect.dev'
         : 'recruiter@company.com';
@@ -70,11 +72,19 @@ export async function getUser(): Promise<User | null> {
         ? decodeURIComponent(rawName)
         : role === 'student'
         ? 'Student Builder'
+        : role === 'faculty'
+        ? 'Faculty Advisor'
         : role === 'admin'
         ? 'Administrator'
         : 'Talent Partner';
       const avatar = rawAvatar ? decodeURIComponent(rawAvatar) : '';
-      const id = role === 'student' ? 'user-1' : role === 'admin' ? 'user-admin' : 'user-recruiter';
+      const id = email.includes('ragav')
+        ? 'c0000000-0000-0000-0000-000000000001'
+        : role === 'recruiter'
+        ? 'c0000000-0000-0000-0000-000000000002'
+        : role === 'admin'
+        ? 'c0000000-0000-0000-0000-000000000003'
+        : 'c0000000-0000-0000-0000-000000000001';
 
       const syntheticUser: User = {
         id,

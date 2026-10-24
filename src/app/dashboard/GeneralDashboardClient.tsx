@@ -17,6 +17,7 @@ import {
   ArrowLeftRight,
 } from 'lucide-react';
 import { Work, Community, Profile } from '@/lib/types';
+import DashboardSessionGuard from '@/components/auth/DashboardSessionGuard';
 
 interface GeneralDashboardClientProps {
   works: Work[];
@@ -39,6 +40,9 @@ export default function GeneralDashboardClient({
 
   return (
     <div className="space-y-10">
+      {/* Session Security Guard: Disables browser back/previous button on authenticated dashboard */}
+      <DashboardSessionGuard />
+
       {/* ── TOP HERO BANNER ── */}
       <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-10 shadow-xs relative overflow-hidden">
         {/* Soft subtle glow wash */}
@@ -244,16 +248,16 @@ export default function GeneralDashboardClient({
               </div>
 
               <h3 className="text-lg font-bold text-slate-900 mt-4 group-hover:text-[#1b59f8] transition-colors">
-                Student Builder Command Center
+                Student Builder &amp; Faculty Command Center
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Empower your career through verified proof of work. Build with rule-based ATS resume validation, inspect incoming recruiter profile views, and launch collaboration sprint rooms.
+                Empower your career and research through verified proof of work. Build with rule-based ATS resume validation, publish research artifacts, inspect views, and launch collaboration sprint rooms.
               </p>
 
               <div className="mt-5 space-y-2 text-xs font-mono text-slate-700">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1b59f8]" />
-                  <span>Rule-Based ATS Resume Checklist</span>
+                  <span>Rule-Based ATS Resume &amp; Research Checklist</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1b59f8]" />
@@ -261,18 +265,18 @@ export default function GeneralDashboardClient({
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1b59f8]" />
-                  <span>WebRTC Pair-Programming Sprints</span>
+                  <span>WebRTC Pair-Programming &amp; Mentorship Sprints</span>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-              {isLoggedIn && currentRole === 'student' ? (
+              {isMounted && isLoggedIn && (currentRole === 'student' || currentRole === 'faculty') ? (
                 <Link
                   href="/dashboard/student"
                   className="w-full py-2.5 px-4 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
                 >
-                  <span>Open Your Student Hub</span>
+                  <span>Open Your {currentRole === 'faculty' ? 'Faculty Workspace' : 'Student Hub'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               ) : isLoggedIn ? (
@@ -291,7 +295,7 @@ export default function GeneralDashboardClient({
                     className="flex-1 py-2.5 px-4 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
                   >
                     <LogIn className="w-3.5 h-3.5" />
-                    <span>Log In as Student</span>
+                    <span>Log In to Campus</span>
                   </Link>
                   <Link
                     href="/dashboard/student"

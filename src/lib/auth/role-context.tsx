@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { firebaseAuth } from '@/lib/firebase/config';
 
-export type UserRoleType = 'admin' | 'student' | 'recruiter';
+export type UserRoleType = 'admin' | 'student' | 'faculty' | 'recruiter';
 
 export interface RoleUser {
   id: string;
@@ -51,6 +51,20 @@ export const ROLE_PERSONAS: Record<UserRoleType, RoleUser> = {
     dashboardUrl: '/dashboard/student',
     accentColor: 'violet',
     institution: 'Engineering & Computing',
+  },
+  faculty: {
+    id: 'user-faculty',
+    name: 'Dr. Anita Sengupta',
+    role: 'faculty',
+    roleLabel: 'Faculty Mentor',
+    email: 'faculty@campus.edu',
+    title: 'Associate Professor & Systems Security Mentor',
+    badge: 'FACULTY MENTOR',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80',
+    initials: 'AS',
+    dashboardUrl: '/dashboard/student',
+    accentColor: 'indigo',
+    institution: 'School of Computing & Engineering',
   },
   recruiter: {
     id: 'user-recruiter',
@@ -224,7 +238,13 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           setCurrentRole(role);
 
           const roleLabel =
-            role === 'admin' ? 'Admin' : role === 'recruiter' ? 'Tech Recruiter' : 'Student Builder';
+            role === 'admin'
+              ? 'Admin'
+              : role === 'recruiter'
+                ? 'Tech Recruiter'
+                : role === 'faculty'
+                  ? 'Faculty Mentor'
+                  : 'Student Builder';
           const dashboardUrl =
             role === 'admin'
               ? '/admin'
@@ -240,13 +260,13 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             roleLabel,
             email: user.email || '',
             title: profile?.headline || 'Campus Skill Connect Member',
-            badge: role.toUpperCase(),
+            badge: role === 'faculty' ? 'FACULTY MENTOR' : role.toUpperCase(),
             avatar:
               profile?.avatar_path ||
               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
             initials: resolvedName.slice(0, 2).toUpperCase(),
             dashboardUrl,
-            accentColor: role === 'admin' ? 'rose' : role === 'recruiter' ? 'emerald' : 'violet',
+            accentColor: role === 'admin' ? 'rose' : role === 'recruiter' ? 'emerald' : role === 'faculty' ? 'indigo' : 'violet',
           };
 
           setUserProfile(resolvedProfile);
@@ -341,7 +361,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       avatar: resolvedAvatar,
       initials: resolvedInitials,
       role,
-      roleLabel: role === 'admin' ? 'Admin' : role === 'recruiter' ? 'Tech Recruiter' : 'Student Builder',
+      roleLabel:
+        role === 'admin'
+          ? 'Admin'
+          : role === 'recruiter'
+            ? 'Tech Recruiter'
+            : role === 'faculty'
+              ? 'Faculty Mentor'
+              : 'Student Builder',
       dashboardUrl: basePersona.dashboardUrl,
     };
 
@@ -359,7 +386,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     }
 
     const target = redirectUrl ? decodeURIComponent(redirectUrl) : ROLE_PERSONAS[role].dashboardUrl;
-    window.location.assign(target);
+    window.location.replace(target);
   };
 
   const switchRole = (role: UserRoleType, redirect: boolean = false) => {
@@ -373,7 +400,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       setSessionCookies(role, newProfile);
     }
     if (redirect) {
-      window.location.assign(ROLE_PERSONAS[role].dashboardUrl);
+      window.location.replace(ROLE_PERSONAS[role].dashboardUrl);
     }
   };
 

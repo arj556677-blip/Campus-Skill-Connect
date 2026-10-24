@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRole, UserRoleType, ROLE_PERSONAS } from '@/lib/auth/role-context';
@@ -59,13 +59,32 @@ function SignInContent() {
 
   const redirectParam = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : null;
 
-  // If already logged in, redirect away from sign-in immediately
-  React.useEffect(() => {
+  // Session guard: if user already has an active authenticated session, prevent seeing sign-in
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasActiveSession =
+        localStorage.getItem('csc_session') === 'active' ||
+        document.cookie.includes('csc_session=active');
+      if (hasActiveSession) {
+        const savedRole = localStorage.getItem('csc_role');
+        const target =
+          redirectParam ||
+          (savedRole === 'admin'
+            ? '/admin'
+            : savedRole === 'recruiter'
+            ? '/dashboard/recruiter'
+            : '/dashboard/student');
+        window.location.replace(target);
+        return;
+      }
+    }
+
     if (isMounted && isLoggedIn && currentUser) {
       const destination = redirectParam || currentUser.dashboardUrl || '/dashboard/student';
       router.replace(destination);
     }
   }, [isMounted, isLoggedIn, currentUser, redirectParam, router]);
+
 
   // Unified form state
   const [email, setEmail] = useState(() => searchParams.get('email') || '');
@@ -83,6 +102,9 @@ function SignInContent() {
     }
     if (lower.includes('recruiter') || lower.includes('@stripe') || lower.includes('@company') || lower.includes('@google.com')) {
       return 'recruiter';
+    }
+    if (lower.includes('faculty') || lower.includes('prof') || lower.includes('mentor') || lower.includes('dr.')) {
+      return 'faculty';
     }
     return 'student';
   };
@@ -409,11 +431,11 @@ function SignInContent() {
             <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block text-center">
               1-Click Instant Demo Testing
             </span>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
                 onClick={() => handleQuickDemo('student')}
-                className="py-2 px-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
+                className="py-2 px-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
               >
                 <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
                 <span>Student</span>
@@ -421,8 +443,17 @@ function SignInContent() {
 
               <button
                 type="button"
+                onClick={() => handleQuickDemo('faculty')}
+                className="py-2 px-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
+              >
+                <Zap className="w-3 h-3 text-indigo-600 fill-indigo-600" />
+                <span>Faculty</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => handleQuickDemo('recruiter')}
-                className="py-2 px-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
+                className="py-2 px-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
               >
                 <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600" />
                 <span>Recruiter</span>
@@ -431,7 +462,7 @@ function SignInContent() {
               <button
                 type="button"
                 onClick={() => handleQuickDemo('admin')}
-                className="py-2 px-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
+                className="py-2 px-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200 shadow-xs flex items-center justify-center gap-1 active:scale-95"
               >
                 <Zap className="w-3 h-3 text-rose-600 fill-rose-600" />
                 <span>Admin</span>

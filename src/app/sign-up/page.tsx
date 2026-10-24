@@ -10,9 +10,11 @@ import {
   Mail,
   Lock,
   User,
+  Building,
   ArrowRight,
   GraduationCap,
   Briefcase,
+  BookOpen,
   CheckCircle2,
   AlertCircle,
   Eye,
@@ -74,7 +76,7 @@ export default function SignUpPage() {
   const [step, setStep] = useState<'details' | 'otp'>('details');
 
   // Form Fields
-  const [accountType, setAccountType] = useState<'student' | 'recruiter'>('student');
+  const [accountType, setAccountType] = useState<'student' | 'faculty' | 'recruiter'>('student');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,6 +84,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [communityId, setCommunityId] = useState(MOCK_COMMUNITIES[0].id);
+  const [facultyDepartment, setFacultyDepartment] = useState('Computer Science & Engineering');
   const [companyName, setCompanyName] = useState('Stripe');
   const [consentGiven, setConsentGiven] = useState(false);
 
@@ -262,8 +265,9 @@ export default function SignUpPage() {
         options: {
           data: {
             display_name: name.trim(),
-            institution_id: accountType === 'student' ? communityId : null,
+            institution_id: accountType === 'student' || accountType === 'faculty' ? communityId : null,
             company_name: accountType === 'recruiter' ? companyName : null,
+            field: accountType === 'faculty' ? facultyDepartment : null,
             role: accountType,
           },
         },
@@ -377,32 +381,63 @@ export default function SignUpPage() {
           {/* ── STEP 1: ACCOUNT DETAILS ── */}
           {step === 'details' && (
             <>
-              {/* Account Type Toggle */}
-              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl">
-                <button
-                  type="button"
-                  onClick={() => setAccountType('student')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                    accountType === 'student'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4 text-[#1b59f8]" />
-                  <span>Student Builder</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAccountType('recruiter')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                    accountType === 'recruiter'
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Briefcase className="w-4 h-4 text-emerald-600" />
-                  <span>Recruiter</span>
-                </button>
+              {/* Account Type 3-Way Toggle */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Select Your Campus Role
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountType('student');
+                      setErrorMsg(null);
+                    }}
+                    className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-all text-center ${
+                      accountType === 'student'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    <GraduationCap className="w-3.5 h-3.5 text-[#1b59f8]" />
+                    <span className="truncate">Student</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountType('faculty');
+                      setErrorMsg(null);
+                    }}
+                    className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-all text-center ${
+                      accountType === 'faculty'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                    <span className="truncate">Faculty</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountType('recruiter');
+                      setErrorMsg(null);
+                    }}
+                    className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-semibold transition-all text-center ${
+                      accountType === 'recruiter'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="truncate">Recruiter</span>
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-500 px-1 font-mono text-center">
+                  {accountType === 'student' && 'Build portfolio & share code proof with recruiters.'}
+                  {accountType === 'faculty' && 'Publish academic lab research & mentor student builders.'}
+                  {accountType === 'recruiter' && 'Source vetted emerging talent through verifiable works.'}
+                </p>
               </div>
 
               {/* Form */}

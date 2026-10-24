@@ -1,37 +1,45 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, Server, Database } from 'lucide-react';
+import { useRole } from '@/lib/auth/role-context';
 
 export default function Footer() {
+  const { currentRole, isLoggedIn, isMounted } = useRole();
+  const isAdmin = isMounted && isLoggedIn && currentRole === 'admin';
+
   return (
     <footer className="mt-auto border-t border-slate-200 bg-[#f8fafc] text-slate-800">
-      {/* Infrastructure Telemetry Bar */}
-      <div className="border-b border-slate-200/80 bg-white py-3 px-4 text-xs font-mono">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-slate-500">
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Real-Time High-Speed Network Active
-            </span>
-            <span className="hidden sm:inline text-slate-300">|</span>
-            <span className="hidden sm:flex items-center gap-1.5 text-slate-600">
-              <Server className="w-3.5 h-3.5 text-blue-600" />
-              Secure Edge Network &amp; DDoS Protection
-            </span>
-            <span className="hidden md:inline text-slate-300">|</span>
-            <span className="hidden md:flex items-center gap-1.5 text-slate-600">
-              <Database className="w-3.5 h-3.5 text-indigo-600" />
-              Tenant-Isolated Data Security &amp; Encryption
-            </span>
-          </div>
+      {/* Infrastructure Telemetry Bar — Visible strictly to Platform Administrators only */}
+      {isAdmin && (
+        <div className="border-b border-slate-200/80 bg-white py-3 px-4 text-xs font-mono animate-in fade-in duration-200">
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-slate-500">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Redis 7: In-Memory Cache-Aside &amp; PubSub Active
+              </span>
+              <span className="hidden sm:inline text-slate-300">|</span>
+              <span className="hidden sm:flex items-center gap-1.5 text-slate-600">
+                <Server className="w-3.5 h-3.5 text-blue-600" />
+                NGINX 1.25 Edge Proxy &amp; Rate Zones Ready
+              </span>
+              <span className="hidden md:inline text-slate-300">|</span>
+              <span className="hidden md:flex items-center gap-1.5 text-slate-600">
+                <Database className="w-3.5 h-3.5 text-indigo-600" />
+                PostgreSQL 15 + RLS 23 Tables
+              </span>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] text-blue-700 font-bold font-mono">
-              Multi-Campus Federation Active
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] text-blue-700 font-bold font-mono">
+                Multi-Campus Federation Active
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
@@ -50,7 +58,7 @@ export default function Footer() {
             </p>
             <div className="mt-4 flex items-center gap-2 text-xs text-slate-600 font-medium">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Granular visibility control & DPDP Act 2023 aligned</span>
+              <span>Granular visibility control &amp; DPDP Act 2023 aligned</span>
             </div>
           </div>
 
@@ -124,9 +132,15 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-slate-500">
               <li>
-                <Link href="/admin" className="hover:text-[#1b59f8] transition-colors">
-                  Admin &amp; Audit Log
-                </Link>
+                {isAdmin ? (
+                  <Link href="/admin" className="hover:text-[#1b59f8] transition-colors">
+                    Admin &amp; Audit Log
+                  </Link>
+                ) : (
+                  <Link href="/support" className="hover:text-[#1b59f8] transition-colors">
+                    Support &amp; Safety Guide
+                  </Link>
+                )}
               </li>
               <li>
                 <Link href="/support" className="hover:text-[#1b59f8] transition-colors">
@@ -172,6 +186,14 @@ export default function Footer() {
             <Link href="/profile/privacy" className="hover:text-[#1b59f8] transition-colors">
               Data Rights
             </Link>
+            {isAdmin && (
+              <>
+                <span className="text-slate-300">•</span>
+                <span className="text-slate-400 font-mono text-[11px]">
+                  Next.js 16 • Redis 7 • PostgreSQL 15 • NGINX
+                </span>
+              </>
+            )}
             <span className="text-slate-300">•</span>
             <span className="text-slate-400 font-mono text-[11px]">
               DPDP Act 2023 Aligned

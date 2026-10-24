@@ -53,8 +53,8 @@ export default function PeopleClient({
       // 2. Exclude current logged in user from talent collaboration directory
       if (isLoggedIn && currentUser) {
         if (p.id === currentUser.id) return false;
-        if ((p as unknown as { user_id?: string }).user_id === currentUser.id) return false;
-        if (currentUser.email && p.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) return false;
+        const pEmail = (p as unknown as { email?: string })?.email;
+        if (currentUser.email && pEmail && pEmail.toLowerCase() === currentUser.email.toLowerCase()) return false;
         if (currentUser.name && p.display_name && p.display_name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) return false;
         // Seed/demo persona match for Ragav
         const curName = (currentUser.name || '').toLowerCase();
@@ -217,7 +217,7 @@ export default function PeopleClient({
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {role === 'all' ? 'All Roles' : role}
+                {role === 'all' ? 'All Roles' : role === 'student' ? 'Students' : role === 'faculty' ? 'Faculty Mentors' : 'Recruiters'}
               </button>
             ))}
           </div>

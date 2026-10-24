@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const user = await getUser();
   const profile = await getUserProfile();
 
-  if (profile?.role === 'student') {
+  if (profile?.role === 'student' || profile?.role === 'faculty') {
     redirect('/dashboard/student');
   } else if (profile?.role === 'recruiter') {
     redirect('/dashboard/recruiter');

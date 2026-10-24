@@ -7,6 +7,7 @@ import { Work } from '@/lib/types';
 import WorkCard from '@/components/cards/WorkCard';
 import { Search, Plus, Compass, SlidersHorizontal, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { WORK_CATEGORIES } from '@/lib/utils';
+import { useRole } from '@/lib/auth/role-context';
 
 interface ShowcaseClientProps {
   initialWorks: Work[];
@@ -17,6 +18,7 @@ const PAGE_SIZE = 24;
 export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { currentRole, isMounted } = useRole();
 
   // Read URL-synced states
   const selectedCategory = searchParams.get('category') || 'all';
@@ -87,13 +89,15 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
           </p>
         </div>
 
-        <Link
-          href="/works/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-colors self-start md:self-end active:scale-95"
-        >
-          <Plus className="w-4 h-4" aria-hidden="true" />
-          <span>Publish Work Item</span>
-        </Link>
+        {(!isMounted || currentRole !== 'admin') && (
+          <Link
+            href="/works/new"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-colors self-start md:self-end active:scale-95"
+          >
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            <span>Publish Work Item</span>
+          </Link>
+        )}
       </div>
 
       {/* Filter and Search Bar with URL-synced state */}

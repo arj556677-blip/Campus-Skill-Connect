@@ -68,13 +68,16 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL(dest, request.url));
     }
 
-    // Protected member routes
+    // Protected member routes — only authorized/logged-in members may access
     const protectedRoutes = [
       '/works/new',
       '/messages',
       '/dashboard/student',
       '/dashboard/recruiter',
       '/profile/edit',
+      '/people',
+      '/collaborate',
+      '/cv',
     ];
 
     const isProtectedRoute = protectedRoutes.some((route) =>
@@ -86,6 +89,23 @@ export async function updateSession(request: NextRequest) {
       url.pathname = '/sign-in';
       url.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(url);
+    }
+
+    // Admins manage the platform and do not share/publish work items
+    if (request.nextUrl.pathname.startsWith('/works/new')) {
+      if (cscRole === 'admin') {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (profile?.role === 'admin') {
+          return NextResponse.redirect(new URL('/admin', request.url));
+        }
+      }
     }
 
     // Admin routes — strictly enforced by verified database role check or admin role session

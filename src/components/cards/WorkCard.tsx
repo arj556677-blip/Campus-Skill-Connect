@@ -11,7 +11,7 @@ interface WorkCardProps {
 }
 
 export default function WorkCard({ work }: WorkCardProps) {
-  const [likes, setLikes] = useState(work.likes_count || 12);
+  const [likes, setLikes] = useState(work.likes_count ?? 0);
   const [liked, setLiked] = useState(false);
 
   const handleLike = (e: React.MouseEvent) => {
@@ -120,7 +120,7 @@ export default function WorkCard({ work }: WorkCardProps) {
             </button>
             <span className="flex items-center gap-1 text-slate-400">
               <Eye className="w-3.5 h-3.5" />
-              <span className="text-[11px] font-semibold text-slate-600">{work.views_count || 120}</span>
+              <span className="text-[11px] font-semibold text-slate-600">{work.views_count ?? 0}</span>
             </span>
           </div>
         </div>

@@ -120,10 +120,25 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                     {profile.display_name}
                   </h1>
-                  <span className="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200">
-                    {profile.role}
+                  <span
+                    className={`text-[10px] uppercase font-mono font-bold px-2.5 py-0.5 rounded-full border ${
+                      profile.role === 'faculty'
+                        ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                        : profile.role === 'recruiter'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : profile.role === 'admin'
+                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : 'bg-blue-50 text-[#1b59f8] border-blue-200'
+                    }`}
+                  >
+                    {profile.role === 'faculty'
+                      ? 'Faculty Mentor'
+                      : profile.role === 'recruiter'
+                      ? 'Tech Recruiter'
+                      : profile.role === 'admin'
+                      ? 'Admin'
+                      : 'Student Builder'}
                   </span>
-                  
                   {/* Dynamic Redis Presence: Online only if active in Redis */}
                   <ProfilePresenceBadge
                     profileId={profile.id}

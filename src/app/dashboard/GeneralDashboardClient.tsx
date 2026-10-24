@@ -111,20 +111,20 @@ export default function GeneralDashboardClient({
         {/* Platform-wide Quick Stats */}
         <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-6 font-mono">
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900">4,820+</p>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">Verified Student Builders</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-slate-900">Student Profiles</p>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">Verified Academic Network</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#1b59f8]">{communities.length} Campuses</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-[#1b59f8]">{communities.length} Campuses</p>
             <p className="text-xs text-slate-500 font-sans mt-0.5">Federated Universities</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-700">142</p>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">Enterprise Tech Recruiters</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-emerald-700">Corporate Access</p>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">Screened Tech Recruiters</p>
           </div>
           <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-indigo-700">PostgreSQL</p>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">RLS Row-Level Security</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-indigo-700">Data Isolation</p>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">Strict Tenant Security</p>
           </div>
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function GeneralDashboardClient({
                 Admin &amp; Operations Dashboard
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Full root governance over the campus network. Review plagiarism flags in the moderation queue, whitelist university domains, inspect PostgreSQL RLS policies, and monitor Redis cache telemetry.
+                Full root governance over the campus network. Review plagiarism flags in the moderation queue, whitelist university domains, inspect access security policies, and monitor real-time network telemetry.
               </p>
 
               <div className="mt-5 space-y-2 text-xs font-mono text-slate-700">
@@ -231,16 +231,16 @@ export default function GeneralDashboardClient({
               </div>
 
               <h3 className="text-lg font-bold text-slate-900 mt-4 group-hover:text-[#1b59f8] transition-colors">
-                Student Builder Command Center
+                Student Builder &amp; Faculty Command Center
               </h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Empower your career through verified proof of work. Build with rule-based ATS resume validation, inspect incoming recruiter profile views, and launch collaboration sprint rooms.
+                Empower your career and research through verified proof of work. Build with rule-based ATS resume validation, publish research artifacts, inspect views, and launch collaboration sprint rooms.
               </p>
 
               <div className="mt-5 space-y-2 text-xs font-mono text-slate-700">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1b59f8]" />
-                  <span>Rule-Based ATS Resume Checklist</span>
+                  <span>Rule-Based ATS Resume &amp; Research Checklist</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1b59f8]" />
@@ -248,18 +248,18 @@ export default function GeneralDashboardClient({
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1b59f8]" />
-                  <span>WebRTC Pair-Programming Sprints</span>
+                  <span>WebRTC Pair-Programming &amp; Mentorship Sprints</span>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-              {isMounted && isLoggedIn && currentRole === 'student' ? (
+              {isMounted && isLoggedIn && (currentRole === 'student' || currentRole === 'faculty') ? (
                 <Link
                   href="/dashboard/student"
                   className="w-full py-2.5 px-4 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
                 >
-                  <span>Open Your Student Hub</span>
+                  <span>Open Your {currentRole === 'faculty' ? 'Faculty Workspace' : 'Student Hub'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               ) : (
@@ -269,7 +269,7 @@ export default function GeneralDashboardClient({
                     className="flex-1 py-2.5 px-4 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
                   >
                     <LogIn className="w-3.5 h-3.5" />
-                    <span>Log In as Student</span>
+                    <span>Log In to Campus</span>
                   </Link>
                   <Link
                     href="/dashboard/student"

@@ -94,9 +94,17 @@ export default function PrivacyDashboardPage() {
             <span>Return to Profile Settings</span>
           </Link>
 
-          <span className="text-[10px] uppercase tracking-wider text-emerald-800 font-bold px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-            DPDPA 2023 Compliant
-          </span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/privacy"
+              className="text-xs font-bold text-[#1b59f8] hover:underline"
+            >
+              Full Legal Privacy Policy ↗
+            </Link>
+            <span className="text-[10px] uppercase tracking-wider text-emerald-800 font-bold px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+              DPDPA 2023 Compliant
+            </span>
+          </div>
         </div>
 
         {/* Header */}
@@ -177,7 +185,7 @@ export default function PrivacyDashboardPage() {
                 <span>Only Me (Private)</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Enforced by Postgres Row Level Security. Never readable by any other user or search query.
+                Enforced by cryptographically isolated tenant security. Never readable by any other user or search query.
               </p>
               <ul className="text-[11px] space-y-1 text-slate-500 list-disc list-inside">
                 <li>Draft projects and unpublished works</li>

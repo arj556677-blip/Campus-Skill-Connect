@@ -58,18 +58,18 @@ User message: ${lastUserMessage}`,
       if (lastUserMessage.toLowerCase().includes('faang') || lastUserMessage.toLowerCase().includes('backend')) {
         reply = `### Technical Assessment for Scalable Backend Roles:
 1. **Highlight Your Systems Work**: Evidence demonstrating cache invalidation, sliding window rate limiting, and connection pools shows real depth. Interviewers specifically drill on race conditions (Cache Stampede, Thundering Herd, Write-Through vs Write-Back).
-2. **PostgreSQL RLS as Security Proof**: Emphasize multi-tenant row-level security policies and canonical schema isolation rather than client-only filters.
-3. **Recommended Next Challenge**: Implement a distributed consensus or leader-election demo using Redis Redlock or Raft.`;
-      } else if (lastUserMessage.toLowerCase().includes('interview') || lastUserMessage.toLowerCase().includes('redis')) {
+2. **Access Control as Security Proof**: Emphasize multi-tenant cryptographic row security policies and canonical schema isolation rather than client-only filters.
+3. **Recommended Next Challenge**: Implement a distributed consensus or leader-election demo using state sync or Raft.`;
+      } else if (lastUserMessage.toLowerCase().includes('interview') || lastUserMessage.toLowerCase().includes('systems')) {
         reply = `### Mock Interview Drill: In-Memory Systems & State
 Here are 3 core questions you should prepare for:
 1. **Sliding Window vs Token Bucket**: Why choose sorted sets for sliding-window rate limiting instead of a fixed counter? *(Hint: Fixed counters suffer from boundary bursts where 2x requests can slip through at window resets).*
 2. **Cache Eviction Under Pressure**: In a high-traffic campus system, what eviction policy would you configure (LRU, LFU, or volatile-ttl) and why?
-3. **Distributed Invalidation**: When a user modifies visibility in PostgreSQL, how do you prevent stale cache reads across multiple edge nodes?`;
+3. **Distributed Invalidation**: When a user modifies visibility in the primary database, how do you prevent stale cache reads across multiple edge nodes?`;
       } else if (lastUserMessage.toLowerCase().includes('ats') || lastUserMessage.toLowerCase().includes('resume')) {
         reply = `### Resume ATS Optimization Checklist:
 1. **Quantification**: Ensure each bullet item has an explicit, measurable impact: e.g., *"Reduced p99 database query latency from 140ms to 8ms"*.
-2. **Keyword Density**: Include standard industry skills you have actually used: *RESTful API, SSR Auth, CI/CD, Redis Pub/Sub, Docker Orchestration*.
+2. **Keyword Density**: Include standard industry skills you have actually used: *RESTful API, SSR Auth, CI/CD, Event Streaming, Container Orchestration*.
 3. **Format**: Use a single-column layout with clean headings for optimal parsing across standard Applicant Tracking Systems.`;
       } else {
         reply = `I am your Campus Career & Engineering Copilot!

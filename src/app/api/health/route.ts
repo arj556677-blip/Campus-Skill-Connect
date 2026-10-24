@@ -52,9 +52,9 @@ export async function GET() {
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
     services: {
-      nextjs: { status: 'healthy', latencyMs: Date.now() - startTime },
-      redisRateLimiter: { status: redisStatus, latencyMs: redisPingMs },
-      supabaseDatabase: { status: supabaseStatus, latencyMs: supabaseLatencyMs },
+      appGateway: { status: 'healthy', latencyMs: Date.now() - startTime },
+      edgeCacheService: { status: redisStatus, latencyMs: redisPingMs },
+      persistenceStore: { status: supabaseStatus, latencyMs: supabaseLatencyMs },
     },
   };
 

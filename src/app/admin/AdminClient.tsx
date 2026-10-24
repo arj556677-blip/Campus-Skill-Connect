@@ -58,9 +58,16 @@ const DEFAULT_RECRUITERS: Profile[] = [
     headline: 'Senior University Talent Partner @ Stripe',
     bio: 'Leading distributed systems and new-grad engineering recruitment for Stripe Core Infrastructure.',
     role: 'recruiter',
+    institution_id: null,
+    campus_id: null,
+    zone_id: null,
+    field: null,
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
     profile_visibility: 'worldwide',
     is_verified: true,
+    github_username: null,
+    linkedin_url: null,
+    website_url: null,
     created_at: '2026-01-10T10:00:00Z',
     updated_at: '2026-10-15T12:00:00Z',
   },
@@ -70,9 +77,16 @@ const DEFAULT_RECRUITERS: Profile[] = [
     headline: 'Engineering Lead & Campus Scout @ Google Cloud',
     bio: 'Scouting top builder talent across WebRTC, low-latency distributed storage, and edge computing.',
     role: 'recruiter',
+    institution_id: null,
+    campus_id: null,
+    zone_id: null,
+    field: null,
     avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
     profile_visibility: 'worldwide',
     is_verified: true,
+    github_username: null,
+    linkedin_url: null,
+    website_url: null,
     created_at: '2026-02-01T09:00:00Z',
     updated_at: '2026-10-18T14:30:00Z',
   },
@@ -82,9 +96,16 @@ const DEFAULT_RECRUITERS: Profile[] = [
     headline: 'AI Research Talent Lead @ Scale AI',
     bio: 'Sourcing machine learning researchers with verified proof of work in PyTorch, transformers, and multimodal vision.',
     role: 'recruiter',
+    institution_id: null,
+    campus_id: null,
+    zone_id: null,
+    field: null,
     avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
     profile_visibility: 'worldwide',
     is_verified: true,
+    github_username: null,
+    linkedin_url: null,
+    website_url: null,
     created_at: '2026-02-15T11:00:00Z',
     updated_at: '2026-10-19T16:00:00Z',
   },
@@ -94,9 +115,16 @@ const DEFAULT_RECRUITERS: Profile[] = [
     headline: 'Systems Engineering Recruiter @ Datadog',
     bio: 'Hiring new grads passionate about high-throughput distributed tracing, eBPF, and Rust.',
     role: 'recruiter',
+    institution_id: null,
+    campus_id: null,
+    zone_id: null,
+    field: null,
     avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
     profile_visibility: 'worldwide',
     is_verified: true,
+    github_username: null,
+    linkedin_url: null,
+    website_url: null,
     created_at: '2026-03-01T08:00:00Z',
     updated_at: '2026-10-20T10:00:00Z',
   },
@@ -121,18 +149,28 @@ export default function AdminClient({
     {
       id: 'rep-3',
       reporter_id: 'user-1',
-      target_type: 'work',
+      target_type: 'work' as const,
       target_id: 'work-consensus-raft',
       reason: 'Potential MIT license attribution omission in repository README',
       details: 'The submitted Raft consensus benchmark repository replicates established reference code without citing the original academic authors.',
-      status: 'pending',
+      status: 'pending' as const,
       created_at: '2026-10-22T11:45:00Z',
       reporter: {
         id: 'user-1',
         display_name: 'Alex Rivera',
         headline: 'Full-Stack Engineer & Distributed Systems Explorer',
         bio: '',
-        role: 'student',
+        role: 'student' as const,
+        institution_id: null,
+        campus_id: null,
+        zone_id: null,
+        field: null,
+        avatar_url: null,
+        profile_visibility: 'public' as const,
+        is_verified: false,
+        github_username: null,
+        linkedin_url: null,
+        website_url: null,
         created_at: '2026-01-10T10:00:00Z',
         updated_at: '2026-10-15T12:00:00Z',
       },
@@ -140,18 +178,28 @@ export default function AdminClient({
     {
       id: 'rep-4',
       reporter_id: 'user-4',
-      target_type: 'comment',
+      target_type: 'profile' as const,
       target_id: 'comm-spam-node',
       reason: 'Automated advertising bot link in collaborative sprint room',
       details: 'User injected external promotional URL inside the WebRTC live sprint chat channel.',
-      status: 'pending',
+      status: 'pending' as const,
       created_at: '2026-10-23T08:15:00Z',
       reporter: {
         id: 'user-4',
         display_name: 'Dr. Anita Sengupta',
         headline: 'Associate Professor & Systems Security Mentor',
         bio: '',
-        role: 'faculty',
+        role: 'faculty' as const,
+        institution_id: null,
+        campus_id: null,
+        zone_id: null,
+        field: null,
+        avatar_url: null,
+        profile_visibility: 'public' as const,
+        is_verified: false,
+        github_username: null,
+        linkedin_url: null,
+        website_url: null,
         created_at: '2026-01-10T10:00:00Z',
         updated_at: '2026-10-15T12:00:00Z',
       },
@@ -159,7 +207,7 @@ export default function AdminClient({
   ]);
   const [resolvedReports, setResolvedReports] = useState<string[]>([]);
   const [inspectedReport, setInspectedReport] = useState<Report | null>(null);
-  const [reportFilter, setReportFilter] = useState<'all' | 'work' | 'profile' | 'comment' | 'resolved'>('all');
+  const [reportFilter, setReportFilter] = useState<'all' | 'work' | 'profile' | 'resolved'>('all');
   const [reportSearch, setReportSearch] = useState('');
 
   // Campus state
@@ -340,13 +388,12 @@ export default function AdminClient({
       if (reportFilter === 'resolved' && !isResolved) return false;
       if (reportFilter === 'work' && report.target_type !== 'work') return false;
       if (reportFilter === 'profile' && report.target_type !== 'profile') return false;
-      if (reportFilter === 'comment' && report.target_type !== 'comment') return false;
       if (reportFilter === 'all' && isResolved) return false;
 
       if (reportSearch.trim()) {
         const q = reportSearch.toLowerCase();
         const matchesReason = report.reason.toLowerCase().includes(q);
-        const matchesDetails = report.details.toLowerCase().includes(q);
+        const matchesDetails = (report.details ?? '').toLowerCase().includes(q);
         const matchesTarget = report.target_id.toLowerCase().includes(q);
         const matchesReporter = report.reporter?.display_name?.toLowerCase().includes(q);
         return matchesReason || matchesDetails || matchesTarget || matchesReporter;
@@ -362,7 +409,7 @@ export default function AdminClient({
 
       if (campusSearch.trim()) {
         const q = campusSearch.toLowerCase();
-        return comm.name.toLowerCase().includes(q) || comm.domain.toLowerCase().includes(q);
+        return comm.name.toLowerCase().includes(q) || (comm.domain ?? '').toLowerCase().includes(q);
       }
       return true;
     });
@@ -395,7 +442,7 @@ export default function AdminClient({
         const matchesActor = log.actor?.display_name?.toLowerCase().includes(q) || log.actor_id.toLowerCase().includes(q);
         const matchesAction = log.action.toLowerCase().includes(q);
         const matchesTarget = log.target_resource.toLowerCase().includes(q);
-        const matchesIp = log.ip_address.toLowerCase().includes(q);
+        const matchesIp = (log.ip_address ?? '').toLowerCase().includes(q);
         return matchesActor || matchesAction || matchesTarget || matchesIp;
       }
       return true;
@@ -884,7 +931,7 @@ export default function AdminClient({
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
                         <img
-                          src={comm.logo_url}
+                          src={comm.logo_url ?? undefined}
                           alt={comm.name}
                           className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
                         />
@@ -1156,48 +1203,51 @@ export default function AdminClient({
           </div>
 
           {/* Interactive JSON Inspector Drawer */}
-          {selectedAuditLog && (
-            <div className="mt-4 p-5 rounded-2xl bg-[#0f172a] text-emerald-400 border border-slate-800 shadow-xl space-y-3 font-mono animate-in fade-in duration-150">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-bold text-white">
-                    Audit Log Cryptographic Inspector • ID: {selectedAuditLog.id}
-                  </span>
+          {selectedAuditLog && (() => {
+            const log = selectedAuditLog!;
+            return (
+              <div className="mt-4 p-5 rounded-2xl bg-[#0f172a] text-emerald-400 border border-slate-800 shadow-xl space-y-3 font-mono animate-in fade-in duration-150">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-white">
+                      Audit Log Cryptographic Inspector • ID: {log.id}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleCopyLogPayload(log)}
+                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-white text-[11px] flex items-center gap-1 transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedLogId === log.id ? 'Copied!' : 'Copy JSON'}</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedAuditLog(null)}
+                      className="text-slate-400 hover:text-white p-1"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleCopyLogPayload(selectedAuditLog)}
-                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-white text-[11px] flex items-center gap-1 transition-colors"
-                  >
-                    <Copy className="w-3 h-3" />
-                    <span>{copiedLogId === selectedAuditLog.id ? 'Copied!' : 'Copy JSON'}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedAuditLog(null)}
-                    className="text-slate-400 hover:text-white p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              <pre className="text-xs overflow-x-auto text-emerald-300 leading-relaxed max-h-60 no-scrollbar">
-                {JSON.stringify(
-                  {
-                    ...selectedAuditLog,
-                    cryptographic_envelope: {
-                      algorithm: 'SHA-256',
-                      block_height: 1482,
-                      tamper_proof_valid: true,
-                      timestamp_utc: new Date(selectedAuditLog.created_at).toUTCString(),
+                <pre className="text-xs overflow-x-auto text-emerald-300 leading-relaxed max-h-60 no-scrollbar">
+                  {JSON.stringify(
+                    {
+                      ...log,
+                      cryptographic_envelope: {
+                        algorithm: 'SHA-256',
+                        block_height: 1482,
+                        tamper_proof_valid: true,
+                        timestamp_utc: new Date(log.created_at).toUTCString(),
+                      },
                     },
-                  },
-                  null,
-                  2
-                )}
-              </pre>
-            </div>
-          )}
+                    null,
+                    2
+                  )}
+                </pre>
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -1426,86 +1476,88 @@ export default function AdminClient({
       )}
 
       {/* ── MODAL: INSPECT REPORTED RESOURCE ── */}
-      {inspectedReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-xl rounded-3xl bg-white border border-slate-200 p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-rose-600" />
-                <h3 className="text-base font-bold text-slate-900">
-                  Moderation Incident Inspector • ID: #{inspectedReport.id}
-                </h3>
-              </div>
-              <button
-                onClick={() => setInspectedReport(null)}
-                className="text-slate-400 hover:text-slate-700 p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 font-mono">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Target Type:</span>
-                  <span className="font-bold text-slate-900 uppercase">{inspectedReport.target_type}</span>
+      {inspectedReport && (() => {
+        const report = inspectedReport!;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="w-full max-w-xl rounded-3xl bg-white border border-slate-200 p-6 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-5 h-5 text-rose-600" />
+                  <h3 className="text-base font-bold text-slate-900">
+                    Moderation Incident Inspector • ID: #{report.id}
+                  </h3>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Target ID:</span>
-                  <span className="font-bold text-[#1b59f8]">{inspectedReport.target_id}</span>
+                <button
+                  onClick={() => setInspectedReport(null)}
+                  className="text-slate-400 hover:text-slate-700 p-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="space-y-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Target Type:</span>
+                    <span className="font-bold text-slate-900 uppercase">{report.target_type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Target ID:</span>
+                    <span className="font-bold text-[#1b59f8]">{report.target_id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Reported Timestamp:</span>
+                    <span className="text-slate-700">{new Date(report.created_at).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Reporter:</span>
+                    <span className="font-bold text-slate-900">{report.reporter?.display_name || 'Anonymous User'}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Reported Timestamp:</span>
-                  <span className="text-slate-700">{new Date(inspectedReport.created_at).toLocaleString()}</span>
+
+                <div>
+                  <p className="font-bold text-slate-800 font-mono uppercase text-[11px] mb-1">
+                    Reason for Flagging:
+                  </p>
+                  <p className="p-3 rounded-xl bg-rose-50 text-rose-900 font-semibold border border-rose-200 leading-relaxed">
+                    {report.reason}
+                  </p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Reporter:</span>
-                  <span className="font-bold text-slate-900">{inspectedReport.reporter?.display_name || 'Anonymous User'}</span>
+
+                <div>
+                  <p className="font-bold text-slate-800 font-mono uppercase text-[11px] mb-1">
+                    Incident Description &amp; Evidence:
+                  </p>
+                  <p className="p-3.5 rounded-xl bg-slate-50 text-slate-700 border border-slate-200 leading-relaxed">
+                    {report.details ?? '—'}
+                  </p>
                 </div>
               </div>
 
-              <div>
-                <p className="font-bold text-slate-800 font-mono uppercase text-[11px] mb-1">
-                  Reason for Flagging:
-                </p>
-                <p className="p-3 rounded-xl bg-rose-50 text-rose-900 font-semibold border border-rose-200 leading-relaxed">
-                  {inspectedReport.reason}
-                </p>
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-end gap-2">
+                <button
+                  onClick={() => handleResolveReport(report.id, 'dismiss')}
+                  className="px-4 py-2 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Dismiss (False Positive)
+                </button>
+                <button
+                  onClick={() => handleResolveReport(report.id, 'strike')}
+                  className="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  Issue Strike to User
+                </button>
+                <button
+                  onClick={() => handleResolveReport(report.id, 'quarantine')}
+                  className="px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  Quarantine &amp; Hide
+                </button>
               </div>
-
-              <div>
-                <p className="font-bold text-slate-800 font-mono uppercase text-[11px] mb-1">
-                  Incident Description &amp; Evidence:
-                </p>
-                <p className="p-3.5 rounded-xl bg-slate-50 text-slate-700 border border-slate-200 leading-relaxed">
-                  {inspectedReport.details}
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-end gap-2">
-              <button
-                onClick={() => handleResolveReport(inspectedReport.id, 'dismiss')}
-                className="px-4 py-2 rounded-full border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                Dismiss (False Positive)
-              </button>
-              <button
-                onClick={() => handleResolveReport(inspectedReport.id, 'strike')}
-                className="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-xs"
-              >
-                Issue Strike to User
-              </button>
-              <button
-                onClick={() => handleResolveReport(inspectedReport.id, 'quarantine')}
-                className="px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs"
-              >
-                Quarantine &amp; Hide
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

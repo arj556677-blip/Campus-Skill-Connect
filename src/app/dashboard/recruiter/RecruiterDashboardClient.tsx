@@ -120,6 +120,14 @@ export default function RecruiterDashboardClient({
               <MessageSquare className="w-4 h-4 text-[#1b59f8]" />
               <span>Candidate Chats</span>
             </Link>
+
+            <Link
+              href="/profile/edit"
+              className="px-4 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold transition-all shadow-xs flex items-center gap-2"
+            >
+              <UserCog className="w-4 h-4 text-emerald-600" />
+              <span>Edit Profile</span>
+            </Link>
           </div>
         </div>
 
@@ -182,7 +190,7 @@ export default function RecruiterDashboardClient({
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Core Infrastructure • Redis, Rust, Raft
+                  Core Infrastructure • Distributed Systems, Rust, Raft
                 </p>
                 <div className="mt-2.5 flex items-center justify-between text-[10px] font-mono text-slate-400">
                   <span>Candidate Search Criteria</span>
@@ -200,7 +208,7 @@ export default function RecruiterDashboardClient({
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Web Applications • Next.js, TypeScript, PostgreSQL
+                  Web Applications • Full-Stack Systems, TypeScript, Relational Data
                 </p>
                 <div className="mt-2.5 flex items-center justify-between text-[10px] font-mono text-slate-400">
                   <span>Candidate Search Criteria</span>
@@ -348,7 +356,7 @@ export default function RecruiterDashboardClient({
                 <th className="py-2.5 px-3">Student Builder</th>
                 <th className="py-2.5 px-3">University Campus</th>
                 <th className="py-2.5 px-3">Primary Focus &amp; Stack</th>
-                <th className="py-2.5 px-3">Match Score</th>
+                <th className="py-2.5 px-3">Status</th>
                 <th className="py-2.5 px-3">Proof Status</th>
                 <th className="py-2.5 px-3 text-right">Actions</th>
               </tr>

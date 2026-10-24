@@ -69,7 +69,7 @@ const PRESET_ALEX: ResumeData = {
   linkedin: 'linkedin.com/in/alexrivera-dev',
   portfolio: 'alexrivera.dev',
   summary:
-    'Master of Computer Applications student at IISc with production experience building high-concurrency web applications, Redis caching layers, and WebRTC streaming protocols. Strong foundation in distributed systems, SQL RLS architecture, and TypeScript.',
+    'Master of Computer Applications student at IISc with production experience building high-concurrency web applications, distributed caching layers, and real-time streaming protocols. Strong foundation in distributed systems, security architecture, and TypeScript.',
   education: [
     {
       institution: 'Indian Institute of Science (IISc), Bangalore',
@@ -90,47 +90,47 @@ const PRESET_ALEX: ResumeData = {
       role: 'Distributed Systems Engineering Intern',
       duration: 'May 2025 – Aug 2025',
       bullets: [
-        'Architected an in-memory Redis cache-aside layer, improving API p99 latency by 64% under 8k concurrent connections.',
-        'Implemented sliding-window rate limiters utilizing Redis sorted sets to defend against API scraping.',
-        'Configured NGINX reverse proxy with Brotli compression and micro-caching for static assets.',
+        'Architected an in-memory high-throughput cache-aside layer, improving API p99 latency by 64% under 8k concurrent connections.',
+        'Implemented sliding-window rate limiters utilizing sorted indexes to defend against API scraping.',
+        'Configured reverse proxy with Brotli compression and micro-caching for static assets.',
       ],
     },
   ],
   projects: [
     {
-      title: 'HyperCache: High-Performance Next.js Cache Engine',
-      technologies: 'Next.js 15, TypeScript, Redis 7, Supabase, Docker',
+      title: 'HyperCache: High-Performance Distributed Cache Engine',
+      technologies: 'TypeScript, Distributed Caching, Containers, REST APIs',
       link: 'github.com/alexrivera-dev/hypercache',
       description:
-        'Engineered transparent multi-tenant caching with automatic cache invalidation on Supabase writes. Handled 10k requests/sec with 99.4% cache hit rates.',
+        'Engineered transparent multi-tenant caching with automatic cache invalidation on write events. Handled 10k requests/sec with 99.4% cache hit rates.',
     },
     {
-      title: 'Campus Peer Mesh: Encrypted WebRTC P2P Streamer',
-      technologies: 'WebRTC, React 19, Node.js, WebAssembly',
+      title: 'Campus Peer Mesh: Encrypted P2P Media Streamer',
+      technologies: 'Real-Time Audio/Video, TypeScript, Node.js, WebAssembly',
       link: 'github.com/alexrivera-dev/peer-mesh',
       description:
         'Developed browser-to-browser chunked media transfer with SHA-256 integrity checks, reducing server egress bandwidth by 82%.',
     },
     {
       title: 'Campus Skill Connect: Proof-of-Skill Platform',
-      technologies: 'Next.js 16, Supabase RLS, Docker, Redis, Tailwind CSS',
+      technologies: 'Full-Stack Architecture, Role-Based Access Control, Cloud Infrastructure',
       link: 'github.com/campus-skill-connect/core',
       description:
-        'Architected role-based multi-tenant authentication gateway with PostgreSQL row-level security policies and real-time ATS optimization scoring.',
+        'Architected role-based multi-tenant authentication gateway with cryptographic row-level security policies and real-time ATS optimization scoring.',
     },
   ],
   skills: [
-    'Next.js 15',
-    'React 19',
+    'Frontend Architecture',
+    'Component Systems',
     'TypeScript',
-    'PostgreSQL & RLS',
-    'Redis Caching & PubSub',
-    'Docker & Compose',
-    'NGINX Reverse Proxy',
-    'WebRTC',
-    'Tailwind CSS',
+    'Relational Databases & Security',
+    'Distributed Caching & PubSub',
+    'Container Orchestration',
+    'Reverse Proxy & Security',
+    'WebRTC & Real-Time Streams',
+    'CSS Systems & Responsive Design',
     'Git CI/CD',
-    'Node.js',
+    'Node.js Services',
     'Python',
   ],
 };
@@ -212,20 +212,19 @@ const EMPTY_RESUME: ResumeData = {
 };
 
 const SUGGESTED_SKILLS = [
-  'Next.js 16',
-  'React 19',
+  'Frontend Architecture',
   'TypeScript',
-  'PostgreSQL',
-  'Redis',
-  'Docker',
-  'WebRTC',
+  'Relational Databases',
+  'Distributed Systems',
+  'Docker & Containers',
+  'WebRTC & Streaming',
   'Python',
   'PyTorch',
   'Kubernetes',
   'GraphQL',
-  'Tailwind CSS',
+  'Responsive UI & CSS',
   'Git CI/CD',
-  'NGINX',
+  'High-Performance Reverse Proxy',
   'Node.js',
   'Go',
 ];
@@ -1048,7 +1047,7 @@ export default function CvBuilderPage() {
                       <div className="grid grid-cols-2 gap-2">
                         <input
                           type="text"
-                          placeholder="Tech Stack (e.g., Next.js 15, Redis, WebRTC)"
+                          placeholder="Technologies (e.g., Python, Rust, Cloud Infrastructure)"
                           value={proj.technologies}
                           onChange={(e) => {
                             const newProjs = [...resume.projects];

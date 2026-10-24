@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { firebaseAuth } from '@/lib/firebase/config';
 
-export type UserRoleType = 'admin' | 'student' | 'recruiter';
+export type UserRoleType = 'admin' | 'student' | 'faculty' | 'recruiter';
 
 export interface RoleUser {
   id: string;
@@ -51,6 +51,20 @@ export const ROLE_PERSONAS: Record<UserRoleType, RoleUser> = {
     dashboardUrl: '/dashboard/student',
     accentColor: 'violet',
     institution: 'Engineering & Computing',
+  },
+  faculty: {
+    id: 'user-faculty',
+    name: 'Dr. Anita Sengupta',
+    role: 'faculty',
+    roleLabel: 'Faculty Mentor',
+    email: 'faculty@campus.edu',
+    title: 'Associate Professor & Systems Security Mentor',
+    badge: 'FACULTY MENTOR',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80',
+    initials: 'AS',
+    dashboardUrl: '/dashboard/student',
+    accentColor: 'indigo',
+    institution: 'School of Computing & Engineering',
   },
   recruiter: {
     id: 'user-recruiter',
@@ -100,6 +114,7 @@ interface RoleContextValue {
   currentUser: RoleUser | null;
   login: (role: UserRoleType, redirectUrl?: string, customProfile?: Partial<RoleUser>) => void;
   switchRole: (role: UserRoleType, redirect?: boolean) => void;
+  updateUserProfile: (updates: Partial<RoleUser>) => void;
   signOut: () => Promise<void>;
 }
 
@@ -179,7 +194,13 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           setCurrentRole(role);
 
           const roleLabel =
-            role === 'admin' ? 'Admin' : role === 'recruiter' ? 'Tech Recruiter' : 'Student Builder';
+            role === 'admin'
+              ? 'Admin'
+              : role === 'recruiter'
+                ? 'Tech Recruiter'
+                : role === 'faculty'
+                  ? 'Faculty Mentor'
+                  : 'Student Builder';
           const dashboardUrl =
             role === 'admin'
               ? '/admin'
@@ -195,13 +216,13 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             roleLabel,
             email: user.email || '',
             title: profile?.headline || 'Campus Skill Connect Member',
-            badge: role.toUpperCase(),
+            badge: role === 'faculty' ? 'FACULTY MENTOR' : role.toUpperCase(),
             avatar:
               profile?.avatar_path ||
               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
             initials: resolvedName.slice(0, 2).toUpperCase(),
             dashboardUrl,
-            accentColor: role === 'admin' ? 'rose' : role === 'recruiter' ? 'emerald' : 'violet',
+            accentColor: role === 'admin' ? 'rose' : role === 'recruiter' ? 'emerald' : role === 'faculty' ? 'indigo' : 'violet',
           };
 
           setUserProfile(resolvedProfile);
@@ -296,7 +317,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       avatar: resolvedAvatar,
       initials: resolvedInitials,
       role,
-      roleLabel: role === 'admin' ? 'Admin' : role === 'recruiter' ? 'Tech Recruiter' : 'Student Builder',
+      roleLabel:
+        role === 'admin'
+          ? 'Admin'
+          : role === 'recruiter'
+            ? 'Tech Recruiter'
+            : role === 'faculty'
+              ? 'Faculty Mentor'
+              : 'Student Builder',
       dashboardUrl: basePersona.dashboardUrl,
     };
 
@@ -330,6 +358,31 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     if (redirect) {
       window.location.replace(ROLE_PERSONAS[role].dashboardUrl);
     }
+  };
+
+  const updateUserProfile = (updates: Partial<RoleUser>) => {
+    setUserProfile((prev) => {
+      const activeRole = currentRole || 'student';
+      const base = prev || ROLE_PERSONAS[activeRole];
+      const updated: RoleUser = {
+        ...base,
+        ...updates,
+      };
+      if (updates.name) {
+        const trimmed = updates.name.trim();
+        updated.name = trimmed;
+        updated.initials = trimmed.slice(0, 2).toUpperCase();
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('csc_user_profile', JSON.stringify(updated));
+          setSessionCookies(updated.role, updated);
+        } catch {
+          // ignore
+        }
+      }
+      return updated;
+    });
   };
 
   const signOut = async () => {
@@ -367,6 +420,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         login,
         switchRole,
+        updateUserProfile,
         signOut,
       }}
     >
@@ -385,6 +439,7 @@ export function useRole() {
       currentUser: null,
       login: () => {},
       switchRole: () => {},
+      updateUserProfile: () => {},
       signOut: async () => {},
     };
   }

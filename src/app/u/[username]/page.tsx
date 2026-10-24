@@ -289,7 +289,13 @@ export default async function PublicProfilePage({ params, searchParams }: Public
                   )}
 
                   <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-[var(--radius-sm)] bg-[var(--surface-sunken)] text-[var(--text-secondary)] border border-[var(--border)]">
-                    {targetProfile.role}
+                    {targetProfile.role === 'faculty'
+                      ? 'Faculty Mentor'
+                      : targetProfile.role === 'recruiter'
+                      ? 'Tech Recruiter'
+                      : targetProfile.role === 'admin'
+                      ? 'Admin'
+                      : 'Student Builder'}
                   </span>
                 </div>
 

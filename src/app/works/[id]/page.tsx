@@ -198,13 +198,13 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
                 <div className="flex items-center justify-between">
                   <span>Views</span>
                   <span className="font-semibold text-slate-900">
-                    {work.views_count}
+                    {work.views_count ?? 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Endorsement Likes</span>
                   <span className="font-semibold text-rose-600">
-                    {work.likes_count}
+                    {work.likes_count ?? 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

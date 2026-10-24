@@ -80,10 +80,10 @@ export default function ProfileCard({ profile, matchScore }: ProfileCardProps) {
       await sendConnectionRequest({
         id: profile.id,
         name: profile.display_name,
-        headline: profile.headline || profile.field,
-        avatar: profile.avatar_url,
+        headline: profile.headline || profile.field || undefined,
+        avatar: profile.avatar_url || undefined,
         role: profile.role,
-        institution: profile.institution?.name || profile.zone?.name,
+        institution: profile.institution?.name || profile.zone?.name || undefined,
       });
       setConnStatus('pending');
       setIsIncoming(false);
@@ -114,15 +114,21 @@ export default function ProfileCard({ profile, matchScore }: ProfileCardProps) {
         <span
           className={`text-[10px] font-mono uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full border ${
             profile.role === 'student'
-              ? 'bg-blue-50 text-blue-700 border-blue-200'
+              ? 'bg-blue-50 text-[#1b59f8] border-blue-200'
               : profile.role === 'faculty'
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
               : profile.role === 'recruiter'
-              ? 'bg-amber-50 text-amber-700 border-amber-200'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
               : 'bg-slate-100 text-slate-700 border-slate-200'
           }`}
         >
-          {profile.role}
+          {profile.role === 'student'
+            ? 'Student'
+            : profile.role === 'faculty'
+            ? 'Faculty Mentor'
+            : profile.role === 'recruiter'
+            ? 'Recruiter'
+            : 'Admin'}
         </span>
 
         {matchScore !== undefined && (

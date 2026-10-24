@@ -79,6 +79,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Role check: Admins manage the platform and do not publish work items
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (userProfile?.role === 'admin') {
+      return NextResponse.json(
+        { error: 'Administrators do not publish work items.' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { title, description, category, external_url, storage_path, visibility, skills } = body;
 

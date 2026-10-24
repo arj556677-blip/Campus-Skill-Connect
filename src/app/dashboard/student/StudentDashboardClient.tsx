@@ -17,6 +17,7 @@ import {
   Trophy,
   Sparkles,
   Users,
+  UserCog,
 } from 'lucide-react';
 import { Work, Profile } from '@/lib/types';
 import CertificatesBadgesSection from '@/components/profile/CertificatesBadgesSection';
@@ -151,8 +152,14 @@ export default function StudentDashboardClient({
             />
             <div>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200/80">
-                  Verified Student Builder
+                <span
+                  className={`text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                    currentUser.role === 'faculty'
+                      ? 'bg-indigo-50 text-indigo-700 border-indigo-200/80'
+                      : 'bg-blue-50 text-[#1b59f8] border-blue-200/80'
+                  }`}
+                >
+                  {currentUser.role === 'faculty' ? 'Verified Faculty Mentor' : 'Verified Student Builder'}
                 </span>
                 <span className="text-xs font-mono text-slate-500">
                   @iisc.ac.in • IISc Bangalore
@@ -162,7 +169,9 @@ export default function StudentDashboardClient({
                 Welcome back, {currentUser.name}
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-xl">
-                Your proof of work and accredited badges are verified across campus. 3 Tier-1 recruiters inspected your repositories this week.
+                {currentUser.role === 'faculty'
+                  ? 'Your academic research showcases, student mentoring channels, and collaborative sprint rooms are active across campus.'
+                  : 'Your proof of work and accredited badges are verified across campus. 3 Tier-1 recruiters inspected your repositories this week.'}
               </p>
             </div>
           </div>
@@ -232,6 +241,14 @@ export default function StudentDashboardClient({
             >
               <ExternalLink className="w-4 h-4 text-slate-400" />
               <span>View Profile</span>
+            </Link>
+
+            <Link
+              href="/profile/edit"
+              className="px-4 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold transition-all shadow-xs flex items-center gap-2"
+            >
+              <UserCog className="w-4 h-4 text-[#1b59f8]" />
+              <span>Edit Profile</span>
             </Link>
           </div>
         </div>
@@ -363,86 +380,40 @@ export default function StudentDashboardClient({
                   Recruiter Inquiries &amp; Portfolio Activity
                 </h2>
               </div>
-              <span className="text-xs font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold">
-                +28% Recruiter Engagement
+              <span className="text-xs font-mono text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full font-bold">
+                Verified Portfolio
               </span>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Recruiter Card 1 */}
-              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200/70 hover:border-blue-300 transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center">
-                        MC
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">Marcus Chen</p>
-                        <p className="text-[10px] text-slate-500">Senior Talent Partner @ Stripe</p>
-                      </div>
-                    </div>
-                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
-                      INQUIRY
-                    </span>
-                  </div>
-
-                  <p className="mt-3 text-xs text-slate-600 italic">
-                    &ldquo;Saw your Redis architecture and benchmark graphs. We&apos;re hiring for Distributed Systems New Grads. Would love to connect!&rdquo;
-                  </p>
-                </div>
-
-                <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-slate-400">2 hours ago</span>
-                  <Link
-                    href="/messages"
-                    className="text-xs font-bold text-[#1b59f8] hover:underline flex items-center gap-1"
-                  >
-                    <span>Reply in Messages</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
+            <div className="mt-4 p-8 rounded-2xl bg-[#f8fafc] border border-slate-200/70 text-center flex flex-col items-center justify-center space-y-3">
+              <div className="w-10 h-10 rounded-full bg-blue-50 text-[#1b59f8] flex items-center justify-center">
+                <Briefcase className="w-5 h-5" />
               </div>
-
-              {/* Recruiter Card 2 */}
-              <div className="p-4 rounded-2xl bg-[#f8fafc] border border-slate-200/70 hover:border-blue-300 transition-all flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-blue-100 text-[#1b59f8] font-bold text-xs flex items-center justify-center">
-                        SC
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">Sarah Chen</p>
-                        <p className="text-[10px] text-slate-500">Engineering Lead @ Google Cloud</p>
-                      </div>
-                    </div>
-                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-[#1b59f8] font-bold">
-                      PROFILE VIEW
-                    </span>
-                  </div>
-
-                  <p className="mt-3 text-xs text-slate-600">
-                    Inspected your WebRTC low-latency audio transmission project and verified your GitHub repository commits.
-                  </p>
-                </div>
-
-                <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-slate-400">Yesterday</span>
-                  <Link
-                    href="/people"
-                    className="text-xs font-bold text-[#1b59f8] hover:underline flex items-center gap-1"
-                  >
-                    <span>View Scout Profile</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
+              <div className="max-w-md">
+                <h3 className="text-sm font-bold text-slate-900">Direct Inquiries from Recruiter Searches</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  When verified recruiters or university faculty reach out regarding your published proof-of-work repositories, their inquiries and meeting invitations will appear here.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center gap-3">
+                <Link
+                  href="/works/new"
+                  className="px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  Publish New Proof
+                </Link>
+                <Link
+                  href="/messages"
+                  className="px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold transition-all"
+                >
+                  Open Messages
+                </Link>
               </div>
             </div>
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 gap-2">
-            <span>Recent searches matching your profile: <strong className="text-slate-800">Redis, Next.js 16, Distributed Systems, WebRTC</strong></span>
+            <span>Matched competencies: <strong className="text-slate-800">Systems Architecture, Distributed Systems, Cloud Infrastructure</strong></span>
             <Link href="/showcase" className="text-[#1b59f8] font-semibold hover:underline shrink-0">
               See what recruiters see &rarr;
             </Link>
@@ -730,8 +701,8 @@ export default function StudentDashboardClient({
 
               <div className="p-3.5 rounded-2xl bg-[#f8fafc] border border-slate-200/70 flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-900">Turbopack &amp; Next.js 16 Internal Sprint</h4>
-                  <p className="text-[11px] text-slate-500 font-mono">2 Builders inside • Code editor active</p>
+                  <h4 className="text-xs font-bold text-slate-900">High-Performance Systems &amp; Compiler Sprint</h4>
+                  <p className="text-[11px] text-slate-500 font-mono">Live sprint room • Code editor active</p>
                 </div>
                 <Link
                   href="/collaborate"
@@ -801,7 +772,7 @@ export default function StudentDashboardClient({
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>Matched to your skills: <strong className="text-slate-800">Redis, Next.js, Rust</strong></span>
+            <span>Matched to your skills: <strong className="text-slate-800">Distributed Systems, Rust, Cloud Architecture</strong></span>
             <Link href="/showcase" className="text-[#1b59f8] font-semibold hover:underline">
               Explore All Projects &rarr;
             </Link>

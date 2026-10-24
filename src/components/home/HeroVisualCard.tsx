@@ -1,8 +1,35 @@
-import React from 'react';
+'use client';
+
+import React, { useRef, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { Sparkles } from 'lucide-react';
-import HoloCard from '@/components/ui/HoloCard';
 
 export default function HeroVisualCard() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    const maxTilt = 8; // subtle, realistic 3D tilt without distortion
+    setTilt({
+      x: -y * maxTilt,
+      y: x * maxTilt,
+    });
+  }, []);
+
+  const handlePointerEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handlePointerLeave = useCallback(() => {
+    setIsHovered(false);
+    setTilt({ x: 0, y: 0 });
+  }, []);
+
   return (
     <div className="relative w-full max-w-[490px] mx-auto lg:max-w-none group/card">
       {/* Outer Card with dot-grid pattern and rounded frame matching reference mockup */}
@@ -27,22 +54,30 @@ export default function HeroVisualCard() {
           </svg>
         </div>
 
-        {/* Central Student Portrait with WebGL2 Holographic Foil Effect from React Bits */}
-        <div className="relative w-full flex items-center justify-center rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200/60 shadow-xs">
-          <HoloCard
-            image="/images/hero-student.jpg"
+        {/* Central Student Portrait — Clean, Crystal-Clear Photo with 3D Tilt (No rainbow, No overlays) */}
+        <div
+          ref={cardRef}
+          onPointerMove={handlePointerMove}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+          style={{
+            transform: isHovered
+              ? `perspective(1000px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`
+              : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+            transition: isHovered
+              ? 'transform 0.1s ease-out'
+              : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+            transformStyle: 'preserve-3d',
+          }}
+          className="relative w-full aspect-[3.25/4] rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200/60 shadow-xs cursor-pointer select-none"
+        >
+          <Image
+            src="/images/hero-student.jpg"
             alt="Student builder collaborating in university innovation lab"
-            preset="bursts"
-            radius={28}
-            width="100%"
-            intensity={0.82}
-            glare={0.45}
-            edgeSparkle={0.8}
-            tiltMax={14}
-            hoverScale={1.03}
-            idle={true}
-            shadow={false}
-            className="w-full block"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
+            className="object-cover object-top select-none pointer-events-none"
           />
         </div>
 

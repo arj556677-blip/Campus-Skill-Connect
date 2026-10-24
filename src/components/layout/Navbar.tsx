@@ -460,13 +460,13 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            /* Logged-Out Actions: Black pill button Login matching reference design */
+            /* Logged-Out Actions: Pill button Login/Signup */
             <div className="flex items-center gap-2">
               <Link
                 href="/sign-in"
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
               >
-                <span>Login</span>
+                <span>Login / Signup</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -592,19 +592,14 @@ export default function Navbar() {
             )}
 
             {isMounted && !isLoggedIn && (
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="pt-1 flex flex-col gap-2">
                 <Link
                   href="/sign-in"
-                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-colors"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-colors shadow-xs"
                 >
                   <LogIn className="w-3.5 h-3.5" />
-                  <span>Log In</span>
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="flex items-center justify-center py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
-                >
-                  <span>Sign Up</span>
+                  <span>Login / Signup</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             )}

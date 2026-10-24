@@ -83,7 +83,7 @@ export default function HomeHeroActions({
         href="/sign-in"
         className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold transition-all active:scale-95"
       >
-        <span>Log In</span>
+        <span>Login / Signup</span>
       </Link>
 
       <Link

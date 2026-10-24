@@ -4,7 +4,11 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getProfileById, getWorks } from '@/lib/data/service';
+import { getUser, createServerSupabaseClient } from '@/lib/supabase/server';
+import { isOnline } from '@/lib/redis/session';
 import WorkCard from '@/components/cards/WorkCard';
+import ProfileExperienceTabs from '@/components/profile/ProfileExperienceTabs';
+import ProfilePresenceBadge from '@/components/profile/ProfilePresenceBadge';
 import {
   ShieldCheck,
   Building,
@@ -37,6 +41,38 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   if (!profile) {
     notFound();
   }
+
+  const currentUser = await getUser();
+  const isOwner = currentUser?.id === profile.id;
+
+  // Determine relationship status between viewer and target profile
+  let connectionStatus: 'none' | 'pending' | 'accepted' | 'declined' | 'withdrawn' | 'blocked' = 'none';
+  let isIncoming = false;
+
+  if (currentUser && !isOwner) {
+    try {
+      const supabase = await createServerSupabaseClient();
+      const userLow = currentUser.id < profile.id ? currentUser.id : profile.id;
+      const userHigh = currentUser.id < profile.id ? profile.id : currentUser.id;
+
+      const { data: conn } = await supabase
+        .from('connections')
+        .select('*')
+        .eq('user_low', userLow)
+        .eq('user_high', userHigh)
+        .single();
+
+      if (conn) {
+        connectionStatus = conn.status;
+        isIncoming = conn.requested_by === profile.id && conn.status === 'pending';
+      }
+    } catch {
+      // Fallback is handled seamlessly by client persistence
+    }
+  }
+
+  // Check online status in Redis presence store
+  const userIsOnline = isOwner ? true : await isOnline(profile.id);
 
   const allWorks = await getWorks();
   const userWorks = allWorks.filter((w) => w.owner_id === profile.id);
@@ -87,10 +123,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <span className="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1b59f8] border border-blue-200">
                     {profile.role}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Online (Redis Active)
-                  </span>
+                  
+                  {/* Dynamic Redis Presence: Online only if active in Redis */}
+                  <ProfilePresenceBadge
+                    profileId={profile.id}
+                    initialOnline={userIsOnline}
+                    isCurrentUser={isOwner}
+                  />
                 </div>
 
                 <p className="text-sm font-semibold text-slate-700">
@@ -116,7 +155,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             {/* Actions & Social Links */}
             <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end gap-3 self-stretch md:self-auto">
-              <ProfileActions profileId={profile.id} />
+              <ProfileActions
+                profileId={profile.id}
+                initialStatus={connectionStatus}
+                isIncoming={isIncoming}
+              />
 
               <div className="flex items-center gap-2 pt-2">
                 {profile.github_username && (
@@ -192,38 +235,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           )}
         </div>
 
-        {/* User's Verified Works Section */}
-        <div className="space-y-6 pt-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                Verified Proof of Work Repositories
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Submissions, live prototypes, and engineering documentation published by {profile.display_name}.
-              </p>
-            </div>
-            <span className="text-xs font-semibold text-slate-500">
-              {userWorks.length} Item{userWorks.length === 1 ? '' : 's'}
-            </span>
-          </div>
-
-          {userWorks.length === 0 ? (
-            <div className="rounded-3xl bg-white border border-slate-200 p-12 text-center max-w-md mx-auto shadow-xs">
-              <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <h4 className="text-sm font-bold text-slate-900">No published work items yet</h4>
-              <p className="text-xs text-slate-500 mt-1">
-                This creator hasn&apos;t shared public work items.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userWorks.map((work) => (
-                <WorkCard key={work.id} work={work} />
-              ))}
-            </div>
-          )}
-        </div>
+        {/* User's Verified Works, LinkedIn-style Certificates & Badges, and Achievement Photo Posts */}
+        <ProfileExperienceTabs
+          profile={profile}
+          works={userWorks}
+          isOwner={isOwner}
+        />
       </div>
     </div>
   );

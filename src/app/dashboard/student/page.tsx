@@ -16,7 +16,17 @@ export default async function StudentDashboardPage() {
   const works = await getWorks();
   const profiles = await getProfiles();
 
-  // Filter works owned by authenticated student, or show empty list if not logged in
+  let studentProfile = null;
+  if (user) {
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('*, institution:communities(*), campus:campuses(*), zone:zones(*)')
+      .eq('id', user.id)
+      .single();
+    studentProfile = prof;
+  }
+
+  // Filter works owned by authenticated student, or show all if demo
   const myWorks = user 
     ? works.filter((w) => w.owner_id === user.id)
     : [];
@@ -24,7 +34,12 @@ export default async function StudentDashboardPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <StudentDashboardClient myWorks={myWorks} profiles={profiles} />
+        <StudentDashboardClient
+          myWorks={myWorks}
+          profiles={profiles}
+          userId={user?.id}
+          studentProfile={studentProfile}
+        />
       </div>
     </div>
   );

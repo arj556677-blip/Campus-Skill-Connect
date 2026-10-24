@@ -1,8 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { UserPlus, UserCheck, UserX, MessageSquare, Share2, Check, Ban, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  UserPlus,
+  UserCheck,
+  UserX,
+  MessageSquare,
+  Share2,
+  Check,
+  Ban,
+  Clock,
+  RotateCcw,
+  Loader2,
+  Sparkles,
+} from 'lucide-react';
+
+import {
+  getConnection,
+  sendConnectionRequest,
+  revokeConnectionRequest,
+  acceptConnectionRequest,
+  declineConnectionRequest,
+  unfollowConnection,
+  CONNECTIONS_EVENT,
+} from '@/lib/connections/connection-store';
 
 interface ProfileActionsProps {
   profileId: string;
@@ -13,45 +35,74 @@ interface ProfileActionsProps {
 export default function ProfileActions({
   profileId,
   initialStatus = 'none',
-  isIncoming = false,
+  isIncoming: initialIsIncoming = false,
 }: ProfileActionsProps) {
   const [status, setStatus] = useState<string>(initialStatus);
+  const [isIncoming, setIsIncoming] = useState<boolean>(initialIsIncoming);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showSimulateActions, setShowSimulateActions] = useState(false);
+
+  // Synchronize with persistent connection-store & events
+  useEffect(() => {
+    const syncStatus = () => {
+      const item = getConnection(profileId);
+      if (item) {
+        setStatus(item.status);
+        setIsIncoming(item.isIncoming);
+      } else {
+        setStatus('none');
+        setIsIncoming(false);
+      }
+    };
+
+    syncStatus();
+    window.addEventListener(CONNECTIONS_EVENT, syncStatus);
+    window.addEventListener('storage', syncStatus);
+    return () => {
+      window.removeEventListener(CONNECTIONS_EVENT, syncStatus);
+      window.removeEventListener('storage', syncStatus);
+    };
+  }, [profileId]);
 
   const performAction = async (action: 'request' | 'accept' | 'decline' | 'withdraw' | 'block' | 'unblock') => {
-    const previousStatus = status;
-    setErrorMessage(null);
     setLoadingAction(action);
 
-    // Optimistic UI updates
-    if (action === 'request') setStatus('pending');
-    else if (action === 'accept') setStatus('accepted');
-    else if (action === 'decline') setStatus('declined');
-    else if (action === 'withdraw') setStatus('withdrawn');
-    else if (action === 'block') setStatus('blocked');
-    else if (action === 'unblock') setStatus('none');
-
     try {
-      const res = await fetch('/api/connections', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUserId: profileId, action }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || `Failed to ${action} connection`);
+      if (action === 'request') {
+        await sendConnectionRequest({
+          id: profileId,
+          name: 'Campus Connection',
+        });
+        setStatus('pending');
+        setIsIncoming(false);
+      } else if (action === 'accept') {
+        await acceptConnectionRequest(profileId);
+        setStatus('accepted');
+        setIsIncoming(false);
+      } else if (action === 'decline') {
+        await declineConnectionRequest(profileId);
+        setStatus('none');
+        setIsIncoming(false);
+      } else if (action === 'withdraw') {
+        if (status === 'accepted') {
+          await unfollowConnection(profileId);
+        } else {
+          await revokeConnectionRequest(profileId);
+        }
+        setStatus('none');
+        setIsIncoming(false);
+      } else if (action === 'block') {
+        await unfollowConnection(profileId);
+        setStatus('blocked');
+      } else if (action === 'unblock') {
+        setStatus('none');
       }
-    } catch (err: unknown) {
-      // Rollback on error
-      setStatus(previousStatus);
-      setErrorMessage(err instanceof Error ? err.message : 'Action failed');
     } finally {
       setLoadingAction(null);
     }
   };
+
 
   const handleShare = () => {
     if (typeof window !== 'undefined') {
@@ -62,9 +113,9 @@ export default function ProfileActions({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2.5">
       <div className="flex flex-wrap items-center gap-2">
-        {/* Connection Action Buttons based on canonical state */}
+        {/* State 1: No request active -> Connect button */}
         {status === 'none' || status === 'withdrawn' || status === 'declined' ? (
           <button
             onClick={() => performAction('request')}
@@ -79,24 +130,41 @@ export default function ProfileActions({
             <span>Connect</span>
           </button>
         ) : status === 'pending' && !isIncoming ? (
-          <div className="inline-flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 border border-slate-200 text-slate-700">
-              Pending
+          /* State 2: Request sent by user -> 'Request Sent' badge + Revoke Request button */
+          <div className="inline-flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-amber-50 border border-amber-300/80 text-amber-800 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <span>Request Sent</span>
             </span>
+
+            {/* Revoke button: allows user self to cancel */}
             <button
               onClick={() => performAction('withdraw')}
               disabled={loadingAction !== null}
-              className="px-3 py-2 rounded-full text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-rose-700 hover:text-rose-800 hover:bg-rose-50 border border-rose-200 transition-colors shadow-2xs active:scale-95"
+              title="Revoke sent connection request"
             >
-              Withdraw
+              <RotateCcw className="w-3.5 h-3.5 text-rose-500" />
+              <span>Revoke Request</span>
+            </button>
+
+            {/* Recipient Action Simulator Toggle */}
+            <button
+              onClick={() => setShowSimulateActions(!showSimulateActions)}
+              className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-400 hover:text-slate-700 px-2 py-1 rounded border border-dashed border-slate-200"
+              title="Test recipient actions (Accept or Decline)"
+            >
+              <Sparkles className="w-3 h-3 text-indigo-500" />
+              <span>Test Recipient Action</span>
             </button>
           </div>
         ) : status === 'pending' && isIncoming ? (
+          /* State 3: Incoming request from target -> Accept or Decline */
           <div className="inline-flex items-center gap-1.5">
             <button
               onClick={() => performAction('accept')}
               disabled={loadingAction !== null}
-              className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold bg-[#1b59f8] hover:bg-[#174ed8] text-white shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-[#1b59f8] hover:bg-[#174ed8] text-white shadow-xs active:scale-95"
             >
               <UserCheck className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Accept</span>
@@ -104,17 +172,35 @@ export default function ProfileActions({
             <button
               onClick={() => performAction('decline')}
               disabled={loadingAction !== null}
-              className="px-3.5 py-2 rounded-full text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200"
+              className="px-3.5 py-2 rounded-full text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 active:scale-95"
             >
               Decline
             </button>
           </div>
         ) : status === 'accepted' ? (
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-            <UserCheck className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Connected</span>
-          </span>
+          /* State 4: Collab Accepted -> Unfollow button with Chat button directly adjacent */
+          <div className="inline-flex items-center gap-2">
+            <button
+              onClick={() => performAction('withdraw')}
+              disabled={loadingAction !== null}
+              title="Click to unfollow / disconnect"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shadow-2xs active:scale-95"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+              <span>Unfollow</span>
+            </button>
+
+            <Link
+              href={`/messages?recipientId=${encodeURIComponent(profileId)}`}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-xs active:scale-95"
+              title="Chat with accepted collaborator"
+            >
+              <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Chat</span>
+            </Link>
+          </div>
         ) : status === 'blocked' ? (
+          /* State 5: Blocked */
           <div className="inline-flex items-center gap-1.5">
             <span className="inline-flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
               <Ban className="w-3.5 h-3.5" aria-hidden="true" />
@@ -129,17 +215,6 @@ export default function ProfileActions({
             </button>
           </div>
         ) : null}
-
-        {/* Message Link (only if connected or public messaging permitted) */}
-        {status === 'accepted' && (
-          <Link
-            href={`/messages?recipientId=${profileId}`}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 text-xs font-semibold transition-colors shadow-xs"
-          >
-            <MessageSquare className="w-3.5 h-3.5 text-slate-600" aria-hidden="true" />
-            <span>Message</span>
-          </Link>
-        )}
 
         {/* Share Button */}
         <button
@@ -174,11 +249,33 @@ export default function ProfileActions({
         )}
       </div>
 
-      {/* Inline Rollback Error Message */}
-      {errorMessage && (
-        <div role="alert" className="text-xs text-rose-600 flex items-center gap-1.5">
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-          <span>{errorMessage}</span>
+      {/* Recipient Action Simulation Drawer (Test Accept / Decline) */}
+      {showSimulateActions && status === 'pending' && !isIncoming && (
+        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs flex flex-wrap items-center justify-between gap-2 animate-in fade-in duration-150">
+          <div className="text-slate-600">
+            <span className="font-semibold text-slate-800">Simulate Recipient Action:</span>{' '}
+            Test when Marcus Chen responds:
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => {
+                performAction('accept');
+                setShowSimulateActions(false);
+              }}
+              className="px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-2xs transition-colors"
+            >
+              ✓ Accept Request
+            </button>
+            <button
+              onClick={() => {
+                performAction('decline');
+                setShowSimulateActions(false);
+              }}
+              className="px-3 py-1 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] shadow-2xs transition-colors"
+            >
+              ✕ Decline Request
+            </button>
+          </div>
         </div>
       )}
     </div>

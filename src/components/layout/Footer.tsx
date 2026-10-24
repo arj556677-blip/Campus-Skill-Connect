@@ -1,37 +1,45 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, Server, Database } from 'lucide-react';
+import { useRole } from '@/lib/auth/role-context';
 
 export default function Footer() {
+  const { currentRole, isLoggedIn, isMounted } = useRole();
+  const isAdmin = isMounted && isLoggedIn && currentRole === 'admin';
+
   return (
     <footer className="mt-auto border-t border-slate-200 bg-[#f8fafc] text-slate-800">
-      {/* Infrastructure Telemetry Bar */}
-      <div className="border-b border-slate-200/80 bg-white py-3 px-4 text-xs font-mono">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-slate-500">
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Redis 7: In-Memory Cache-Aside & PubSub Active
-            </span>
-            <span className="hidden sm:inline text-slate-300">|</span>
-            <span className="hidden sm:flex items-center gap-1.5 text-slate-600">
-              <Server className="w-3.5 h-3.5 text-blue-600" />
-              NGINX 1.25 Edge Proxy & Rate Zones Ready
-            </span>
-            <span className="hidden md:inline text-slate-300">|</span>
-            <span className="hidden md:flex items-center gap-1.5 text-slate-600">
-              <Database className="w-3.5 h-3.5 text-indigo-600" />
-              PostgreSQL 15 + RLS 23 Tables
-            </span>
-          </div>
+      {/* Infrastructure Telemetry Bar — Visible strictly to Platform Administrators only */}
+      {isAdmin && (
+        <div className="border-b border-slate-200/80 bg-white py-3 px-4 text-xs font-mono animate-in fade-in duration-200">
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-slate-500">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Redis 7: In-Memory Cache-Aside &amp; PubSub Active
+              </span>
+              <span className="hidden sm:inline text-slate-300">|</span>
+              <span className="hidden sm:flex items-center gap-1.5 text-slate-600">
+                <Server className="w-3.5 h-3.5 text-blue-600" />
+                NGINX 1.25 Edge Proxy &amp; Rate Zones Ready
+              </span>
+              <span className="hidden md:inline text-slate-300">|</span>
+              <span className="hidden md:flex items-center gap-1.5 text-slate-600">
+                <Database className="w-3.5 h-3.5 text-indigo-600" />
+                PostgreSQL 15 + RLS 23 Tables
+              </span>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] text-blue-700 font-bold font-mono">
-              Multi-Campus Federation Active
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[10px] text-blue-700 font-bold font-mono">
+                Multi-Campus Federation Active
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
@@ -124,9 +132,15 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-slate-500">
               <li>
-                <Link href="/admin" className="hover:text-[#1b59f8] transition-colors">
-                  Admin & Audit Log
-                </Link>
+                {isAdmin ? (
+                  <Link href="/admin" className="hover:text-[#1b59f8] transition-colors">
+                    Admin &amp; Audit Log
+                  </Link>
+                ) : (
+                  <Link href="/support" className="hover:text-[#1b59f8] transition-colors">
+                    Support &amp; Safety Guide
+                  </Link>
+                )}
               </li>
               <li>
                 <Link href="/support" className="hover:text-[#1b59f8] transition-colors">
@@ -135,7 +149,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/terms" className="hover:text-[#1b59f8] transition-colors">
-                  Privacy & RLS Policies
+                  Privacy &amp; Terms
                 </Link>
               </li>
               <li>
@@ -150,9 +164,15 @@ export default function Footer() {
         <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p>© {new Date().getFullYear()} Campus Skill Connect. Engineered for student creators and developers.</p>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
-              Next.js 16 • Redis 7 • PostgreSQL 15 • NGINX
-            </span>
+            {isAdmin ? (
+              <span className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
+                Next.js 16 • Redis 7 • PostgreSQL 15 • NGINX
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
+                Verified Campus Federation
+              </span>
+            )}
           </div>
         </div>
       </div>

@@ -314,7 +314,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     }
 
     const target = redirectUrl ? decodeURIComponent(redirectUrl) : ROLE_PERSONAS[role].dashboardUrl;
-    window.location.assign(target);
+    window.location.replace(target);
   };
 
   const switchRole = (role: UserRoleType, redirect: boolean = false) => {
@@ -328,7 +328,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       setSessionCookies(role, newProfile);
     }
     if (redirect) {
-      window.location.assign(ROLE_PERSONAS[role].dashboardUrl);
+      window.location.replace(ROLE_PERSONAS[role].dashboardUrl);
     }
   };
 

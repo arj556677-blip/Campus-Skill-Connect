@@ -52,6 +52,22 @@ export async function updateSession(request: NextRequest) {
 
     const isAuthenticated = !!user || cscSession === 'active' || !!cscRole;
 
+    // Prevent navigating back to sign-in / login while having an active session (prevents login session breach)
+    const isAuthRoute =
+      request.nextUrl.pathname === '/sign-in' ||
+      request.nextUrl.pathname === '/login' ||
+      request.nextUrl.pathname === '/sign-up';
+
+    if (isAuthRoute && isAuthenticated) {
+      const dest =
+        cscRole === 'admin'
+          ? '/admin'
+          : cscRole === 'recruiter'
+          ? '/dashboard/recruiter'
+          : '/dashboard/student';
+      return NextResponse.redirect(new URL(dest, request.url));
+    }
+
     // Protected member routes
     const protectedRoutes = [
       '/works/new',

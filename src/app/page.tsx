@@ -21,6 +21,7 @@ import {
 import WorkCard from '@/components/cards/WorkCard';
 import ProfileCard from '@/components/cards/ProfileCard';
 import { getWorks, getProfiles, getCommunities } from '@/lib/data/service';
+import HomeHeroCTAs from '@/components/home/HomeHeroCTAs';
 
 export default async function HomePage() {
   const works = await getWorks();
@@ -44,57 +45,9 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
-            {/* Left Column: Headline & Action CTAs */}
-            <div className="lg:col-span-6 flex flex-col items-start">
-              {/* Kicker Pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 mb-6 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-[#1b59f8] animate-pulse" />
-                <span>#1 Campus Proof-of-Work Platform 2026</span>
-              </div>
-
-              {/* Bold Display Headline */}
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-[#0f172a] tracking-tight leading-[1.08]">
-                Shape Your Future with the{' '}
-                <span className="text-[#1b59f8]">Right Proof</span> of Work
-              </h1>
-
-              {/* Subtitle */}
-              <p className="mt-6 text-base sm:text-lg text-slate-500 leading-relaxed max-w-xl font-normal">
-                Discover a high-trust campus proof-of-work ecosystem. Empower yourself to succeed in your career, passions, and peer collaborations through verifiable repositories, research, and design.
-              </p>
-
-              {/* Action Buttons: Black Pill CTA */}
-              <div className="mt-8 flex flex-wrap items-center gap-3.5">
-                <Link
-                  href="/sign-up"
-                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-md active:scale-95 transition-all group"
-                >
-                  <span>GET STARTED</span>
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
-                    <ArrowUpRight className="w-3.5 h-3.5 text-white" />
-                  </div>
-                </Link>
-
-                <Link
-                  href="/showcase"
-                  className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold active:scale-95 transition-all"
-                >
-                  <Compass className="w-4 h-4 text-slate-600" />
-                  <span>Explore Showcase</span>
-                </Link>
-              </div>
-
-              {/* Micro Proof Elements */}
-              <div className="mt-10 flex items-center gap-6 text-xs text-slate-500 font-medium">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Verified Domain Identity</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>100% Free for Students</span>
-                </div>
-              </div>
+            {/* Left Column: Headline & Action CTAs (Client-role & session aware) */}
+            <div className="lg:col-span-6 flex flex-col items-start w-full">
+              <HomeHeroCTAs />
             </div>
 
             {/* Right Column: Signature Hero Container matching reference image */}

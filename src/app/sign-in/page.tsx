@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRole, UserRoleType, ROLE_PERSONAS } from '@/lib/auth/role-context';
@@ -53,9 +53,43 @@ function GithubIcon() {
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useRole();
+  const { login, isLoggedIn, isMounted, currentUser } = useRole();
 
   const redirectParam = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : null;
+
+  // Immediate synchronous guard for browser back-button navigation into /sign-in
+  if (typeof window !== 'undefined') {
+    const hasActiveSession =
+      localStorage.getItem('csc_session') === 'active' ||
+      document.cookie.includes('csc_session=active');
+    if (hasActiveSession) {
+      const savedRole = localStorage.getItem('csc_role');
+      const target =
+        redirectParam ||
+        (savedRole === 'admin'
+          ? '/admin'
+          : savedRole === 'recruiter'
+          ? '/dashboard/recruiter'
+          : '/dashboard/student');
+      window.location.replace(target);
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+          <div className="text-center space-y-3">
+            <div className="w-8 h-8 mx-auto border-2 border-[#1b59f8] border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs font-bold text-slate-700">Active session detected. Securing and returning to dashboard...</p>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // Session guard: if user already has an active authenticated session, prevent seeing sign-in
+  useEffect(() => {
+    if (isMounted && isLoggedIn && currentUser) {
+      const destination = redirectParam || currentUser.dashboardUrl || '/dashboard/student';
+      router.replace(destination);
+    }
+  }, [isMounted, isLoggedIn, currentUser, redirectParam, router]);
 
   // Unified form state
   const [email, setEmail] = useState('');

@@ -16,6 +16,7 @@ import {
   LogIn,
 } from 'lucide-react';
 import { Work, Community, Profile } from '@/lib/types';
+import DashboardSessionGuard from '@/components/auth/DashboardSessionGuard';
 
 interface GeneralDashboardClientProps {
   works: Work[];
@@ -31,6 +32,9 @@ export default function GeneralDashboardClient({
 
   return (
     <div className="space-y-10">
+      {/* Session Security Guard: Disables browser back/previous button on authenticated dashboard */}
+      <DashboardSessionGuard />
+
       {/* ── TOP HERO BANNER ── */}
       <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-10 shadow-xs relative overflow-hidden">
         {/* Soft subtle glow wash */}

@@ -5,6 +5,8 @@ import { Profile, Community, Zone } from '@/lib/types';
 import ProfileCard from '@/components/cards/ProfileCard';
 import { Search, Users, Building, MapPin, Sparkles, X, ShieldCheck } from 'lucide-react';
 
+import { useRole } from '@/lib/auth/role-context';
+
 interface PeopleClientProps {
   initialProfiles: Profile[];
   communities: Community[];
@@ -36,15 +38,35 @@ export default function PeopleClient({
   initialCommunity,
   initialRole,
 }: PeopleClientProps) {
+  const { currentUser, isLoggedIn } = useRole();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>(initialRole || 'all');
   const [selectedCommunity, setSelectedCommunity] = useState<string>(initialCommunity || 'all');
   const [selectedZone, setSelectedZone] = useState<string>(initialZone || 'all');
 
-  // Filter out any system administration accounts - talent directory is exclusively for builders, mentors, & recruiters
+  // Filter out system administration accounts AND current logged-in user (self cannot collaborate with self)
   const talentProfiles = useMemo(() => {
-    return initialProfiles.filter((p) => p.role !== 'admin');
-  }, [initialProfiles]);
+    return initialProfiles.filter((p) => {
+      // 1. Exclude platform administrators
+      if (p.role === 'admin') return false;
+
+      // 2. Exclude current logged in user from talent collaboration directory
+      if (isLoggedIn && currentUser) {
+        if (p.id === currentUser.id) return false;
+        if ((p as unknown as { user_id?: string }).user_id === currentUser.id) return false;
+        if (currentUser.email && p.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) return false;
+        if (currentUser.name && p.display_name && p.display_name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) return false;
+        // Seed/demo persona match for Ragav
+        const curName = (currentUser.name || '').toLowerCase();
+        const curEmail = (currentUser.email || '').toLowerCase();
+        const pName = (p.display_name || '').toLowerCase();
+        if ((curName.includes('ragav') || curEmail.includes('ragav')) && pName.includes('ragav')) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [initialProfiles, isLoggedIn, currentUser]);
 
   // Handle changing institution with smart zone coordination
   const handleCommunityChange = (communityId: string) => {

@@ -1,0 +1,126 @@
+'use client';
+
+import React from 'react';
+import Image from 'next/image';
+import { Sparkles } from 'lucide-react';
+
+export default function HeroVisualCard() {
+  return (
+    <div className="relative w-full max-w-[490px] mx-auto lg:max-w-none">
+      {/* Outer Card with dot-grid pattern and rounded frame matching reference mockup */}
+      <div className="relative w-full p-5 sm:p-7 sm:pb-8 rounded-[2.5rem] bg-white border border-slate-200/80 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.03)] bg-[radial-gradient(#cbd5e1_1.2px,transparent_1.2px)] [background-size:18px_18px]">
+        
+        {/* Top-Left Decorative Squiggle Icon */}
+        <div className="absolute top-6 left-6 z-10 text-[#1b59f8]">
+          <svg
+            className="w-8 h-4 text-[#1b59f8]"
+            viewBox="0 0 36 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M2 8 C 5 2, 9 2, 12 8 C 15 14, 19 14, 22 8 C 25 2, 29 2, 34 8"
+              stroke="currentColor"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+
+        {/* Central Portrait Container */}
+        <div className="relative w-full aspect-[3.25/4] rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200/60 shadow-xs">
+          <Image
+            src="/images/hero-student.jpg"
+            alt="Student builder collaborating in university innovation lab"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
+            className="object-cover object-top select-none"
+          />
+        </div>
+
+        {/* ── 1. Top-Right Badge: Federated Campus Network ── */}
+        <div className="absolute -top-3 -right-2 sm:-top-4 sm:-right-4 z-20 flex items-center gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-[#1b59f8] text-white shadow-[0_12px_28px_rgba(27,89,248,0.4)] border border-white/20 select-none">
+          {/* Avatar stack */}
+          <div className="flex -space-x-2 shrink-0">
+            <div className="w-7 h-7 rounded-full bg-[#bfdbfe] text-[#1e3a8a] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+              AF
+            </div>
+            <div className="w-7 h-7 rounded-full bg-[#e9d5ff] text-[#581c87] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+              PS
+            </div>
+            <div className="w-7 h-7 rounded-full bg-[#a7f3d0] text-[#065f46] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+              KV
+            </div>
+            <div className="w-7 h-7 rounded-full bg-white text-slate-800 text-[11px] font-black flex items-center justify-center ring-2 ring-white shadow-xs">
+              +
+            </div>
+          </div>
+          {/* Label & title */}
+          <div className="leading-tight text-left pr-1">
+            <span className="block text-[9px] font-mono font-bold uppercase tracking-wider text-blue-200">
+              FEDERATED
+            </span>
+            <span className="block text-xs sm:text-sm font-extrabold text-white">
+              Campus Network
+            </span>
+          </div>
+        </div>
+
+        {/* ── 2. Mid-Right Badge: Peer Collaboration with hand-drawn arrow ── */}
+        <div className="absolute -right-3 sm:-right-5 top-[52%] -translate-y-1/2 z-20 select-none">
+          {/* Hand-drawn curved arrow above pill pointing towards the badge */}
+          <div className="absolute -top-11 right-5 pointer-events-none text-[#1b59f8]">
+            <svg
+              className="w-7 h-9 text-[#1b59f8]"
+              viewBox="0 0 28 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M22 4 C 27 14, 18 22, 8 28"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 29 L 6 29 L 8 23"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          <div className="flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-[#1b59f8] text-white shadow-[0_12px_28px_rgba(27,89,248,0.4)] border border-white/20">
+            <div className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+            <span className="text-xs sm:text-sm font-extrabold text-white tracking-tight">
+              Peer Collaboration
+            </span>
+          </div>
+        </div>
+
+        {/* ── 3. Bottom-Left Card: Verified Access $0 Free ── */}
+        <div className="absolute -bottom-4 -left-3 sm:-bottom-5 sm:-left-5 z-20 p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-[#1b59f8] text-white shadow-[0_18px_36px_rgba(27,89,248,0.45)] border border-white/20 select-none min-w-[210px] sm:min-w-[230px] text-left">
+          <div className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-blue-200">
+            VERIFIED ACCESS
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-0.5">
+            $0 Free
+          </div>
+          <div className="text-[11px] text-blue-100 font-semibold mt-1 leading-snug">
+            For All Accredited Students &amp; Faculty
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}

@@ -19,6 +19,7 @@ import WorkCard from '@/components/cards/WorkCard';
 import { getWorks, getCommunities } from '@/lib/data/service';
 import { getUser } from '@/lib/supabase/server';
 import HomeHeroActions from '@/components/home/HomeHeroActions';
+import HeroVisualCard from '@/components/home/HeroVisualCard';
 
 export default async function HomePage() {
   const user = await getUser();
@@ -27,48 +28,59 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col w-full bg-white text-[#0f172a] selection:bg-[#1b59f8]/20 selection:text-[#1b59f8]">
-      {/* ── 1. HERO SECTION: Grounded, authentic, direct ── */}
-      <section className="relative pt-12 pb-16 sm:pt-16 sm:pb-20 border-b border-slate-100 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
-            {/* Identity Pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 mb-6 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#1b59f8]" />
-              <span>Campus Skill Connect (CSC)</span>
+      {/* ── 1. HERO SECTION: 2-Column Responsive Layout ── */}
+      <section className="relative pt-8 pb-16 sm:pt-12 sm:pb-20 lg:pt-16 lg:pb-24 border-b border-slate-100 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+            
+            {/* Left Column: Headline, Subtitle, Actions & Verification Notes */}
+            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+              {/* Identity Pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 mb-6 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#1b59f8]" />
+                <span>Campus Skill Connect (CSC)</span>
+              </div>
+
+              {/* Clear Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f172a] tracking-tight leading-[1.12]">
+                A Skill-First, Work-First <br className="hidden sm:inline" />
+                <span className="text-[#1b59f8]">Campus Platform</span>
+              </h1>
+
+              {/* Direct Subtitle */}
+              <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+                Where university students and faculty publish verifiable proof of their technical projects, find peer collaborators matching their skills, and connect with academic peers and recruiters.
+              </p>
+
+              {/* Action Buttons: Dynamically adapts to Logged In vs Guest */}
+              <HomeHeroActions
+                initialIsLoggedIn={Boolean(user)}
+                initialRole={user?.user_metadata?.role || 'student'}
+                align="left"
+              />
+
+              {/* Core Verification Notes */}
+              <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-slate-500 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Verified University Email Domains</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Real GitHub &amp; Research Links</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Zero Unverified Resumes</span>
+                </div>
+              </div>
             </div>
 
-            {/* Clear Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f172a] tracking-tight leading-[1.12]">
-              A Skill-First, Work-First <br className="hidden sm:inline" />
-              <span className="text-[#1b59f8]">Campus Platform</span>
-            </h1>
-
-            {/* Direct Subtitle */}
-            <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Where university students and faculty publish verifiable proof of their technical projects, find peer collaborators matching their skills, and connect with academic peers and recruiters.
-            </p>
-
-            {/* Action Buttons: Dynamically adapts to Logged In vs Guest */}
-            <HomeHeroActions
-              initialIsLoggedIn={Boolean(user)}
-              initialRole={user?.user_metadata?.role || 'student'}
-            />
-
-            {/* Core Verification Notes */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Verified University Email Domains</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Real GitHub &amp; Research Links</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Zero Unverified Resumes</span>
-              </div>
+            {/* Right Column: Hero Visual Card with Portrait & Badges */}
+            <div className="lg:col-span-5 flex items-center justify-center lg:justify-end w-full">
+              <HeroVisualCard />
             </div>
+
           </div>
         </div>
       </section>

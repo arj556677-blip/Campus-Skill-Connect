@@ -8,13 +8,16 @@ import { ArrowRight, LayoutDashboard, Plus, Compass } from 'lucide-react';
 interface HomeHeroActionsProps {
   initialIsLoggedIn?: boolean;
   initialRole?: string;
+  align?: 'center' | 'left';
 }
 
 export default function HomeHeroActions({
   initialIsLoggedIn = false,
   initialRole = 'student',
+  align = 'center',
 }: HomeHeroActionsProps) {
   const { isLoggedIn, isMounted, currentUser } = useRole();
+  const justifyClass = align === 'left' ? 'justify-center lg:justify-start' : 'justify-center';
 
   // If mounted on client, use live client role state; otherwise fallback to SSR state
   const userLoggedIn = isMounted ? isLoggedIn : initialIsLoggedIn;
@@ -38,7 +41,7 @@ export default function HomeHeroActions({
 
   if (userLoggedIn) {
     return (
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <div className={`mt-8 flex flex-wrap items-center ${justifyClass} gap-3`}>
         <Link
           href={dashboardUrl}
           className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-sm font-bold shadow-sm transition-all active:scale-95"
@@ -70,7 +73,7 @@ export default function HomeHeroActions({
   }
 
   return (
-    <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+    <div className={`mt-8 flex flex-wrap items-center ${justifyClass} gap-3`}>
       <Link
         href="/sign-up"
         className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-sm transition-all active:scale-95"

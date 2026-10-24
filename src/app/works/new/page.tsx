@@ -40,13 +40,20 @@ const CATEGORIES: { id: WorkCategory; label: string }[] = [
 
 export default function NewWorkPage() {
   const router = useRouter();
-  const { currentRole, isMounted } = useRole();
+  const { currentRole, isLoggedIn, isMounted } = useRole();
 
   useEffect(() => {
-    if (isMounted && currentRole === 'admin') {
+    if (!isMounted) return;
+
+    if (!isLoggedIn) {
+      router.replace('/sign-in?redirect=%2Fworks%2Fnew');
+      return;
+    }
+
+    if (currentRole === 'admin') {
       router.replace('/admin');
     }
-  }, [isMounted, currentRole, router]);
+  }, [isMounted, isLoggedIn, currentRole, router]);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -164,6 +171,30 @@ export default function NewWorkPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isMounted && !isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center py-20 px-4">
+        <div className="text-center space-y-4 max-w-md mx-auto p-8 bg-white rounded-3xl border border-slate-200 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#1b59f8] flex items-center justify-center mx-auto">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Sign In Required</h2>
+            <p className="text-xs text-slate-500 mt-1">
+              You must be logged in to an accredited campus account to share work and publish proof. Redirecting to sign in...
+            </p>
+          </div>
+          <Link
+            href="/sign-in?redirect=%2Fworks%2Fnew"
+            className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+          >
+            <span>Log In to Continue</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (isMounted && currentRole === 'admin') {
     return (

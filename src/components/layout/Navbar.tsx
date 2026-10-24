@@ -268,8 +268,8 @@ export default function Navbar() {
 
         {/* Action Center (Right Side) */}
         <div className="flex items-center gap-2.5">
-          {/* Primary CTA: Share Work (Not applicable for Admin) */}
-          {(!isMounted || currentRole !== 'admin') && (
+          {/* Primary CTA: Share Work (Only for authenticated members, not admin or logged-out guests) */}
+          {isMounted && isLoggedIn && currentRole !== 'admin' && (
             <Link
               href="/works/new"
               className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
@@ -571,7 +571,7 @@ export default function Navbar() {
 
           {/* Quick Actions in Mobile Drawer */}
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-            {(!isMounted || currentRole !== 'admin') && (
+            {isMounted && isLoggedIn && currentRole !== 'admin' && (
               <Link
                 href="/works/new"
                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors"

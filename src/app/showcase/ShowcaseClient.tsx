@@ -18,7 +18,7 @@ const PAGE_SIZE = 24;
 export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentRole, isMounted } = useRole();
+  const { currentRole, isLoggedIn, isMounted } = useRole();
 
   // Read URL-synced states
   const selectedCategory = searchParams.get('category') || 'all';
@@ -89,7 +89,7 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
           </p>
         </div>
 
-        {(!isMounted || currentRole !== 'admin') && (
+        {isMounted && isLoggedIn && currentRole !== 'admin' ? (
           <Link
             href="/works/new"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-colors self-start md:self-end active:scale-95"
@@ -97,7 +97,15 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
             <Plus className="w-4 h-4" aria-hidden="true" />
             <span>Publish Work Item</span>
           </Link>
-        )}
+        ) : isMounted && !isLoggedIn ? (
+          <Link
+            href="/sign-in?redirect=%2Fworks%2Fnew"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors self-start md:self-end"
+          >
+            <Plus className="w-4 h-4 text-slate-500" aria-hidden="true" />
+            <span>Sign In to Share Work</span>
+          </Link>
+        ) : null}
       </div>
 
       {/* Filter and Search Bar with URL-synced state */}

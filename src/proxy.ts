@@ -42,10 +42,28 @@ export function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL(destination, request.url));
     }
   }
+  // 3. Sharing work requires an authenticated session — unauthenticated users must sign in first
+  if (pathname.startsWith('/works/new')) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL('/sign-in?redirect=%2Fworks%2Fnew', request.url));
+    }
+    if (role === 'admin') {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard', '/dashboard/', '/sign-in', '/sign-in/', '/sign-up', '/sign-up/'],
+  matcher: [
+    '/dashboard',
+    '/dashboard/',
+    '/sign-in',
+    '/sign-in/',
+    '/sign-up',
+    '/sign-up/',
+    '/works/new',
+    '/works/new/:path*',
+  ],
 };

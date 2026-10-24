@@ -909,11 +909,17 @@ export default function AdminClient({
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <img
-                          src={comm.logo_url ?? undefined}
-                          alt={comm.name}
-                          className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
-                        />
+                        {comm.logo_url ? (
+                          <img
+                            src={comm.logo_url}
+                            alt={comm.name}
+                            className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#1b59f8] font-bold text-xs flex items-center justify-center ring-1 ring-slate-200 shrink-0">
+                            {comm.name?.slice(0, 2).toUpperCase() || 'CP'}
+                          </div>
+                        )}
                         <div>
                           <h3 className="font-bold text-sm text-slate-900 group-hover:text-[#1b59f8] transition-colors">
                             {comm.name}

@@ -73,11 +73,17 @@ export default function RecruiterDashboardClient({
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start gap-4">
-            <img
-              src={currentUser.avatar}
-              alt={currentUser.name}
-              className="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-500/20 shadow-sm shrink-0"
-            />
+            {currentUser.avatar ? (
+              <img
+                src={currentUser.avatar}
+                alt={currentUser.name}
+                className="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-500/20 shadow-sm shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-emerald-700 text-white text-xl font-bold flex items-center justify-center ring-2 ring-emerald-500/20 shadow-sm shrink-0">
+                {currentUser.name?.slice(0, 2).toUpperCase() || 'RC'}
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -256,11 +262,17 @@ export default function RecruiterDashboardClient({
                     <div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <img
-                            src={candidate.avatar_url || ''}
-                            alt={candidate.display_name}
-                            className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200"
-                          />
+                          {candidate.avatar_url ? (
+                            <img
+                              src={candidate.avatar_url}
+                              alt={candidate.display_name}
+                              className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white text-xs font-bold flex items-center justify-center ring-1 ring-slate-200 shrink-0">
+                              {candidate.display_name?.slice(0, 2).toUpperCase() || 'ST'}
+                            </div>
+                          )}
                           <div>
                             <p className="text-xs font-bold text-slate-900">{candidate.display_name}</p>
                             <p className="text-[10px] text-slate-500 truncate max-w-[150px]">
@@ -369,11 +381,17 @@ export default function RecruiterDashboardClient({
                   <tr key={candidate.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={candidate.avatar_url || ''}
-                          alt={candidate.display_name}
-                          className="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-200"
-                        />
+                        {candidate.avatar_url ? (
+                          <img
+                            src={candidate.avatar_url}
+                            alt={candidate.display_name}
+                            className="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-200 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center ring-1 ring-slate-200 shrink-0">
+                            {candidate.display_name?.slice(0, 2).toUpperCase() || 'ST'}
+                          </div>
+                        )}
                         <div>
                           <p className="font-bold text-slate-900">{candidate.display_name}</p>
                           <p className="text-[11px] text-slate-500">{candidate.field || 'Computer Science'}</p>

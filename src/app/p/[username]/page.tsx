@@ -312,11 +312,17 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPro
             {/* Avatar with Verified Ring */}
             <div className="relative shrink-0">
               <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl overflow-hidden ring-4 ring-indigo-500/20 border-2 border-white/[0.1] shadow-xl bg-slate-800">
-                <img
-                  src={profile.avatarUrl}
-                  alt={profile.displayName}
-                  className="w-full h-full object-cover object-top"
-                />
+                {profile.avatarUrl ? (
+                  <img
+                    src={profile.avatarUrl}
+                    alt={profile.displayName}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-800 text-white font-bold text-2xl flex items-center justify-center">
+                    {profile.displayName.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
               </div>
 
               {/* Verified Institutional Ribbon Badge */}

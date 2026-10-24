@@ -174,11 +174,17 @@ export default function CertificatesBadgesSection({
                   className="relative w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 cursor-pointer group-hover:ring-2 group-hover:ring-blue-400 transition-all"
                   title="Click to view credential"
                 >
-                  <img
-                    src={cert.image_url}
-                    alt={cert.title}
-                    className="w-full h-full object-cover"
-                  />
+                  {cert.image_url ? (
+                    <img
+                      src={cert.image_url}
+                      alt={cert.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-blue-50 text-blue-600 font-bold text-xs">
+                      CERT
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                     <Eye className="w-4 h-4 text-white" />
                   </div>

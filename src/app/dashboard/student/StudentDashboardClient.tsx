@@ -145,11 +145,17 @@ export default function StudentDashboardClient({
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start gap-4">
-            <img
-              src={currentUser.avatar}
-              alt={currentUser.name}
-              className="w-16 h-16 rounded-2xl object-cover ring-2 ring-[#1b59f8]/20 shadow-sm shrink-0"
-            />
+            {currentUser.avatar ? (
+              <img
+                src={currentUser.avatar}
+                alt={currentUser.name}
+                className="w-16 h-16 rounded-2xl object-cover ring-2 ring-[#1b59f8]/20 shadow-sm shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-[#1b59f8] text-white text-xl font-bold flex items-center justify-center ring-2 ring-[#1b59f8]/20 shadow-sm shrink-0">
+                {currentUser.name?.slice(0, 2).toUpperCase() || 'ST'}
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span

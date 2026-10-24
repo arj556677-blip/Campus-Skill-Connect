@@ -433,11 +433,17 @@ export default function GeneralDashboardClient({
                 className="p-3.5 rounded-2xl bg-[#f8fafc] border border-slate-200/70 hover:border-blue-300 transition-all shadow-xs"
               >
                 <div className="flex items-center gap-2.5">
-                  <img
-                    src={comm.logo_url || ''}
-                    alt={comm.name}
-                    className="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200"
-                  />
+                  {comm.logo_url ? (
+                    <img
+                      src={comm.logo_url}
+                      alt={comm.name}
+                      className="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-xl bg-blue-100 text-[#1b59f8] font-bold text-xs flex items-center justify-center ring-1 ring-slate-200 shrink-0">
+                      {comm.name?.slice(0, 2).toUpperCase() || 'CP'}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <h4 className="text-xs font-bold text-slate-900 truncate">{comm.name}</h4>
                     <p className="text-[10px] font-mono text-slate-500 truncate">*.{comm.domain}</p>

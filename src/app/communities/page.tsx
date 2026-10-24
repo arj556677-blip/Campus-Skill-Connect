@@ -44,11 +44,17 @@ export default async function CommunitiesPage() {
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3.5">
-                      <img
-                        src={comm.logo_url!}
-                        alt={comm.name}
-                        className="w-14 h-14 rounded-2xl object-cover ring-1 ring-zinc-200"
-                      />
+                      {comm.logo_url ? (
+                        <img
+                          src={comm.logo_url}
+                          alt={comm.name}
+                          className="w-14 h-14 rounded-2xl object-cover ring-1 ring-zinc-200 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-700 font-bold text-lg flex items-center justify-center ring-1 ring-zinc-200 shrink-0">
+                          {comm.name?.slice(0, 2).toUpperCase() || 'CP'}
+                        </div>
+                      )}
                       <div>
                         <div className="flex items-center gap-1.5">
                           <h3 className="font-bold text-base text-[var(--color-ink)]">{comm.name}</h3>

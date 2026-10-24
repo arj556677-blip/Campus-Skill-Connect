@@ -707,7 +707,7 @@ export default function HoloCard({
           {image ? <img src={image} alt="" draggable={false} /> : null}
           <canvas ref={canvasRef} />
         </div>
-        {flippable ? (
+        {flippable && backImage ? (
           <div className="holo-card__face holo-card__face--back">
             <img src={backImage} alt="" draggable={false} />
           </div>

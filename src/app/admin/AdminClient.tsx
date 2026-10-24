@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useRole } from '@/lib/auth/role-context';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -138,7 +137,6 @@ export default function AdminClient({
   works: _initialWorks = [],
   recruiters: initialRecruiters = [],
 }: AdminClientProps) {
-  const { switchRole } = useRole();
 
   // Navigation tab
   const [activeTab, setActiveTab] = useState<'reports' | 'audit' | 'institutions' | 'recruiters' | 'health'>('reports');
@@ -502,26 +500,6 @@ export default function AdminClient({
 
           {/* Header Action Strip */}
           <div className="flex flex-wrap items-center gap-2.5">
-            {/* Quick Persona Tester */}
-            <div className="p-1 rounded-full bg-slate-100 border border-slate-200/90 flex items-center gap-1 shadow-2xs">
-              <span className="text-[10px] font-mono uppercase text-slate-400 px-2.5 font-bold">
-                Test View:
-              </span>
-              <button
-                onClick={() => switchRole('student', true)}
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-700 hover:text-[#1b59f8] border border-slate-200/80 transition-all flex items-center gap-1.5 shadow-xs active:scale-95"
-              >
-                <GraduationCap className="w-3.5 h-3.5 text-[#1b59f8]" />
-                <span>Student</span>
-              </button>
-              <button
-                onClick={() => switchRole('recruiter', true)}
-                className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-700 hover:text-emerald-700 border border-slate-200/80 transition-all flex items-center gap-1.5 shadow-xs active:scale-95"
-              >
-                <Briefcase className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Recruiter</span>
-              </button>
-            </div>
 
             {/* Benchmark Ping Button */}
             <button

@@ -28,7 +28,7 @@ import {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isLoggedIn, isMounted, currentRole, currentUser, switchRole, signOut } = useRole();
+  const { isLoggedIn, isMounted, currentRole, currentUser, signOut } = useRole();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -348,32 +348,6 @@ export default function Navbar() {
                     </div>
                     <p className="text-[11px] text-slate-500 truncate mt-0.5">{currentUser.title}</p>
                     <p className="text-[10px] font-mono text-slate-400 truncate mt-0.5">{currentUser.email}</p>
-                  </div>
-
-                  {/* Persona Switcher Quick Control */}
-                  <div className="p-2 border-b border-slate-100 bg-slate-50 rounded-xl my-1.5">
-                    <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block mb-1.5 font-bold">
-                      Switch Role:
-                    </span>
-                    <div className="grid grid-cols-4 gap-1">
-                      {(['student', 'faculty', 'recruiter', 'admin'] as UserRoleType[]).map((r) => (
-                        <button
-                          key={r}
-                          type="button"
-                          onClick={() => {
-                            switchRole(r, true);
-                            setUserDropdownOpen(false);
-                          }}
-                          className={`py-1 px-1 rounded-lg text-[9px] font-semibold capitalize transition-colors text-center ${
-                            currentRole === r
-                              ? 'bg-[#0f172a] text-white shadow-xs font-bold'
-                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                          }`}
-                        >
-                          {r === 'faculty' ? 'Faculty' : r}
-                        </button>
-                      ))}
-                    </div>
                   </div>
 
                   {/* Navigation Links */}

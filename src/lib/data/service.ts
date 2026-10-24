@@ -154,13 +154,6 @@ export async function getProfileById(id: string): Promise<Profile | null> {
     CacheKeys.profile(id),
     async () => {
       if (isPlaceholderConfig()) {
-        const mock = MOCK_PROFILES.find((p) => p.id === id);
-        if (mock) {
-          return {
-            ...mock,
-            skills: mock.skills || MOCK_SKILLS.slice(0, 6).map((sk) => ({ id: sk.id, name: sk.name, skill: sk })),
-          };
-        }
         return null;
       }
 
@@ -173,26 +166,12 @@ export async function getProfileById(id: string): Promise<Profile | null> {
           .single();
 
         if (error || !data) {
-          const mock = MOCK_PROFILES.find((p) => p.id === id);
-          if (mock) {
-            return {
-              ...mock,
-              skills: mock.skills || MOCK_SKILLS.slice(0, 6).map((sk) => ({ id: sk.id, name: sk.name, skill: sk })),
-            };
-          }
           return null;
         }
 
         return data as Profile;
       } catch (err) {
-        console.warn('[getProfileById] Service notice, serving mock profile:', err);
-        const mock = MOCK_PROFILES.find((p) => p.id === id);
-        if (mock) {
-          return {
-            ...mock,
-            skills: mock.skills || MOCK_SKILLS.slice(0, 6).map((sk) => ({ id: sk.id, name: sk.name, skill: sk })),
-          };
-        }
+        console.error('[getProfileById] Service failure:', err);
         return null;
       }
     },

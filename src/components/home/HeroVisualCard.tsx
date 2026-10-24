@@ -1,8 +1,6 @@
-'use client';
-
 import React from 'react';
-import Image from 'next/image';
 import { Sparkles } from 'lucide-react';
+import HoloCard from '@/components/ui/HoloCard';
 
 export default function HeroVisualCard() {
   return (
@@ -29,15 +27,22 @@ export default function HeroVisualCard() {
           </svg>
         </div>
 
-        {/* Central Portrait Container with gentle zoom on card hover */}
-        <div className="relative w-full aspect-[3.25/4] rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200/60 shadow-xs">
-          <Image
-            src="/images/hero-student.jpg"
+        {/* Central Student Portrait with WebGL2 Holographic Foil Effect from React Bits */}
+        <div className="relative w-full flex items-center justify-center rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200/60 shadow-xs">
+          <HoloCard
+            image="/images/hero-student.jpg"
             alt="Student builder collaborating in university innovation lab"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
-            className="object-cover object-top select-none transition-transform duration-700 ease-out group-hover/card:scale-105"
+            preset="bursts"
+            radius={28}
+            width="100%"
+            intensity={0.82}
+            glare={0.45}
+            edgeSparkle={0.8}
+            tiltMax={14}
+            hoverScale={1.03}
+            idle={true}
+            shadow={false}
+            className="w-full block"
           />
         </div>
 

@@ -79,29 +79,17 @@ export async function getWorks(filters?: { category?: string; query?: string }):
       // 3. Normalize verified mock works catalog with live user profiles
       const normalizedMockWorks = normalizeWorksWithProfiles(MOCK_WORKS, liveProfiles);
 
-      // 4. Generate verified proof-of-work repositories for other registered student/faculty profiles that don't have works yet
-      const generatedProfileWorks: Work[] = [];
-      for (const prof of liveProfiles) {
-        if (prof.role === 'student' || prof.role === 'faculty') {
-          const hasExistingWork =
-            dbWorks.some((w) => w.owner_id === prof.id || w.owner?.id === prof.id) ||
-            normalizedMockWorks.some((w) => w.owner_id === prof.id || w.owner?.id === prof.id);
-
-          if (!hasExistingWork) {
-            const tailored = generateTailoredWorksForProfile(prof);
-            generatedProfileWorks.push(...tailored);
-          }
-        }
-      }
-
-      // 5. Combine and deduplicate across all sources
+      // 4. Combine and deduplicate across real database works and distinct verified portfolio works
       const seenIds = new Set<string>();
+      const seenTitles = new Set<string>();
       const combined: Work[] = [];
 
-      for (const w of [...dbWorks, ...normalizedMockWorks, ...generatedProfileWorks]) {
-        if (!w || !w.id) continue;
-        if (!seenIds.has(w.id)) {
+      for (const w of [...dbWorks, ...normalizedMockWorks]) {
+        if (!w || !w.id || !w.title) continue;
+        const normalizedTitle = w.title.trim().toLowerCase();
+        if (!seenIds.has(w.id) && !seenTitles.has(normalizedTitle)) {
           seenIds.add(w.id);
+          seenTitles.add(normalizedTitle);
           combined.push(w);
         }
       }

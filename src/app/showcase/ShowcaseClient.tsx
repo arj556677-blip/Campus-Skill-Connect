@@ -52,12 +52,13 @@ export default function ShowcaseClient({ initialWorks }: ShowcaseClientProps) {
       .filter((work) => {
         const matchesCategory =
           selectedCategory === 'all' || work.category === selectedCategory;
+        const q = searchQuery.toLowerCase();
         const matchesQuery =
           !searchQuery ||
-          work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (work.description ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-          work.skills?.some((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          work.owner?.display_name.toLowerCase().includes(searchQuery.toLowerCase());
+          work.title.toLowerCase().includes(q) ||
+          (work.description ?? '').toLowerCase().includes(q) ||
+          work.skills?.some((s) => s?.name?.toLowerCase().includes(q)) ||
+          Boolean(work.owner?.display_name?.toLowerCase().includes(q));
         return matchesCategory && matchesQuery;
       })
       .sort((a, b) => {

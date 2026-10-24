@@ -67,14 +67,26 @@ export default function WorkCard({ work }: WorkCardProps) {
 
         {/* Skill Tags */}
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {work.skills?.slice(0, 3).map((skill) => (
-            <span
-              key={skill.id}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-[10px] font-semibold text-slate-600 border border-slate-200/60 transition-colors"
-            >
-              #{skill.name}
-            </span>
-          ))}
+          {work.skills?.slice(0, 3).map((skill, index) => {
+            const skillId =
+              skill?.id ||
+              (skill as { skills?: { id?: string } })?.skills?.id ||
+              skill?.name ||
+              (skill as { skills?: { name?: string } })?.skills?.name ||
+              `skill-${work.id}-${index}`;
+            const skillName =
+              skill?.name ||
+              (skill as { skills?: { name?: string } })?.skills?.name ||
+              (typeof skill === 'string' ? skill : 'Skill');
+            return (
+              <span
+                key={skillId}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-[10px] font-semibold text-slate-600 border border-slate-200/60 transition-colors"
+              >
+                #{skillName}
+              </span>
+            );
+          })}
           {(work.skills?.length || 0) > 3 && (
             <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold text-slate-500 bg-slate-100 border border-slate-200/60">
               +{work.skills!.length - 3}

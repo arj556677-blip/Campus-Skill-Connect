@@ -6,6 +6,3 @@ export type { HoloCardProps, HoloPreset } from './HoloCard';
 
 export { default as TechText } from './TechText';
 export type { TechTextProps } from './TechText';
-
-export { default as FolderFloat } from './FolderFloat';
-export type { FolderFloatProps, FolderItem } from './FolderFloat';

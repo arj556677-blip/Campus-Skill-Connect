@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminSupabaseClient, getUser } from '@/lib/supabase/server';
 import { getClientIp } from '@/lib/utils/ip';
 
 export async function DELETE(request: NextRequest) {
   const ip = getClientIp(request);
   try {
     const supabase = await createServerSupabaseClient();
+    const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminSupabaseClient() : null;
+    const dbClient = admin || supabase;
     const user = await getUser();
 
     if (!user) {
@@ -21,23 +23,23 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 1. Delete user's works
-    await supabase.from('works').delete().eq('owner_id', user.id);
+    await dbClient.from('works').delete().eq('owner_id', user.id);
 
     // 2. Delete user's skills
-    await supabase.from('user_skills').delete().eq('user_id', user.id);
+    await dbClient.from('user_skills').delete().eq('user_id', user.id);
 
     // 3. Delete connections and blocks
-    await supabase
+    await dbClient
       .from('connections')
       .delete()
       .or(`user_low.eq.${user.id},user_high.eq.${user.id}`);
-    await supabase
+    await dbClient
       .from('blocks')
       .delete()
       .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`);
 
     // 4. Delete CV storage files
-    const { data: cvRecords } = await supabase
+    const { data: cvRecords } = await dbClient
       .from('cv_uploads')
       .select('file_url')
       .eq('user_id', user.id);
@@ -46,16 +48,16 @@ export async function DELETE(request: NextRequest) {
       const filePaths = cvRecords.map((r) => r.file_url).filter(Boolean) as string[];
       if (filePaths.length > 0) {
         try {
-          await supabase.storage.from('cv-documents').remove(filePaths);
+          await dbClient.storage.from('cv-documents').remove(filePaths);
         } catch {
           // Continue with profile deletion
         }
       }
-      await supabase.from('cv_uploads').delete().eq('user_id', user.id);
+      await dbClient.from('cv_uploads').delete().eq('user_id', user.id);
     }
 
     // 5. Anonymize/erase profile personal data
-    await supabase
+    await dbClient
       .from('profiles')
       .update({
         display_name: 'Anonymized Former User',

@@ -98,13 +98,20 @@ export async function getUser(): Promise<User | null> {
         ? 'Administrator'
         : 'Talent Partner';
       const avatar = rawAvatar ? decodeURIComponent(rawAvatar) : '';
-      const id = email.includes('ragav')
-        ? 'c0000000-0000-0000-0000-000000000001'
-        : role === 'recruiter'
-        ? 'c0000000-0000-0000-0000-000000000002'
-        : role === 'admin'
-        ? 'c0000000-0000-0000-0000-000000000003'
-        : 'c0000000-0000-0000-0000-000000000001';
+      const id =
+        role === 'recruiter'
+          ? '3839c28a-891f-4dd6-a7c0-39539a211ea0'
+          : role === 'faculty'
+          ? '028f8cbb-239e-45a3-b5ec-29c173777d1a'
+          : role === 'admin'
+          ? 'fa2eaf13-d843-4e21-87bb-11c8261bb362'
+          : email.toLowerCase().includes('ragav') || name.toLowerCase().includes('ragav')
+          ? '4adab108-bcfd-43f4-9686-645a23f2fda7'
+          : email.toLowerCase().includes('sibin') || name.toLowerCase().includes('sibin')
+          ? '1146b373-d3e5-46c2-9971-641c2824cc62'
+          : email.toLowerCase().includes('aaron') || name.toLowerCase().includes('aaron')
+          ? '45473221-5eca-4792-bae8-f78ab115dc96'
+          : '8ba443b3-af5c-422d-b3b0-fc2baeccc822';
 
       const syntheticUser: User = {
         id,

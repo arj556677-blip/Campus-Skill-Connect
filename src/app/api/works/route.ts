@@ -101,12 +101,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Use admin client if service role key is present to bypass RLS for server-verified session
+    const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminSupabaseClient() : null;
+    const dbClient = admin || supabase;
+
     // Role check: Admins manage the platform and do not publish work items
-    const { data: userProfile } = await supabase
+    const { data: userProfile } = await dbClient
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (userProfile?.role === 'admin') {
       return NextResponse.json(
@@ -151,7 +155,7 @@ export async function POST(request: NextRequest) {
       : 'public';
 
     // Insert work with verified owner_id from session
-    const { data: work, error } = await supabase
+    const { data: work, error } = await dbClient
       .from('works')
       .insert({
         owner_id: user.id,
@@ -175,7 +179,7 @@ export async function POST(request: NextRequest) {
         work_id: work.id,
         skill_id: skillId,
       }));
-      await supabase.from('work_skills').insert(workSkills);
+      await dbClient.from('work_skills').insert(workSkills);
     }
 
     // Invalidate Redis Showcase feed cache atomically

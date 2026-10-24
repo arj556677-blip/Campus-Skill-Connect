@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminSupabaseClient, getUser } from '@/lib/supabase/server';
 import { cacheInvalidatePattern } from '@/lib/redis/cache';
 
 const ALLOWED_CATEGORIES = new Set([
@@ -53,9 +53,11 @@ export async function PATCH(
     }
 
     const supabase = await createServerSupabaseClient();
+    const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminSupabaseClient() : null;
+    const dbClient = admin || supabase;
 
     // Verify ownership
-    const { data: existing, error: fetchErr } = await supabase
+    const { data: existing, error: fetchErr } = await dbClient
       .from('works')
       .select('id, owner_id')
       .eq('id', id)
@@ -127,7 +129,7 @@ export async function PATCH(
       updateData.storage_path = body.storage_path || null;
     }
 
-    const { data: updatedWork, error: updateErr } = await supabase
+    const { data: updatedWork, error: updateErr } = await dbClient
       .from('works')
       .update(updateData)
       .eq('id', id)
@@ -160,9 +162,11 @@ export async function DELETE(
     }
 
     const supabase = await createServerSupabaseClient();
+    const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminSupabaseClient() : null;
+    const dbClient = admin || supabase;
 
     // Verify ownership
-    const { data: existing, error: fetchErr } = await supabase
+    const { data: existing, error: fetchErr } = await dbClient
       .from('works')
       .select('id, owner_id')
       .eq('id', id)
@@ -179,7 +183,7 @@ export async function DELETE(
       );
     }
 
-    const { error: deleteErr } = await supabase.from('works').delete().eq('id', id);
+    const { error: deleteErr } = await dbClient.from('works').delete().eq('id', id);
 
     if (deleteErr) {
       return NextResponse.json({ error: deleteErr.message }, { status: 400 });

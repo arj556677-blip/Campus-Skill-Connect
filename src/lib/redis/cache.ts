@@ -35,8 +35,11 @@ export async function cacheGet<T>(
   if (redis.status === 'ready') {
     try {
       const cached = await redis.get(cacheKey);
-      if (cached) {
-        return JSON.parse(cached) as T;
+      if (cached && cached !== 'null') {
+        const parsed = JSON.parse(cached);
+        if (parsed !== null && parsed !== undefined) {
+          return parsed as T;
+        }
       }
     } catch {
       // Redis read failed, fall through smoothly to source
@@ -47,7 +50,7 @@ export async function cacheGet<T>(
   const data = await fetcher();
 
   // 3. Store in cache if Redis is active
-  if (redis.status === 'ready') {
+  if (redis.status === 'ready' && data !== null && data !== undefined) {
     try {
       await redis.setex(cacheKey, ttlSeconds, JSON.stringify(data));
     } catch {

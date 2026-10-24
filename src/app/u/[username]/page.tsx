@@ -4,7 +4,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
-import { getWorks } from '@/lib/data/service';
+import { getWorks, getWorksForProfile } from '@/lib/data/service';
 import { Profile } from '@/lib/types';
 import WorkCard from '@/components/cards/WorkCard';
 import ProfileActions from '@/app/profile/[id]/ProfileActions';
@@ -189,9 +189,8 @@ export default async function PublicProfilePage({ params, searchParams }: Public
   }
 
   // 5. Fetch works based on viewer authorization
-  const allWorks = await getWorks();
-  const visibleWorks = allWorks.filter((w) => {
-    if (w.owner_id !== targetProfile.id) return false;
+  const profileWorks = await getWorksForProfile(targetProfile);
+  const visibleWorks = profileWorks.filter((w) => {
     if (isOwner && !isPreviewMode) return true;
     if (w.visibility === 'only_me') return false;
     if (w.visibility === 'connections') return isConnected;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createAdminSupabaseClient, getUser } from '@/lib/supabase/server';
 import { cacheInvalidatePattern } from '@/lib/redis/cache';
 import { checkRateLimit, getRateLimitHeaders, RateLimits } from '@/lib/redis/rate-limit';
 import { getClientIp } from '@/lib/utils/ip';
@@ -41,13 +41,37 @@ export async function GET(request: NextRequest) {
       query = query.eq('category', category);
     }
 
-    const { data, error } = await query;
+    let { data, error } = await query;
+    if (error && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const admin = createAdminSupabaseClient();
+        let adminQuery = admin
+          .from('works')
+          .select('*, owner:profiles(*), skills:work_skills(skills(*))')
+          .in('visibility', ['public', 'worldwide'])
+          .order('published_at', { ascending: false });
+
+        if (category && category !== 'all') {
+          adminQuery = adminQuery.eq('category', category);
+        }
+
+        const adminRes = await adminQuery;
+        if (!adminRes.error && adminRes.data) {
+          data = adminRes.data;
+          error = null;
+        }
+      } catch {
+        // keep original error
+      }
+    }
+
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     return NextResponse.json({ works: data });
   } catch (err: unknown) {
+
     const message = err instanceof Error ? err.message : 'Failed to retrieve works';
     return NextResponse.json({ error: message }, { status: 500 });
   }

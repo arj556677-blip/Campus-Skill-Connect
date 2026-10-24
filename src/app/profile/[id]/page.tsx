@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getProfileById, getWorks } from '@/lib/data/service';
+import { getProfileById, getWorks, getWorksForProfile } from '@/lib/data/service';
 import { getUser, createServerSupabaseClient } from '@/lib/supabase/server';
 import { isOnline } from '@/lib/redis/session';
 import WorkCard from '@/components/cards/WorkCard';
@@ -74,8 +74,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   // Check online status in Redis presence store
   const userIsOnline = isOwner ? true : await isOnline(profile.id);
 
-  const allWorks = await getWorks();
-  const userWorks = allWorks.filter((w) => w.owner_id === profile.id);
+  const userWorks = await getWorksForProfile(profile);
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 py-10">

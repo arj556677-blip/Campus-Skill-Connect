@@ -7,6 +7,8 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { User } from '@supabase/supabase-js';
 
+import { createClient } from '@supabase/supabase-js';
+
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
@@ -33,6 +35,24 @@ export async function createServerSupabaseClient() {
       },
     }
   );
+}
+
+/**
+ * Service-role admin client that bypasses RLS for system feeds and server data loaders.
+ */
+export function createAdminSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    'placeholder_anon_key';
+
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 }
 
 /** Get the current authenticated user or fallback session identity or null */

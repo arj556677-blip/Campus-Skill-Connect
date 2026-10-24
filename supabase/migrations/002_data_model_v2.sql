@@ -481,28 +481,56 @@ SELECT USING (
   )
 );
 
--- Drop legacy works policy to reinstall hardened policy
+-- 1. Helper function for work ownership (SECURITY DEFINER avoids RLS recursion)
+CREATE OR REPLACE FUNCTION is_work_owner(p_work_id UUID, p_user_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  IF p_work_id IS NULL OR p_user_id IS NULL THEN
+    RETURN false;
+  END IF;
+  RETURN EXISTS (
+    SELECT 1 FROM works WHERE id = p_work_id AND owner_id = p_user_id
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+-- 2. Helper function for granted work access (SECURITY DEFINER avoids RLS recursion)
+CREATE OR REPLACE FUNCTION can_access_work(p_work_id UUID, p_user_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  IF p_work_id IS NULL OR p_user_id IS NULL THEN
+    RETURN false;
+  END IF;
+  RETURN EXISTS (
+    SELECT 1 FROM work_access WHERE work_id = p_work_id AND granted_user_id = p_user_id
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+-- 3. Fix work_access policies to eliminate circular dependency
+DROP POLICY IF EXISTS "Work Access: work owner can manage" ON work_access;
+DROP POLICY IF EXISTS "Work Access: granted user can view" ON work_access;
+
+CREATE POLICY "Work Access: work owner can manage" ON work_access FOR ALL USING (
+  is_work_owner(work_id, auth.uid())
+);
+
+CREATE POLICY "Work Access: granted user can view" ON work_access FOR SELECT USING (
+  granted_user_id = auth.uid()
+);
+
+-- 4. Hardened non-recursive works policy
 DROP POLICY IF EXISTS "Works: viewable based on visibility" ON works;
-CREATE POLICY "Works: viewable based on visibility" ON works FOR
-SELECT USING (
-  -- Owner can always view own works
+CREATE POLICY "Works: viewable based on visibility" ON works FOR SELECT USING (
   owner_id = auth.uid()
   OR (
-    -- Neither party is blocked
     NOT is_blocked(auth.uid(), owner_id)
     AND (
       visibility IN ('public', 'worldwide')
       OR (visibility = 'connections' AND are_connected(auth.uid(), owner_id))
       OR (visibility = 'campus' AND shares_campus(auth.uid(), owner_id))
-      OR (
-        visibility = 'selected_users'
-        AND EXISTS (
-          SELECT 1
-          FROM work_access
-          WHERE work_id = works.id
-            AND granted_user_id = auth.uid()
-        )
-      )
+      OR (visibility = 'selected_users' AND can_access_work(id, auth.uid()))
     )
   )
 );
+

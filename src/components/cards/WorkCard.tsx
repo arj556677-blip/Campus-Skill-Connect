@@ -67,13 +67,19 @@ export default function WorkCard({ work }: WorkCardProps) {
 
         {/* Skill Tags */}
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {work.skills?.slice(0, 3).map((skill, idx) => {
-            const skillObj = (skill as unknown as { skills?: { id?: string; name?: string } })?.skills || skill;
-            const skillName = skillObj?.name || (skill as unknown as { name?: string })?.name || 'Skill';
-            const skillKey = skillObj?.id || (skill as unknown as { id?: string })?.id || skillName;
+          {work.skills?.slice(0, 3).map((skill, index) => {
+            const skillObj = (skill as unknown as { skills?: { id?: string; name?: string } })?.skills || (typeof skill === 'object' && skill !== null ? skill : null);
+            const skillName =
+              skillObj?.name ||
+              (skill as { name?: string })?.name ||
+              (typeof skill === 'string' ? skill : 'Skill');
+            const skillId =
+              skillObj?.id ||
+              (skill as { id?: string })?.id ||
+              skillName;
             return (
               <span
-                key={`work-skill-${work.id || 'w'}-${skillKey}-${idx}`}
+                key={`work-skill-${work.id || 'w'}-${skillId}-${index}`}
                 className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-[10px] font-semibold text-slate-600 border border-slate-200/60 transition-colors"
               >
                 #{skillName}

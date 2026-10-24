@@ -182,15 +182,20 @@ export default async function WorkDetailPage({ params }: WorkPageProps) {
                   Verified Technologies &amp; Skills
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
-                  {work.skills?.map((skill) => (
-                    <span
-                      key={skill.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-xs font-mono font-semibold text-[#1b59f8] border border-blue-200"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#1b59f8]" />
-                      {skill.name}
-                    </span>
-                  ))}
+                  {work.skills?.map((skill, idx) => {
+                    const skillObj = (skill as unknown as { skills?: { id?: string; name?: string } })?.skills || skill;
+                    const skillName = skillObj?.name || (skill as unknown as { name?: string })?.name || 'Skill';
+                    const skillKey = skillObj?.id || (skill as unknown as { id?: string })?.id || skillName;
+                    return (
+                      <span
+                        key={`work-skill-${work.id}-${skillKey}-${idx}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-xs font-mono font-semibold text-[#1b59f8] border border-blue-200"
+                      >
+                        <Sparkles className="w-3 h-3 text-[#1b59f8]" />
+                        {skillName}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
 

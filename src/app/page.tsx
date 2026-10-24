@@ -309,8 +309,8 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {works.slice(0, 6).map((work) => (
-              <WorkCard key={work.id} work={work} />
+            {works.slice(0, 6).map((work, idx) => (
+              <WorkCard key={work.id || `work-${idx}`} work={work} />
             ))}
           </div>
         </div>

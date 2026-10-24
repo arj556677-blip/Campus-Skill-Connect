@@ -233,11 +233,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <span>Verified Technical Competencies</span>
               </h3>
               <div className="flex flex-wrap gap-2">
-                {profile.skills.map((skill) => {
+                {profile.skills.map((skill, idx) => {
                   const name = 'skill' in skill && skill.skill ? skill.skill.name : (skill as { name?: string }).name || 'Skill';
+                  const skillKey = skill.id || name;
                   return (
                     <span
-                      key={skill.id}
+                      key={`prof-skill-${profile.id}-${skillKey}-${idx}`}
                       className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-800 border border-slate-200"
                     >
                       #{name}

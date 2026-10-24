@@ -136,7 +136,7 @@ export default function Navbar() {
             href="/"
             className="flex items-center gap-2.5 group shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl py-1"
           >
-            <div className="w-8 h-8 rounded-xl bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-sm group-hover:bg-[#1b59f8] transition-all duration-200">
+            <div className="w-8 h-8 rounded-xl bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-sm group-hover:bg-[#1b59f8] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
               CS
             </div>
             <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={targetHref}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
                     isActive
                       ? 'text-[#1b59f8] bg-blue-50 font-bold'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -272,9 +272,9 @@ export default function Navbar() {
           {isMounted && isLoggedIn && currentRole !== 'admin' && (
             <Link
               href="/works/new"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1b59f8] hover:bg-blue-700 hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5 text-white text-xs font-bold transition-all duration-200 shadow-sm active:scale-95 group/share"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 transition-transform duration-200 group-hover/share:rotate-90" />
               <span>Share Work</span>
             </Link>
           )}
@@ -284,7 +284,7 @@ export default function Navbar() {
             <Link
               href="/messages"
               title="Direct Messages"
-              className="relative p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="relative p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all duration-150"
             >
               <MessageSquare className="w-4 h-4" />
             </Link>
@@ -464,10 +464,10 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 href="/sign-in"
-                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                className="group inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-[#0f172a] hover:bg-slate-800 hover:shadow-md hover:shadow-slate-900/20 hover:-translate-y-0.5 text-white text-xs font-bold transition-all duration-200 shadow-sm active:scale-95"
               >
                 <span>Login / Signup</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>
           )}

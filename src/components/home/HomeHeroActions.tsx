@@ -44,28 +44,28 @@ export default function HomeHeroActions({
       <div className={`mt-8 flex flex-wrap items-center ${justifyClass} gap-3`}>
         <Link
           href={dashboardUrl}
-          className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-sm font-bold shadow-sm transition-all active:scale-95"
+          className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-sm font-bold shadow-sm hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
         >
-          <LayoutDashboard className="w-4 h-4" />
+          <LayoutDashboard className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
           <span>Go to {roleLabel} Dashboard</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
         </Link>
 
         {resolvedRole !== 'admin' && (
           <Link
             href="/works/new"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold transition-all active:scale-95"
+            className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 hover:shadow-sm hover:-translate-y-0.5 text-slate-800 text-sm font-semibold transition-all duration-200 active:scale-95"
           >
-            <Plus className="w-4 h-4 text-[#1b59f8]" />
+            <Plus className="w-4 h-4 text-[#1b59f8] transition-transform duration-200 group-hover:rotate-90" />
             <span>Share Work</span>
           </Link>
         )}
 
         <Link
           href="/showcase"
-          className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all"
+          className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm hover:-translate-y-0.5 text-slate-700 text-sm font-semibold transition-all duration-200 active:scale-95"
         >
-          <Compass className="w-4 h-4 text-slate-500" />
+          <Compass className="w-4 h-4 text-slate-500 transition-transform duration-300 group-hover:rotate-45 group-hover:text-[#1b59f8]" />
           <span>Explore Works</span>
         </Link>
       </div>
@@ -76,23 +76,24 @@ export default function HomeHeroActions({
     <div className={`mt-8 flex flex-wrap items-center ${justifyClass} gap-3`}>
       <Link
         href="/sign-up"
-        className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold shadow-sm transition-all active:scale-95"
+        className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#0f172a] hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 hover:-translate-y-0.5 text-white text-sm font-bold shadow-sm transition-all duration-200 active:scale-95"
       >
         <span>Create Account</span>
-        <ArrowRight className="w-4 h-4" />
+        <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
       </Link>
 
       <Link
         href="/sign-in"
-        className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold transition-all active:scale-95"
+        className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 hover:shadow-sm hover:-translate-y-0.5 text-slate-800 text-sm font-semibold transition-all duration-200 active:scale-95"
       >
         <span>Login / Signup</span>
       </Link>
 
       <Link
         href="/showcase"
-        className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all"
+        className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm hover:-translate-y-0.5 text-slate-700 text-sm font-semibold transition-all duration-200 active:scale-95"
       >
+        <Compass className="w-4 h-4 text-slate-500 transition-transform duration-300 group-hover:rotate-45 group-hover:text-[#1b59f8]" />
         <span>Explore Works</span>
       </Link>
     </div>

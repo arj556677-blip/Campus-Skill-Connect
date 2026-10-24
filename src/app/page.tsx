@@ -102,12 +102,12 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1 */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div className="group p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1b59f8] flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1b59f8] group-hover:scale-110 group-hover:bg-[#1b59f8] group-hover:text-white transition-all duration-300 flex items-center justify-center mb-4">
                   <FileCheck className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">Link-First Proof of Work</h3>
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#1b59f8] transition-colors">Link-First Proof of Work</h3>
                 <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                   Publish real GitHub code repositories, research papers, and technical blueprints with safe link previews. No fake assertions.
                 </p>
@@ -118,12 +118,12 @@ export default async function HomePage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div className="group p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 flex items-center justify-center mb-4">
                   <Users className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">Skill-Matched Collaborations</h3>
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Skill-Matched Collaborations</h3>
                 <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                   Discover student teams needing your exact skills (e.g. React, Python, Rust, ML) for hackathons, papers, and campus projects.
                 </p>
@@ -134,12 +134,12 @@ export default async function HomePage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div className="group p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 flex items-center justify-center mb-4">
                   <MessageSquare className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">Connections &amp; Messages</h3>
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Connections &amp; Messages</h3>
                 <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                   Send connection requests to peers and mentors, communicate in real time, and form cross-department project teams.
                 </p>
@@ -150,12 +150,12 @@ export default async function HomePage() {
             </div>
 
             {/* Feature 4 */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div className="group p-6 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer">
               <div>
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 flex items-center justify-center mb-4">
                   <Lock className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">4-Level Privacy Control</h3>
+                <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">4-Level Privacy Control</h3>
                 <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                   PostgreSQL Row Level Security enforces visibility across Only Me, Connections, Campus, and Public. Zero unauthorized data leaks.
                 </p>
@@ -185,11 +185,11 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="p-6 rounded-2xl bg-[#f8fafc] border border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs mb-4">
+            <div className="group p-6 rounded-2xl bg-[#f8fafc] border border-slate-200 hover:border-blue-300 hover:bg-white hover:shadow-xl hover:shadow-slate-900/5 hover:-translate-y-1.5 transition-all duration-300">
+              <div className="w-8 h-8 rounded-full bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs mb-4 group-hover:scale-110 group-hover:bg-[#1b59f8] transition-all duration-200">
                 1
               </div>
-              <h3 className="text-base font-bold text-slate-900">Sign Up &amp; Verify Email</h3>
+              <h3 className="text-base font-bold text-slate-900 group-hover:text-[#1b59f8] transition-colors">Sign Up &amp; Verify Email</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Enter your details to receive a 6-digit one-time verification code (OTP) at your email address. Verify the code to securely confirm your account.
               </p>
@@ -202,41 +202,41 @@ export default async function HomePage() {
                 ) : (
                   <Link
                     href="/sign-up"
-                    className="text-xs font-bold text-[#1b59f8] hover:underline inline-flex items-center gap-1"
+                    className="group/link text-xs font-bold text-[#1b59f8] hover:text-blue-700 inline-flex items-center gap-1 transition-colors"
                   >
                     <span>Start registration</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover/link:translate-x-1" />
                   </Link>
                 )}
               </div>
             </div>
 
             {/* Step 2 */}
-            <div className="p-6 rounded-2xl bg-[#f8fafc] border border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-[#1b59f8] text-white flex items-center justify-center font-bold text-xs mb-4">
+            <div className="group p-6 rounded-2xl bg-[#f8fafc] border border-slate-200 hover:border-blue-300 hover:bg-white hover:shadow-xl hover:shadow-slate-900/5 hover:-translate-y-1.5 transition-all duration-300">
+              <div className="w-8 h-8 rounded-full bg-[#1b59f8] text-white flex items-center justify-center font-bold text-xs mb-4 group-hover:scale-110 transition-transform duration-200">
                 2
               </div>
-              <h3 className="text-base font-bold text-slate-900">Add Profile Details &amp; Skills</h3>
+              <h3 className="text-base font-bold text-slate-900 group-hover:text-[#1b59f8] transition-colors">Add Profile Details &amp; Skills</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Add your profile picture, university institution, technical skills, and collaboration preferences so peers can discover what you build.
               </p>
               <div className="mt-4">
                 <Link
                   href="/profile/edit"
-                  className="text-xs font-bold text-[#1b59f8] hover:underline inline-flex items-center gap-1"
+                  className="group/link text-xs font-bold text-[#1b59f8] hover:text-blue-700 inline-flex items-center gap-1 transition-colors"
                 >
                   <span>View profile settings</span>
-                  <ArrowRight className="w-3 h-3" />
+                  <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
             </div>
 
             {/* Step 3 */}
-            <div className="p-6 rounded-2xl bg-[#f8fafc] border border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs mb-4">
+            <div className="group p-6 rounded-2xl bg-[#f8fafc] border border-slate-200 hover:border-blue-300 hover:bg-white hover:shadow-xl hover:shadow-slate-900/5 hover:-translate-y-1.5 transition-all duration-300">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs mb-4 group-hover:scale-110 transition-transform duration-200">
                 3
               </div>
-              <h3 className="text-base font-bold text-slate-900">Dashboard &amp; Collaboration</h3>
+              <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Dashboard &amp; Collaboration</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Your dashboard matches you to open collaboration roles matching your skills, displays your profile on the right, and lets you manage messages and connection requests.
               </p>
@@ -249,10 +249,10 @@ export default async function HomePage() {
                       ? '/dashboard/recruiter'
                       : '/dashboard/student'
                   }
-                  className="text-xs font-bold text-[#1b59f8] hover:underline inline-flex items-center gap-1"
+                  className="group/link text-xs font-bold text-[#1b59f8] hover:text-blue-700 inline-flex items-center gap-1 transition-colors"
                 >
                   <span>Open your dashboard</span>
-                  <ArrowRight className="w-3 h-3" />
+                  <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
             </div>
@@ -278,9 +278,10 @@ export default async function HomePage() {
 
             <Link
               href="/showcase"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1b59f8] hover:text-blue-700 transition-colors"
+              className="group inline-flex items-center gap-1.5 text-xs font-bold text-[#1b59f8] hover:text-blue-700 transition-colors"
             >
-              <span>Explore all works &rarr;</span>
+              <span>Explore all works</span>
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
           </div>
 
@@ -303,7 +304,7 @@ export default async function HomePage() {
             {communities.map((comm) => (
               <div
                 key={comm.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#f8fafc] border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#f8fafc] hover:bg-white hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 text-xs font-semibold text-slate-700 border border-slate-200 shadow-2xs transition-all duration-200 cursor-default"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>{comm.name}</span>
@@ -315,9 +316,9 @@ export default async function HomePage() {
           <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 max-w-4xl mx-auto">
             <span>© 2026 Campus Skill Connect (CSC). Digital Personal Data Protection (DPDP) Act 2023 Compliant.</span>
             <div className="flex items-center gap-4">
-              <Link href="/privacy" className="hover:text-slate-800 transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-slate-800 transition-colors">Terms of Service</Link>
-              <Link href="/support" className="hover:text-slate-800 transition-colors">Help &amp; Support</Link>
+              <Link href="/privacy" className="hover:text-slate-800 hover:underline transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-slate-800 hover:underline transition-colors">Terms of Service</Link>
+              <Link href="/support" className="hover:text-slate-800 hover:underline transition-colors">Help &amp; Support</Link>
             </div>
           </div>
         </div>

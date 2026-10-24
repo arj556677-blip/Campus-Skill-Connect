@@ -27,7 +27,7 @@ export default function WorkCard({ work }: WorkCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:border-blue-400 transition-all duration-300 p-3.5 justify-between">
+    <div className="group relative flex flex-col rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-400 hover:-translate-y-1 transition-all duration-300 p-3.5 justify-between">
       {/* Cover Media */}
       <Link href={`/works/${work.id}`} className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-100 block">
         {work.storage_path ? (
@@ -38,19 +38,19 @@ export default function WorkCard({ work }: WorkCardProps) {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600">
-            <Sparkles className="w-8 h-8 mb-2 opacity-70" />
+            <Sparkles className="w-8 h-8 mb-2 opacity-70 animate-sparkle-pulse" />
             <span className="text-[11px] font-mono font-bold tracking-wide text-blue-700">Verified Campus Proof</span>
           </div>
         )}
 
         {/* Category Pill Over Image */}
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1b59f8] text-white text-[10px] font-bold shadow-sm">
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1b59f8] text-white text-[10px] font-bold shadow-sm transition-transform duration-200 hover:scale-105">
           <span>{getCategoryLabel(work.category)}</span>
         </div>
 
         {/* Arrow Action Badge */}
-        <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/95 backdrop-blur-sm text-slate-800 shadow-sm flex items-center justify-center group-hover:bg-[#0f172a] group-hover:text-white transition-all">
-          <ArrowUpRight className="w-3.5 h-3.5" />
+        <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/95 backdrop-blur-sm text-slate-800 shadow-sm flex items-center justify-center group-hover:bg-[#0f172a] group-hover:text-white group-hover:scale-110 transition-all duration-200">
+          <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </div>
       </Link>
 
@@ -70,7 +70,7 @@ export default function WorkCard({ work }: WorkCardProps) {
           {work.skills?.slice(0, 3).map((skill) => (
             <span
               key={skill.id}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600 border border-slate-200/60"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-[10px] font-semibold text-slate-600 border border-slate-200/60 transition-colors"
             >
               #{skill.name}
             </span>
@@ -93,14 +93,14 @@ export default function WorkCard({ work }: WorkCardProps) {
                 <img
                   src={work.owner.avatar_url}
                   alt={work.owner.display_name}
-                  className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-200"
+                  className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-200 transition-transform duration-200 group-hover/author:scale-110"
                 />
               ) : (
-                <div className="w-6 h-6 rounded-full bg-[#0f172a] text-white text-[9px] font-bold flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#0f172a] text-white text-[9px] font-bold flex items-center justify-center transition-transform duration-200 group-hover/author:scale-110">
                   {work.owner.display_name.slice(0, 2)}
                 </div>
               )}
-              <span className="text-xs font-semibold text-slate-700 group-hover/author:text-blue-600 truncate max-w-[120px]">
+              <span className="text-xs font-semibold text-slate-700 group-hover/author:text-blue-600 truncate max-w-[120px] transition-colors">
                 {work.owner.display_name}
               </span>
             </Link>
@@ -111,11 +111,11 @@ export default function WorkCard({ work }: WorkCardProps) {
           <div className="flex items-center gap-3 text-xs text-slate-400">
             <button
               onClick={handleLike}
-              className={`flex items-center gap-1 transition-colors ${
-                liked ? 'text-rose-500 font-bold' : 'hover:text-rose-500'
+              className={`flex items-center gap-1 transition-all duration-200 active:scale-125 ${
+                liked ? 'text-rose-500 font-bold' : 'hover:text-rose-500 hover:scale-105'
               }`}
             >
-              <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-rose-500 text-rose-500' : ''}`} />
+              <Heart className={`w-3.5 h-3.5 transition-all duration-200 ${liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`} />
               <span className="text-[11px] font-semibold text-slate-600">{likes}</span>
             </button>
             <span className="flex items-center gap-1 text-slate-400">

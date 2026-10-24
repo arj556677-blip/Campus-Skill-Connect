@@ -6,12 +6,12 @@ import { Sparkles } from 'lucide-react';
 
 export default function HeroVisualCard() {
   return (
-    <div className="relative w-full max-w-[490px] mx-auto lg:max-w-none">
+    <div className="relative w-full max-w-[490px] mx-auto lg:max-w-none group/card">
       {/* Outer Card with dot-grid pattern and rounded frame matching reference mockup */}
-      <div className="relative w-full p-5 sm:p-7 sm:pb-8 rounded-[2.5rem] bg-white border border-slate-200/80 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.03)] bg-[radial-gradient(#cbd5e1_1.2px,transparent_1.2px)] [background-size:18px_18px]">
+      <div className="relative w-full p-5 sm:p-7 sm:pb-8 rounded-[2.5rem] bg-white border border-slate-200/80 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_70px_-15px_rgba(27,89,248,0.12)] transition-all duration-500 bg-[radial-gradient(#cbd5e1_1.2px,transparent_1.2px)] [background-size:18px_18px]">
         
-        {/* Top-Left Decorative Squiggle Icon */}
-        <div className="absolute top-6 left-6 z-10 text-[#1b59f8]">
+        {/* Top-Left Decorative Squiggle Icon with hover reaction */}
+        <div className="absolute top-6 left-6 z-10 text-[#1b59f8] cursor-pointer hover:scale-115 hover:rotate-6 transition-transform duration-300">
           <svg
             className="w-8 h-4 text-[#1b59f8]"
             viewBox="0 0 36 16"
@@ -29,7 +29,7 @@ export default function HeroVisualCard() {
           </svg>
         </div>
 
-        {/* Central Portrait Container */}
+        {/* Central Portrait Container with gentle zoom on card hover */}
         <div className="relative w-full aspect-[3.25/4] rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200/60 shadow-xs">
           <Image
             src="/images/hero-student.jpg"
@@ -37,24 +37,24 @@ export default function HeroVisualCard() {
             fill
             priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
-            className="object-cover object-top select-none"
+            className="object-cover object-top select-none transition-transform duration-700 ease-out group-hover/card:scale-105"
           />
         </div>
 
-        {/* ── 1. Top-Right Badge: Federated Campus Network ── */}
-        <div className="absolute -top-3 -right-2 sm:-top-4 sm:-right-4 z-20 flex items-center gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-[#1b59f8] text-white shadow-[0_12px_28px_rgba(27,89,248,0.4)] border border-white/20 select-none">
-          {/* Avatar stack */}
+        {/* ── 1. Top-Right Badge: Federated Campus Network with float & hover lift ── */}
+        <div className="absolute -top-3 -right-2 sm:-top-4 sm:-right-4 z-20 flex items-center gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-[#1b59f8] text-white shadow-[0_12px_28px_rgba(27,89,248,0.4)] hover:shadow-[0_18px_36px_rgba(27,89,248,0.55)] border border-white/20 select-none cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-float-slow group/badge">
+          {/* Avatar stack with interactive pop on hover */}
           <div className="flex -space-x-2 shrink-0">
-            <div className="w-7 h-7 rounded-full bg-[#bfdbfe] text-[#1e3a8a] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+            <div className="w-7 h-7 rounded-full bg-[#bfdbfe] text-[#1e3a8a] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs transition-transform duration-200 hover:scale-125 hover:z-30 hover:-translate-y-0.5">
               AF
             </div>
-            <div className="w-7 h-7 rounded-full bg-[#e9d5ff] text-[#581c87] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+            <div className="w-7 h-7 rounded-full bg-[#e9d5ff] text-[#581c87] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs transition-transform duration-200 hover:scale-125 hover:z-30 hover:-translate-y-0.5">
               PS
             </div>
-            <div className="w-7 h-7 rounded-full bg-[#a7f3d0] text-[#065f46] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs">
+            <div className="w-7 h-7 rounded-full bg-[#a7f3d0] text-[#065f46] text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white shadow-xs transition-transform duration-200 hover:scale-125 hover:z-30 hover:-translate-y-0.5">
               KV
             </div>
-            <div className="w-7 h-7 rounded-full bg-white text-slate-800 text-[11px] font-black flex items-center justify-center ring-2 ring-white shadow-xs">
+            <div className="w-7 h-7 rounded-full bg-white text-slate-800 text-[11px] font-black flex items-center justify-center ring-2 ring-white shadow-xs transition-transform duration-200 hover:scale-125 hover:z-30 hover:-translate-y-0.5">
               +
             </div>
           </div>
@@ -69,10 +69,10 @@ export default function HeroVisualCard() {
           </div>
         </div>
 
-        {/* ── 2. Mid-Right Badge: Peer Collaboration with hand-drawn arrow ── */}
-        <div className="absolute -right-3 sm:-right-5 top-[52%] -translate-y-1/2 z-20 select-none">
-          {/* Hand-drawn curved arrow above pill pointing towards the badge */}
-          <div className="absolute -top-11 right-5 pointer-events-none text-[#1b59f8]">
+        {/* ── 2. Mid-Right Badge: Peer Collaboration with hand-drawn arrow & sparkle pulse ── */}
+        <div className="absolute -right-3 sm:-right-5 top-[52%] -translate-y-1/2 z-20 select-none animate-float-slow-reverse group/collab">
+          {/* Hand-drawn curved arrow above pill pointing towards the badge with interactive nudge */}
+          <div className="absolute -top-11 right-5 pointer-events-none text-[#1b59f8] transition-transform duration-300 group-hover/collab:-translate-y-1 group-hover/collab:translate-x-0.5">
             <svg
               className="w-7 h-9 text-[#1b59f8]"
               viewBox="0 0 28 36"
@@ -97,9 +97,9 @@ export default function HeroVisualCard() {
             </svg>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-[#1b59f8] text-white shadow-[0_12px_28px_rgba(27,89,248,0.4)] border border-white/20">
+          <div className="flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-[#1b59f8] text-white shadow-[0_12px_28px_rgba(27,89,248,0.4)] hover:shadow-[0_18px_36px_rgba(27,89,248,0.55)] border border-white/20 cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 active:scale-95">
             <div className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-white" />
+              <Sparkles className="w-3 h-3 text-white animate-sparkle-pulse group-hover/collab:rotate-45 transition-transform duration-300" />
             </div>
             <span className="text-xs sm:text-sm font-extrabold text-white tracking-tight">
               Peer Collaboration
@@ -107,8 +107,8 @@ export default function HeroVisualCard() {
           </div>
         </div>
 
-        {/* ── 3. Bottom-Left Card: Verified Access $0 Free ── */}
-        <div className="absolute -bottom-4 -left-3 sm:-bottom-5 sm:-left-5 z-20 p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-[#1b59f8] text-white shadow-[0_18px_36px_rgba(27,89,248,0.45)] border border-white/20 select-none min-w-[210px] sm:min-w-[230px] text-left">
+        {/* ── 3. Bottom-Left Card: Verified Access $0 Free with tactile hover & active states ── */}
+        <div className="absolute -bottom-4 -left-3 sm:-bottom-5 sm:-left-5 z-20 p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-[#1b59f8] text-white shadow-[0_18px_36px_rgba(27,89,248,0.45)] hover:shadow-[0_24px_48px_rgba(27,89,248,0.6)] border border-white/20 select-none min-w-[210px] sm:min-w-[230px] text-left cursor-pointer transition-all duration-300 hover:scale-104 hover:-translate-y-1 active:scale-96">
           <div className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-blue-200">
             VERIFIED ACCESS
           </div>

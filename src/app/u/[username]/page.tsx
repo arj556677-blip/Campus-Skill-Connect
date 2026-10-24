@@ -10,6 +10,7 @@ import WorkCard from '@/components/cards/WorkCard';
 import ProfileActions from '@/app/profile/[id]/ProfileActions';
 import SkillEvidenceBadge from './SkillEvidenceBadge';
 import ProfileExperienceTabs from '@/components/profile/ProfileExperienceTabs';
+import ProfileSkillsFolder from '@/components/profile/ProfileSkillsFolder';
 import {
   ShieldCheck,
   Building,
@@ -343,14 +344,22 @@ export default async function PublicProfilePage({ params, searchParams }: Public
             </div>
           )}
 
-          {/* Skills Section with Evidence Links */}
-          <div className="pt-4 border-t border-[var(--border-subtle)] space-y-3">
-            <h2 className="text-xs font-mono uppercase font-bold text-[var(--text-muted)] tracking-wider">
-              Demonstrated Skills & Evidence
-            </h2>
+          {/* Skills Section with Floating Folder & Evidence Links */}
+          <div className="pt-4 border-t border-[var(--border-subtle)] space-y-4">
+            {userSkills && userSkills.length > 0 ? (
+              <ProfileSkillsFolder
+                skills={userSkills}
+                title="Demonstrated Skills & Competencies"
+                variant="light"
+              />
+            ) : null}
 
             {userSkills && userSkills.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="space-y-3 pt-2">
+                <h3 className="text-xs font-mono uppercase font-bold text-[var(--text-muted)] tracking-wider">
+                  Verified Evidence & Peer Endorsements
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {userSkills.map((us: { id: string; proficiency?: string | null; endorsements_count?: number; skill?: { name: string; category?: string } | null }) => {
                   const sName = us.skill?.name || 'Skill';
                   const linkedWorks = visibleWorks
@@ -370,6 +379,7 @@ export default async function PublicProfilePage({ params, searchParams }: Public
                   );
                 })}
               </div>
+            </div>
             ) : (
               <p className="text-xs text-[var(--text-muted)]">No skills published yet.</p>
             )}

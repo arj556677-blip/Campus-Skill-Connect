@@ -9,6 +9,7 @@ import { isOnline } from '@/lib/redis/session';
 import WorkCard from '@/components/cards/WorkCard';
 import ProfileExperienceTabs from '@/components/profile/ProfileExperienceTabs';
 import ProfilePresenceBadge from '@/components/profile/ProfilePresenceBadge';
+import ProfileSkillsFolder from '@/components/profile/ProfileSkillsFolder';
 import {
   ShieldCheck,
   Building,
@@ -226,26 +227,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </div>
           )}
 
-          {/* Endorsed Skills Pill Matrix */}
+          {/* Interactive Skills Floating Folder */}
           {profile.skills && profile.skills.length > 0 && (
             <div className="pt-4 border-t border-slate-100">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#1b59f8]" />
-                <span>Verified Technical Competencies</span>
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {profile.skills.map((skill) => {
-                  const name = 'skill' in skill && skill.skill ? skill.skill.name : (skill as { name?: string }).name || 'Skill';
-                  return (
-                    <span
-                      key={skill.id}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-800 border border-slate-200"
-                    >
-                      #{name}
-                    </span>
-                  );
-                })}
-              </div>
+              <ProfileSkillsFolder
+                skills={profile.skills}
+                title="Verified Technical Competencies"
+                variant="light"
+              />
             </div>
           )}
         </div>

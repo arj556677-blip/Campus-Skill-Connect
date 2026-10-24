@@ -24,6 +24,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { Github, Linkedin } from '@/components/icons/SocialIcons';
+import ProfileSkillsFolder from '@/components/profile/ProfileSkillsFolder';
 
 export const dynamic = 'force-dynamic';
 
@@ -451,19 +452,18 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPro
           </div>
         </section>
 
-        {/* ── 2. ACTIVE SKILLS SECTION (Categorized Glassmorphism Grid) ── */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-indigo-400" />
-              <h2 className="text-base font-bold text-white uppercase tracking-wider font-mono">
-                Technical Competencies &amp; Verified Skills
-              </h2>
-            </div>
-            <span className="text-xs font-mono text-slate-400">
-              Database Enforced
-            </span>
-          </div>
+        {/* ── 2. ACTIVE SKILLS SECTION (Interactive Floating Folder + Categorized Grid) ── */}
+        <section className="space-y-6">
+          <ProfileSkillsFolder
+            skills={profile.skills.flatMap((cat) =>
+              cat.items.map((it) => ({
+                name: it.name,
+                proficiency: it.level,
+              }))
+            )}
+            title="Technical Competencies & Verified Skills"
+            variant="dark"
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {profile.skills.map((categoryGroup, idx) => (

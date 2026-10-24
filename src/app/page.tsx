@@ -20,6 +20,7 @@ import { getWorks, getCommunities } from '@/lib/data/service';
 import { getUser } from '@/lib/supabase/server';
 import HomeHeroActions from '@/components/home/HomeHeroActions';
 import HeroVisualCard from '@/components/home/HeroVisualCard';
+import TechText from '@/components/ui/TechText';
 
 export default async function HomePage() {
   const user = await getUser();
@@ -41,11 +42,33 @@ export default async function HomePage() {
                 <span>Campus Skill Connect (CSC)</span>
               </div>
 
-              {/* Clear Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f172a] tracking-tight leading-[1.12]">
-                A Skill-First, Work-First <br className="hidden sm:inline" />
-                <span className="text-[#1b59f8]">Campus Platform</span>
-              </h1>
+              {/* Clear Headline with Interactive TechText */}
+              <div className="w-full">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0f172a] tracking-tight leading-[1.12]">
+                  <span>A Skill-First, Work-First</span>
+                  <span className="sr-only"> Campus Platform</span>
+                </h1>
+                <div className="w-full h-14 sm:h-18 lg:h-22 relative mt-1" aria-hidden="true">
+                  <TechText
+                    text="Campus Platform"
+                    color="#1b59f8"
+                    accentColor="#1b59f8"
+                    fontWeight={800}
+                    fontSize={68}
+                    align="responsive"
+                    reveal="letter"
+                    dashLength={4}
+                    dashGap={2}
+                    specks={15}
+                    clickKick
+                    selection
+                    draggable
+                    labels
+                    guides={false}
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
 
               {/* Direct Subtitle */}
               <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">

@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
 import { getClientIp } from '@/lib/utils/ip';
 
 export async function DELETE(request: NextRequest) {
   const ip = getClientIp(request);
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });

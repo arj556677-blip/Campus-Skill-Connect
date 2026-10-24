@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
 import { validateCvFile } from '@/lib/utils/validators';
 import { checkRateLimit, RateLimits } from '@/lib/redis/rate-limit';
 import { getClientIp } from '@/lib/utils/ip';
@@ -33,16 +33,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser();
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required. Please sign in to upload your CV.' },
-        { status: 401 }
-      );
-    }
+    const isGuest = !user;
+    const userId = user?.id || 'guest-session';
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -150,22 +144,24 @@ export async function POST(request: NextRequest) {
 
     // Secure private storage path
     const safeFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const storagePath = `cvs/${user.id}/${safeFilename}`;
+    const storagePath = `cvs/${userId}/${safeFilename}`;
 
-    // Upload to private Supabase bucket
+    // Upload to private Supabase bucket if authenticated
     let uploadSuccess = false;
-    try {
-      const { error: storageError } = await supabase.storage
-        .from('cv-documents')
-        .upload(storagePath, bytes, {
-          contentType: fileValidation.mimeType || 'application/pdf',
-          upsert: true,
-        });
-      if (!storageError) {
-        uploadSuccess = true;
+    if (user) {
+      try {
+        const { error: storageError } = await supabase.storage
+          .from('cv-documents')
+          .upload(storagePath, bytes, {
+            contentType: fileValidation.mimeType || 'application/pdf',
+            upsert: true,
+          });
+        if (!storageError) {
+          uploadSuccess = true;
+        }
+      } catch {
+        // Storage bucket might be mock or local; record path
       }
-    } catch {
-      // Storage bucket might be mock or local; record path
     }
 
     const extractedData = {
@@ -178,29 +174,48 @@ export async function POST(request: NextRequest) {
       extractedSkills,
       checklist,
       keywordCoverage,
+      isGuest,
     };
 
-    // Persist parsed record in cv_uploads table
-    const { data: cvRecord, error: dbError } = await supabase
-      .from('cv_uploads')
-      .insert({
-        user_id: user.id,
-        file_url: storagePath,
-        extracted_data: extractedData,
-        status: 'parsed',
-      })
-      .select()
-      .single();
+    // Persist parsed record in cv_uploads table if authenticated
+    let uploadId = `upload-${Date.now()}`;
+    if (user) {
+      try {
+        const { data: cvRecord, error: dbError } = await supabase
+          .from('cv_uploads')
+          .insert({
+            user_id: user.id,
+            file_url: storagePath,
+            extracted_data: extractedData,
+            status: 'parsed',
+          })
+          .select()
+          .single();
 
-    if (dbError) {
-      console.warn('[CV Upload] DB insert failed:', dbError.message);
+        if (cvRecord?.id) {
+          uploadId = cvRecord.id;
+        }
+        if (dbError) {
+          console.warn('[CV Upload] DB insert notice:', dbError.message);
+        }
+      } catch {
+        // Fallback upload ID retained
+      }
     }
 
     return NextResponse.json({
       success: true,
-      uploadId: cvRecord?.id || `upload-${Date.now()}`,
+      uploadId,
       extractedData,
       checklist,
+      isGuest,
+      user: user
+        ? {
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.display_name || user.user_metadata?.name || 'Student Builder',
+          }
+        : null,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Server error processing CV';

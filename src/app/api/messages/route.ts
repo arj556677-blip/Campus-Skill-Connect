@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getRateLimitHeaders, RateLimits } from '@/lib/redis/rate-limit';
 import { publishChatMessage } from '@/lib/redis/pubsub';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
 import { getClientIp } from '@/lib/utils/ip';
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -9,9 +9,7 @@ const MAX_MESSAGE_LENGTH = 2000;
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -91,11 +89,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser();
 
-    // Enforce authentication: identity must be derived strictly from auth.uid()
+    // Enforce authentication: identity derived from session
     if (!user) {
       return NextResponse.json(
         { error: 'Authentication required. Please sign in to send messages.' },

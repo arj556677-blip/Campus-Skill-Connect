@@ -55,9 +55,17 @@ function GithubIcon() {
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useRole();
+  const { login, isLoggedIn, isMounted, currentUser } = useRole();
 
   const redirectParam = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : null;
+
+  // If already logged in, redirect away from sign-in immediately
+  React.useEffect(() => {
+    if (isMounted && isLoggedIn && currentUser) {
+      const destination = redirectParam || currentUser.dashboardUrl || '/dashboard/student';
+      router.replace(destination);
+    }
+  }, [isMounted, isLoggedIn, currentUser, redirectParam, router]);
 
   // Unified form state
   const [email, setEmail] = useState(() => searchParams.get('email') || '');
@@ -219,6 +227,18 @@ function SignInContent() {
     login(role, redirectParam || undefined);
   };
 
+  if (isMounted && isLoggedIn && currentUser) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 text-center">
+        <div className="w-10 h-10 border-3 border-blue-200 border-t-[#1b59f8] rounded-full animate-spin mx-auto mb-4" />
+        <h2 className="text-base font-bold text-slate-800">Already Signed In</h2>
+        <p className="text-xs text-slate-500 mt-1">
+          Redirecting to your {currentUser.roleLabel} dashboard...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[92vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-[#f8fafc] text-slate-900">
       <div className="max-w-md w-full space-y-6 relative z-10">
@@ -226,11 +246,11 @@ function SignInContent() {
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <Link
-            href="/dashboard"
+            href={currentUser?.dashboardUrl || '/'}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <span>{isLoggedIn ? 'Back to Dashboard' : 'Back to Home'}</span>
           </Link>
 
           <span className="text-[11px] font-mono text-slate-400">

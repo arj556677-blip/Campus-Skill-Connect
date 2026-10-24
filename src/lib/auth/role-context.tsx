@@ -118,9 +118,53 @@ function useIsMounted() {
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const isMounted = useIsMounted();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentRole, setCurrentRole] = useState<UserRoleType | null>(null);
-  const [userProfile, setUserProfile] = useState<RoleUser | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedSession = localStorage.getItem('csc_session');
+        const storedRole = localStorage.getItem('csc_role');
+        const hasCookie = document.cookie.includes('csc_session=active');
+        return (storedSession === 'active' && !!storedRole) || hasCookie;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+
+  const [currentRole, setCurrentRole] = useState<UserRoleType | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = (localStorage.getItem('csc_role') as UserRoleType) || null;
+        if (stored && ROLE_PERSONAS[stored]) return stored;
+        const match = document.cookie.match(/csc_role=([^;]+)/);
+        if (match && match[1] && ROLE_PERSONAS[match[1] as UserRoleType]) {
+          return match[1] as UserRoleType;
+        }
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  const [userProfile, setUserProfile] = useState<RoleUser | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedProfileRaw = localStorage.getItem('csc_user_profile');
+        if (storedProfileRaw) {
+          return JSON.parse(storedProfileRaw);
+        }
+        const storedRole = (localStorage.getItem('csc_role') as UserRoleType) || null;
+        if (storedRole && ROLE_PERSONAS[storedRole]) {
+          return ROLE_PERSONAS[storedRole];
+        }
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
 
   useEffect(() => {
     let active = true;

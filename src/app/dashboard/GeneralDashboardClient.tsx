@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRole } from '@/lib/auth/role-context';
 import {
@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Code2,
   LogIn,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { Work, Community, Profile } from '@/lib/types';
 
@@ -27,7 +28,14 @@ export default function GeneralDashboardClient({
   works,
   communities,
 }: GeneralDashboardClientProps) {
-  const { isLoggedIn, isMounted, currentRole, currentUser } = useRole();
+  const { isLoggedIn, isMounted, currentRole, currentUser, switchRole } = useRole();
+
+  // If already logged in, automatically navigate to the user's role-specific dashboard
+  useEffect(() => {
+    if (isMounted && isLoggedIn && currentUser?.dashboardUrl) {
+      window.location.replace(currentUser.dashboardUrl);
+    }
+  }, [isMounted, isLoggedIn, currentUser]);
 
   return (
     <div className="space-y-10">
@@ -85,7 +93,7 @@ export default function GeneralDashboardClient({
           </div>
         </div>
 
-        {/* Public Guest Guidance Banner (When NOT Logged In) */}
+        {/* Public Guest Guidance Banner (ONLY When NOT Logged In) */}
         {isMounted && !isLoggedIn && (
           <div className="mt-6 p-4 rounded-2xl bg-blue-50/50 border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-3 text-slate-700">
@@ -185,7 +193,7 @@ export default function GeneralDashboardClient({
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-              {isMounted && isLoggedIn && currentRole === 'admin' ? (
+              {isLoggedIn && currentRole === 'admin' ? (
                 <Link
                   href="/admin"
                   className="w-full py-2.5 px-4 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
@@ -193,6 +201,15 @@ export default function GeneralDashboardClient({
                   <span>Open Your Admin Console</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+              ) : isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={() => switchRole('admin', true)}
+                  className="w-full py-2.5 px-4 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  <span>Switch to Admin Console</span>
+                </button>
               ) : (
                 <>
                   <Link
@@ -250,7 +267,7 @@ export default function GeneralDashboardClient({
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-              {isMounted && isLoggedIn && currentRole === 'student' ? (
+              {isLoggedIn && currentRole === 'student' ? (
                 <Link
                   href="/dashboard/student"
                   className="w-full py-2.5 px-4 rounded-full bg-[#1b59f8] hover:bg-[#174ed8] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
@@ -258,6 +275,15 @@ export default function GeneralDashboardClient({
                   <span>Open Your Student Hub</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+              ) : isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={() => switchRole('student', true)}
+                  className="w-full py-2.5 px-4 rounded-full bg-blue-50 hover:bg-blue-100 text-[#1b59f8] border border-blue-200 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  <span>Switch to Student Hub</span>
+                </button>
               ) : (
                 <>
                   <Link
@@ -315,7 +341,7 @@ export default function GeneralDashboardClient({
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-              {isMounted && isLoggedIn && currentRole === 'recruiter' ? (
+              {isLoggedIn && currentRole === 'recruiter' ? (
                 <Link
                   href="/dashboard/recruiter"
                   className="w-full py-2.5 px-4 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
@@ -323,6 +349,15 @@ export default function GeneralDashboardClient({
                   <span>Open Your Recruiter Radar</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+              ) : isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={() => switchRole('recruiter', true)}
+                  className="w-full py-2.5 px-4 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  <span>Switch to Recruiter Radar</span>
+                </button>
               ) : (
                 <>
                   <Link

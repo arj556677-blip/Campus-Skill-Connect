@@ -16,7 +16,9 @@ import {
   Download,
   Trash2,
   XCircle,
+  LogIn,
 } from 'lucide-react';
+import { useRole } from '@/lib/auth/role-context';
 
 interface AtsRuleCheck {
   id: string;
@@ -37,9 +39,11 @@ interface ParsedCvResponse {
   extractedSkills: string[];
   checklist: AtsRuleCheck[];
   keywordCoverage?: { matched: string[]; missing: string[] } | null;
+  isGuest?: boolean;
 }
 
 export default function CvUploadPage() {
+  const { isLoggedIn, currentUser } = useRole();
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
   const [isParsing, setIsParsing] = useState(false);
@@ -111,6 +115,12 @@ export default function CvUploadPage() {
 
   const handleApproveAndSync = async () => {
     if (!uploadId) return;
+    if (!isLoggedIn) {
+      if (confirm('Authentication required to synchronize extracted skills to your profile. Would you like to sign in now?')) {
+        window.location.assign('/sign-in?redirect=/cv/upload');
+      }
+      return;
+    }
     setIsSyncing(true);
     try {
       const res = await fetch('/api/cv', {
@@ -191,10 +201,22 @@ export default function CvUploadPage() {
         </div>
 
         {/* Header */}
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-mono font-bold text-[#1b59f8]">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Verified Server Extraction • Signature Validated</span>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-mono font-bold text-[#1b59f8]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Verified Server Extraction • Signature Validated</span>
+            </div>
+            {isLoggedIn && currentUser ? (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-800">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Signed In: <strong>{currentUser.name}</strong> ({currentUser.email})</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-600">
+                <span>Guest Preview Mode • Sign in to save to profile</span>
+              </div>
+            )}
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Upload &amp; Scan Resume with Rule-Based ATS Checklist
@@ -262,9 +284,20 @@ export default function CvUploadPage() {
 
         {/* Error message */}
         {errorMsg && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono flex items-center gap-2">
-            <XCircle className="w-4 h-4 shrink-0 text-rose-500" />
-            <span>{errorMsg}</span>
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2">
+              <XCircle className="w-4 h-4 shrink-0 text-rose-500" />
+              <span>{errorMsg}</span>
+            </div>
+            {errorMsg.toLowerCase().includes('sign in') && (
+              <Link
+                href="/sign-in?redirect=/cv/upload"
+                className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-[#0f172a] hover:bg-black text-white text-xs font-bold transition-all shrink-0"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In to Continue</span>
+              </Link>
+            )}
           </div>
         )}
 

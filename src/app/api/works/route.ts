@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, getUser } from '@/lib/supabase/server';
 import { cacheInvalidatePattern } from '@/lib/redis/cache';
 import { checkRateLimit, getRateLimitHeaders, RateLimits } from '@/lib/redis/rate-limit';
 import { getClientIp } from '@/lib/utils/ip';
@@ -67,9 +67,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser();
 
     // Strict identity check: Never accept owner_id from request body
     if (!user) {

@@ -62,6 +62,7 @@ export default function EditProfilePage() {
   const [saving, setSaving] = useState(false);
   const [verifyingCampus, setVerifyingCampus] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isOnboarding, setIsOnboarding] = useState(false);
 
   // Profile Form States
   const [displayName, setDisplayName] = useState('');
@@ -101,6 +102,9 @@ export default function EditProfilePage() {
 
         // 2. Extra stored attributes from localStorage
         if (typeof window !== 'undefined') {
+          if (window.location.search.includes('onboarding=true')) {
+            setIsOnboarding(true);
+          }
           const storedBio = localStorage.getItem('csc_user_bio');
           if (storedBio) setBio(storedBio);
 
@@ -394,6 +398,27 @@ export default function EditProfilePage() {
                 Go to Dashboard &rarr;
               </Link>
             )}
+          </div>
+        )}
+
+        {/* Onboarding Welcome Banner */}
+        {isOnboarding && (
+          <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-5 h-5 text-[#1b59f8] shrink-0" />
+              <div>
+                <p className="font-bold">Email Verified Successfully!</p>
+                <p className="text-blue-700 text-[11px] mt-0.5">
+                  Complete your profile photo, institution, and skills below to personalize your dashboard collaboration matches.
+                </p>
+              </div>
+            </div>
+            <Link
+              href={dashboardTarget}
+              className="px-3.5 py-1.5 rounded-full bg-[#1b59f8] text-white font-bold text-xs hover:bg-blue-700 transition-colors shrink-0"
+            >
+              Skip to Dashboard &rarr;
+            </Link>
           </div>
         )}
 

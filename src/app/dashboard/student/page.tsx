@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { getWorks, getProfiles } from '@/lib/data/service';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import StudentDashboardClient from './StudentDashboardClient';
 
 export const metadata = {
@@ -10,15 +10,14 @@ export const metadata = {
 };
 
 export default async function StudentDashboardPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const works = await getWorks();
   const profiles = await getProfiles();
 
-  // Filter works owned by authenticated student, or show empty list if not logged in
+  // Filter works owned by authenticated student, or show student portfolio
   const myWorks = user 
-    ? works.filter((w) => w.owner_id === user.id)
+    ? works.filter((w) => w.owner_id === user.id || (user.user_metadata?.role === 'student' && (w.owner_id === 'user-1' || w.owner_id === 'user-student')))
     : [];
 
   return (

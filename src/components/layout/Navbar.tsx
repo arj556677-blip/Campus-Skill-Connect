@@ -234,7 +234,7 @@ export default function Navbar() {
             {/* Dashboard Shortcut (if logged in) */}
             {isMounted && isLoggedIn && (
               <Link
-                href="/dashboard"
+                href={currentUser?.dashboardUrl || '/dashboard'}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                   pathname.startsWith('/dashboard')
                     ? 'text-[#1b59f8] bg-blue-50 font-bold'
@@ -272,7 +272,9 @@ export default function Navbar() {
           )}
 
           {/* User Profile or Auth Trigger */}
-          {isMounted && isLoggedIn && currentUser ? (
+          {!isMounted ? (
+            <div className="w-20 h-8 rounded-full bg-slate-100/70 animate-pulse" />
+          ) : isLoggedIn && currentUser ? (
             /* Logged-In User Profile Menu */
             <div className="relative" ref={userRef}>
               <button
@@ -393,6 +395,14 @@ export default function Navbar() {
                     </Link>
 
                     <Link
+                      href="/messages"
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Messages</span>
+                    </Link>
+
+                    <Link
                       href="/connections"
                       className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors"
                     >
@@ -436,12 +446,6 @@ export default function Navbar() {
                 <span>Login</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
-              <Link
-                href="/sign-up"
-                className="hidden sm:inline-flex items-center gap-1 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
-              >
-                <span>Join</span>
-              </Link>
             </div>
           )}
 
@@ -482,7 +486,7 @@ export default function Navbar() {
             })}
             {isMounted && isLoggedIn && (
               <Link
-                href="/dashboard"
+                href={currentUser?.dashboardUrl || '/dashboard'}
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
                   pathname.startsWith('/dashboard')
                     ? 'bg-blue-50 text-blue-600 font-bold'
@@ -546,7 +550,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {(!isMounted || !isLoggedIn) && (
+            {isMounted && !isLoggedIn && (
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <Link
                   href="/sign-in"
@@ -562,6 +566,20 @@ export default function Navbar() {
                   <span>Sign Up</span>
                 </Link>
               </div>
+            )}
+
+            {isMounted && isLoggedIn && (
+              <button
+                type="button"
+                onClick={() => {
+                  signOut();
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
             )}
           </div>
         </div>

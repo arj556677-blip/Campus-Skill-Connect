@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getUser, getUserProfile } from '@/lib/supabase/server';
 import { getProfiles, getCommunities, getZones } from '@/lib/data/service';
 import RecruiterClient from './RecruiterClient';
@@ -20,6 +21,11 @@ export default async function RecruiterSearchPage({
 }) {
   const params = await searchParams;
   const user = await getUser();
+
+  if (!user) {
+    redirect('/sign-in?redirect=%2Frecruiter%2Fsearch');
+  }
+
   const profile = await getUserProfile();
   const isRecruiterOrAdmin = profile?.role === 'recruiter' || profile?.role === 'admin';
 

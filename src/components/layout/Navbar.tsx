@@ -86,7 +86,7 @@ export default function Navbar() {
   const primaryLinks = [
     { label: 'Showcase', href: '/showcase' },
     { label: 'Talent', href: '/people', requiresAuth: true },
-    { label: 'Recruiters', href: '/recruiter/search' },
+    { label: 'Recruiters', href: '/recruiter/search', requiresAuth: true },
   ];
 
   // Secondary suite/tools grouped into an elegant popover dropdown

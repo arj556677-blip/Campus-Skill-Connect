@@ -162,6 +162,28 @@ export default function RecruitersDirectoryClient({
     });
   }, [recruiters, selectedZone, searchQuery]);
 
+  if (!isLoggedIn) {
+    return (
+      <div className="rounded-3xl bg-white border border-slate-200 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-xs space-y-4 my-12">
+        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#1b59f8] flex items-center justify-center mx-auto">
+          <Lock className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-slate-900">Sign In to View Industry Recruiters</h2>
+          <p className="text-xs text-slate-500 mt-1">
+            Access to verified corporate recruiters, company talent partners, and direct connections requires an accredited campus account.
+          </p>
+        </div>
+        <Link
+          href="/sign-in?redirect=%2Frecruiter%2Fsearch"
+          className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-[#1b59f8] hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+        >
+          <span>Login / Signup to Continue</span>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}

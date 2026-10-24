@@ -52,6 +52,15 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // 4. Recruiter directory and search require an authenticated session
+  if (pathname.startsWith('/recruiter')) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(
+        new URL('/sign-in?redirect=' + encodeURIComponent(pathname), request.url)
+      );
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -65,5 +74,7 @@ export const config = {
     '/sign-up/',
     '/works/new',
     '/works/new/:path*',
+    '/recruiter',
+    '/recruiter/:path*',
   ],
 };
